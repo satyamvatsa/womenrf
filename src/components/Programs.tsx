@@ -19,10 +19,15 @@ export default function Programs() {
   const { t } = useTranslation();
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const [homepageData, setHomepageData] = useState<Record<string, any> | null>(null);
   useEffect(() => {
     fetch('/api/data/programs', { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
+      .catch(() => {});
+    fetch('/api/data/homepage', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => { if (d && Object.keys(d).length > 0) setHomepageData(d); })
       .catch(() => {});
   }, []);
 
@@ -70,17 +75,30 @@ export default function Programs() {
         }))
     : PROGRAMS;
 
+  const PROG_BG_MAP: Record<string, string> = {
+    'bg-primary': 'bg-wrf-black',
+    'bg-secondary': 'bg-wrf-purple',
+    'bg-accent': 'bg-wrf-coral',
+    'bg-support-1': 'bg-wrf-footer-mauve',
+  };
+  const showPrograms = homepageData?.showPrograms !== undefined ? homepageData.showPrograms : true;
+  const progTitle = homepageData?.programsTitle || t('programs.title');
+  const progSubtitle = homepageData?.programsSubtitle || t('programs.description');
+  const progTitleBg = PROG_BG_MAP[homepageData?.programsTitleBg] || 'bg-wrf-purple';
+
+  if (!showPrograms) return null;
+
   return (
     <section id="programs" className="bg-white py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-left">
-          <div className="mb-4 inline-block bg-wrf-purple px-8 py-6">
+          <div className={`mb-4 inline-block ${progTitleBg} px-8 py-6`}>
             <h2 className="text-4xl font-bold text-white">
-              {t('programs.title')}
+              {progTitle}
             </h2>
           </div>
           <p className="text-lg text-gray-600">
-            {t('programs.description')}
+            {progSubtitle}
           </p>
         </div>
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">

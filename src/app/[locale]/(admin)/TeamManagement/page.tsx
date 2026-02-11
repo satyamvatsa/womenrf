@@ -44,7 +44,7 @@ const CATEGORY_COLOR_OPTIONS = [
   { value: 'bg-support-1', label: 'Support' },
 ];
 
-type Category = { id: string; name: string; colorClass: string };
+type Category = { id: string; name: string; description: string; colorClass: string };
 type TeamMember = {
   id: string;
   name: string;
@@ -57,8 +57,8 @@ type TeamMember = {
 };
 
 const defaultCategories: Category[] = [
-  { id: 'cat-1', name: 'Board of Directors', colorClass: 'bg-secondary' },
-  { id: 'cat-2', name: 'Management Team', colorClass: 'bg-secondary' },
+  { id: 'cat-1', name: 'Board of Directors', description: '', colorClass: 'bg-secondary' },
+  { id: 'cat-2', name: 'Management Team', description: '', colorClass: 'bg-secondary' },
 ];
 
 const defaultMembers: TeamMember[] = [
@@ -67,7 +67,7 @@ const defaultMembers: TeamMember[] = [
     name: 'Morten Kjaerum',
     role: 'Board Member',
     categoryId: 'cat-1',
-    imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&h=400&fit=crop',
+    imageUrl: '/images/1-Panelist-Morten-Kjaerum-Picture-1.jpg',
     bio: 'Morten Kjaerum is an Adjunct professor at the University of Aalborg, Denmark and an affiliated scholar at The Raoul Wallenberg Institute (RWI), Sweden. 2015 -2024 Director the RWI, 2008-15: director the EU Agency for Fundamental Rights, 1991-2008: Director, the Danish Institute for Human Rights; Member of the UN Committee on the Elimination of Racial Discrimination 2002-08. 2018-2020 Chair the Board of Trustees for the United Nations Voluntary Fund for Technical Cooperation in the Field of Human Rights (VFTC) and of the UPR Trust Fund for Financial and Technical Assistance. From 2015-23 he was chair of the European Council for Refugees and Exiles (ECRE). He has written extensively on human rights issues and lectured at universities across continents.',
     linkedinUrl: 'https://www.linkedin.com/in/morten-kjaerum-434b6a2',
     email: '',
@@ -80,6 +80,7 @@ export default function TeamManagementPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryDescription, setNewCategoryDescription] = useState('');
   const [newCategoryColor, setNewCategoryColor] = useState('bg-primary');
   const [memberName, setMemberName] = useState('');
   const [memberRole, setMemberRole] = useState('');
@@ -169,10 +170,11 @@ export default function TeamManagementPage() {
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
     const id = 'cat-' + Date.now();
-    const updatedCategories = [...categories, { id, name: newCategoryName.trim(), colorClass: newCategoryColor }];
+    const updatedCategories = [...categories, { id, name: newCategoryName.trim(), description: newCategoryDescription.trim(), colorClass: newCategoryColor }];
     setCategories(updatedCategories);
     persist(updatedCategories, members);
     setNewCategoryName('');
+    setNewCategoryDescription('');
     setNewCategoryColor('bg-primary');
   };
 
@@ -244,29 +246,38 @@ export default function TeamManagementPage() {
                 </div>
               ))}
             </div>
-            <div className="flex gap-2">
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  className={inputClass}
+                  placeholder="New category name"
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCategory())}
+                />
+                <select
+                  className={`${inputClass} w-[180px]`}
+                  value={newCategoryColor}
+                  onChange={(e) => setNewCategoryColor(e.target.value)}
+                >
+                  {CATEGORY_COLOR_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+                <button type="button" onClick={handleAddCategory} className={btnPrimary}>
+                  Add
+                </button>
+              </div>
               <input
                 type="text"
                 className={inputClass}
-                placeholder="New category name"
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCategory())}
+                placeholder="Category description (optional, shown on frontend)"
+                value={newCategoryDescription}
+                onChange={(e) => setNewCategoryDescription(e.target.value)}
               />
-              <select
-                className={`${inputClass} w-[180px]`}
-                value={newCategoryColor}
-                onChange={(e) => setNewCategoryColor(e.target.value)}
-              >
-                {CATEGORY_COLOR_OPTIONS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <button type="button" onClick={handleAddCategory} className={btnPrimary}>
-                Add
-              </button>
             </div>
           </div>
         </div>

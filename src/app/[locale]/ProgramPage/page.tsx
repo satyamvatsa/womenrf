@@ -6,47 +6,47 @@ import { Suspense, useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
 
 const PEACEBUILDING_HERO_BG =
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/GettyImages-1232002648.jpg';
+  '/images/GettyImages-1232002648.jpg';
 const PEACEBUILDING_HERO_OVERLAY =
-  'http://miladjosofe45.sg-host.com/wp-content/uploads/2025/09/Element-2-03-scaled.png';
+  '/images/Element-2-03-scaled.png';
 const PEACEBUILDING_HANIFA_IMAGE =
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/IMG_3571.jpeg';
+  '/images/IMG_3571.jpeg';
 
 const PEACEBUILDING_GALLERY_IMAGES = [
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/781d8497-62e7-35f7-a01d-2a9c690e5fb3.jpg.webp',
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-23-at-1.11.02-PM.jpeg',
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-23-at-11.24.22-AM.jpeg',
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-23-at-1.10.11-PM-1.jpeg',
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-23-at-1.10.37-PM.jpeg',
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-23-at-3.21.39-PM.jpeg',
+  '/images/1.jpeg',
+  '/images/2.jpeg',
+  '/images/4.jpeg',
+  '/images/7.jpeg',
+  '/images/WhatsApp-Image-2025-10-25-at-15.48.55-rotated.jpeg',
+  '/images/9.jpeg',
 ];
 
 // Legal Empowerment program
 const LEGAL_HERO_BG =
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/Hearing-ICJ-South-Africa-versus-Israel-11-12-Jan-2024-Low-res.jpg';
+  '/images/Hearing%20ICJ%20South%20Africa%20versus%20Israel%2011-12%20Jan%202024%20Low%20res.jpg';
 const LEGAL_HERO_OVERLAY =
-  'http://miladjosofe45.sg-host.com/wp-content/uploads/2025/09/Element-2-03-scaled.png';
+  '/images/Element-2-03-scaled.png';
 const LEGAL_AISHA_IMAGE =
-  'https://prod-img.telegraaf.nl/public/incoming/tzoqs6-a876493e-d77d-4880-8e6c-32b9fd1c.jpg/alternates/SIXTEEN_NINE_1200/a876493e-d77d-4880-8e6c-32b9fd1c.jpg';
+  '/images/pexels-ekaterina-bolovtsova-6077181-scaled-1.jpg';
 
 // Digital Transformation and Open Gender Data program
 const DIGITAL_SLUG = 'Digital-Transformation-and -Open -Gender -Data';
 const DIGITAL_HERO_BG =
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/freedom-of-movement-for-afghan-women-1920x1002-en.avif';
+  '/images/freedom-of-movement-for-afghan-women-1920x1002-en.avif';
 const DIGITAL_HERO_OVERLAY =
-  'http://miladjosofe45.sg-host.com/wp-content/uploads/2025/09/Element-2-03-scaled.png';
+  '/images/Element-2-03-scaled.png';
 
 // Representation and Advocacy program
 const REPRESENTATION_HERO_BG =
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/IMG_3600.jpg';
+  '/images/12.jpg';
 const REPRESENTATION_HERO_OVERLAY =
-  'http://miladjosofe45.sg-host.com/wp-content/uploads/2025/09/Element-2-03-scaled.png';
+  '/images/Element-2-03-scaled.png';
 
 const REPRESENTATION_GALLERY_IMAGES = [
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/IMG_2239.jpeg',
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/IMG_3599.jpg',
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/IMG_3602.jpg',
-  'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/IMG_1314-scaled.jpg',
+  '/images/11.jpg',
+  '/images/12.jpg',
+  '/images/5.jpeg',
+  '/images/6.jpeg',
 ];
 
 function Icon({ name }: { name: string }) {
@@ -308,9 +308,15 @@ function LegalEmpowermentContent({ adminProgram }: { adminProgram?: any }) {
             <div id="images" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('programPage.images')}</h2>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="aspect-video bg-wrf-gray-bg" aria-hidden />
-                ))}
+                <div className="aspect-video overflow-hidden">
+                  <img src="/images/Hearing%20ICJ%20South%20Africa%20versus%20Israel%2011-12%20Jan%202024%20Low%20res.jpg" alt="ICJ Hearing" className="h-full w-full object-cover" />
+                </div>
+                <div className="aspect-video overflow-hidden">
+                  <img src="/images/5.jpeg" alt="Legal proceedings" className="h-full w-full object-cover" />
+                </div>
+                <div className="aspect-video overflow-hidden">
+                  <img src="/images/6.jpeg" alt="Legal team at work" className="h-full w-full object-cover" />
+                </div>
               </div>
             </div>
 
@@ -353,12 +359,8 @@ function LegalEmpowermentContent({ adminProgram }: { adminProgram?: any }) {
             <div id="partners" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('programPage.partnersAndSupporters')}</h2>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center justify-center border border-gray-200 p-4 shadow-sm">
-                  <img
-                    src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-                    alt={t('program.legal.partner1')}
-                    className="mb-2 max-h-20 max-w-full object-contain"
-                  />
+                <div className="flex flex-col items-center justify-center border border-gray-200 bg-wrf-black p-4 shadow-sm">
+                  <span className="mb-2 text-2xl font-bold text-white">ICJ</span>
                   <p className="text-center text-sm font-medium">{t('program.legal.partner1')}</p>
                 </div>
               </div>
@@ -536,12 +538,8 @@ function DigitalTransformationContent({ adminProgram }: { adminProgram?: any }) 
             <div id="partners" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('programPage.partnersAndSupporters')}</h2>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center justify-center border border-gray-200 p-4 shadow-sm">
-                  <img
-                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80"
-                    alt={t('program.digital.partner1')}
-                    className="mb-2 max-h-20 max-w-full object-contain"
-                  />
+                <div className="flex flex-col items-center justify-center border border-gray-200 bg-wrf-coral p-4 shadow-sm">
+                  <span className="mb-2 text-lg font-bold text-white">Partner</span>
                   <p className="text-center text-sm font-medium">{t('program.digital.partner1')}</p>
                 </div>
               </div>
@@ -756,20 +754,12 @@ function RepresentationAdvocacyContent({ adminProgram }: { adminProgram?: any })
             <div id="partners" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('programPage.partnersAndSupporters')}</h2>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center justify-center border border-gray-200 p-4 shadow-sm">
-                  <img
-                    src="https://via.placeholder.com/200x100/003399/ffffff?text=EU+Parliament"
-                    alt="European Parliament"
-                    className="mb-2 max-h-20 max-w-full object-contain"
-                  />
+                <div className="flex flex-col items-center justify-center border border-gray-200 bg-[#003399] p-4 shadow-sm">
+                  <span className="mb-2 text-lg font-bold text-white">EU Parliament</span>
                   <p className="text-center text-sm font-medium">European Parliament</p>
                 </div>
-                <div className="flex flex-col items-center justify-center border border-gray-200 p-4 shadow-sm">
-                  <img
-                    src="https://via.placeholder.com/200x100/7c3aed/ffffff?text=WILPF"
-                    alt="Women's International League"
-                    className="mb-2 max-h-20 max-w-full object-contain"
-                  />
+                <div className="flex flex-col items-center justify-center border border-gray-200 bg-wrf-purple p-4 shadow-sm">
+                  <span className="mb-2 text-lg font-bold text-white">WILPF</span>
                   <p className="text-center text-sm font-medium">Women&apos;s International League</p>
                 </div>
               </div>
@@ -1019,12 +1009,12 @@ function PeacebuildingContent({ adminProgram }: { adminProgram?: any }) {
             <div id="partners" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('program.peace.nav.partners')}</h2>
               <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center justify-center border border-gray-200 p-4 shadow-sm">
-                  <img src="https://via.placeholder.com/200x100/0066cc/white?text=UN+PBF" alt={t('program.peace.partner1')} className="mb-2 max-h-20 max-w-full object-contain" />
+                <div className="flex flex-col items-center justify-center border border-gray-200 bg-[#0066cc] p-4 shadow-sm">
+                  <span className="mb-2 text-xl font-bold text-white">UN PBF</span>
                   <p className="text-center text-sm font-medium">{t('program.peace.partner1')}</p>
                 </div>
-                <div className="flex flex-col items-center justify-center border border-gray-200 p-4 shadow-sm">
-                  <img src="https://via.placeholder.com/200x100/228B22/white?text=IPI" alt={t('program.peace.partner2')} className="mb-2 max-h-20 max-w-full object-contain" />
+                <div className="flex flex-col items-center justify-center border border-gray-200 bg-[#228B22] p-4 shadow-sm">
+                  <span className="mb-2 text-xl font-bold text-white">IPI</span>
                   <p className="text-center text-sm font-medium">{t('program.peace.partner2')}</p>
                 </div>
               </div>

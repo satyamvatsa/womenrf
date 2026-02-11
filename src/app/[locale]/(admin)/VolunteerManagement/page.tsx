@@ -21,6 +21,8 @@ interface VolunteerRole {
   id: string;
   title: string;
   description: string;
+  colorClass: string;
+  iconName: string;
   isActive: boolean;
 }
 
@@ -55,7 +57,21 @@ const defaultPageContent: PageContent = {
   showRoles: true, showTestimonials: true, showForm: true,
 };
 
-const emptyRole: Omit<VolunteerRole, 'id'> = { title: '', description: '', isActive: true };
+const ROLE_COLOR_OPTIONS = [
+  { value: 'bg-wrf-purple', label: 'Purple' },
+  { value: 'bg-wrf-coral', label: 'Coral / Red' },
+  { value: 'bg-wrf-black', label: 'Black' },
+];
+const ROLE_ICON_OPTIONS = [
+  { value: 'calendar', label: 'Calendar' },
+  { value: 'megaphone', label: 'Megaphone' },
+  { value: 'book', label: 'Book' },
+  { value: 'target', label: 'Target' },
+  { value: 'users', label: 'Users' },
+  { value: 'heart', label: 'Heart' },
+];
+
+const emptyRole: Omit<VolunteerRole, 'id'> = { title: '', description: '', colorClass: 'bg-wrf-purple', iconName: 'users', isActive: true };
 
 export default function VolunteerManagementPage() {
   const [activeTab, setActiveTab] = useState<TabId>('applications');
@@ -117,7 +133,7 @@ export default function VolunteerManagementPage() {
 
   /* ---------- Role actions ---------- */
   const openAddRole = () => { setEditingRole(null); setRoleForm(emptyRole); setRoleDialog(true); };
-  const openEditRole = (r: VolunteerRole) => { setEditingRole(r); setRoleForm({ title: r.title, description: r.description, isActive: r.isActive }); setRoleDialog(true); };
+  const openEditRole = (r: VolunteerRole) => { setEditingRole(r); setRoleForm({ title: r.title, description: r.description, colorClass: r.colorClass || 'bg-wrf-purple', iconName: r.iconName || 'users', isActive: r.isActive }); setRoleDialog(true); };
 
   const handleRoleSubmit = async () => {
     if (!roleForm.title.trim()) { alert('Title is required'); return; }
@@ -341,6 +357,22 @@ export default function VolunteerManagementPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                 <textarea rows={3} value={roleForm.description} onChange={e => setRoleForm(f => ({ ...f, description: e.target.value }))}
                   className="w-full rounded-none border-2 border-gray-200 px-3 py-2 focus:ring-2 focus:ring-[#725D92] outline-none" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Card Color</label>
+                  <select value={roleForm.colorClass} onChange={e => setRoleForm(f => ({ ...f, colorClass: e.target.value }))}
+                    className="w-full rounded-none border-2 border-gray-200 px-3 py-2 focus:ring-2 focus:ring-[#725D92] outline-none">
+                    {ROLE_COLOR_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Icon</label>
+                  <select value={roleForm.iconName} onChange={e => setRoleForm(f => ({ ...f, iconName: e.target.value }))}
+                    className="w-full rounded-none border-2 border-gray-200 px-3 py-2 focus:ring-2 focus:ring-[#725D92] outline-none">
+                    {ROLE_ICON_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
               </div>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input type="checkbox" checked={roleForm.isActive} onChange={e => setRoleForm(f => ({ ...f, isActive: e.target.checked }))}

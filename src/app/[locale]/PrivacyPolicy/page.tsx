@@ -81,10 +81,17 @@ export default function PrivacyPolicyPage() {
       .catch(() => {});
   }, []);
 
+  const POLICY_BG_MAP: Record<string, string> = {
+    primary: 'bg-wrf-black',
+    secondary: 'bg-wrf-purple',
+    accent: 'bg-wrf-coral',
+    support: 'bg-wrf-footer-mauve',
+  };
+
   const displayArticles = adminData && adminData.articles?.length > 0
     ? adminData.articles.map((a: any) => ({
         title: a.title,
-        bgClass: a.bgClass || 'bg-wrf-black',
+        bgClass: a.bgClass || POLICY_BG_MAP[a.backgroundColor] || 'bg-wrf-black',
         content: a.content,
       }))
     : articles;

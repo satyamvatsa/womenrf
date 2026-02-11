@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
 
 const HERO_BG =
-  'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1920&q=80';
+  '/images/7.jpeg';
 
 function RoleIcon({ name }: { name: string }) {
   const cls = 'mb-4 h-12 w-12';
@@ -66,12 +66,17 @@ export default function VolunteerPage() {
   const { t } = useTranslation();
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const [testimonialData, setTestimonialData] = useState<Record<string, any> | null>(null);
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
   useEffect(() => {
     fetch('/api/data/volunteers', { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
+      .catch(() => {});
+    fetch('/api/data/testimonials', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => { if (d && Object.keys(d).length > 0) setTestimonialData(d); })
       .catch(() => {});
   }, []);
 
@@ -147,7 +152,7 @@ export default function VolunteerPage() {
       name: t('volunteer.testimonials.3.author'),
       role: t('volunteer.testimonials.3.role'),
       bg: 'bg-wrf-purple',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
+      image: null,
     },
   ];
 
@@ -317,7 +322,16 @@ export default function VolunteerPage() {
             <p className="text-lg text-gray-600">{t('volunteer.testimonials.description')}</p>
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {TESTIMONIALS.map((testimonial) => (
+            {(testimonialData?.testimonials && testimonialData.testimonials.length > 0
+              ? testimonialData.testimonials.map((t: any, i: number) => ({
+                  quote: t.quote,
+                  name: t.authorName,
+                  role: t.authorRole || '',
+                  bg: ['bg-wrf-black', 'bg-wrf-coral', 'bg-wrf-purple'][i % 3],
+                  image: t.authorImageUrl || null,
+                }))
+              : TESTIMONIALS
+            ).map((testimonial: any) => (
               <div key={testimonial.name} className={`${testimonial.bg} p-8 text-white shadow-lg`}>
                 <div className="mb-6">
                   <p className="text-lg italic leading-relaxed">&quot;{testimonial.quote}&quot;</p>

@@ -9,6 +9,7 @@ const VALID_SECTIONS = [
   'partnership-inquiries',
   'newsletter-subscribers',
   'job-applications',
+  'donation-intents',
 ];
 
 export async function POST(

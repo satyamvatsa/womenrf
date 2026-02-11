@@ -74,10 +74,10 @@ export default function PageSettingManagementPage() {
 
   // Hero section design
   const [heroBgImageUrl, setHeroBgImageUrl] = useState(
-    'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-28-at-12.19.20-PM-1.jpeg'
+    '/images/GettyImages-1232002648.jpg'
   );
   const [heroTriangleImageUrl, setHeroTriangleImageUrl] = useState(
-    'http://miladjosofe45.sg-host.com/wp-content/uploads/2025/09/Element-2-03-scaled.png'
+    '/images/Element-2-03-scaled.png'
   );
   const [heroTitleBgColor, setHeroTitleBgColor] = useState('bg-secondary');
   const [heroTitleTextColor, setHeroTitleTextColor] = useState('text-white');

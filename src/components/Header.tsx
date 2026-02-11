@@ -62,7 +62,23 @@ export default function Header() {
   const langDropdownMobileRef = useRef<HTMLDivElement>(null);
   const { t, localePrefix: tLocalePrefix } = useTranslation();
 
-  const MENU_SECTIONS: { title: string; titleClass: string; links: { href: string; label: string }[] }[] = adminData?.megaColumns || [
+  const COLOR_MAP: Record<string, string> = {
+    secondary: 'text-wrf-purple',
+    accent: 'text-wrf-coral',
+    support: 'text-wrf-footer-mauve',
+    white: 'text-white',
+  };
+
+  const MENU_SECTIONS: { title: string; titleClass: string; links: { href: string; label: string }[] }[] = adminData?.megaColumns
+    ? adminData.megaColumns.map((col: any) => ({
+        title: col.title,
+        titleClass: col.titleClass || COLOR_MAP[col.color] || 'text-white',
+        links: (col.links || []).map((l: any) => ({
+          href: l.href || (l.path ? `/${l.path}` : '/'),
+          label: l.label || l.name || '',
+        })),
+      }))
+    : [
     {
       title: t('header.menuSection.wrf.title'),
       titleClass: 'text-wrf-purple',
@@ -103,7 +119,12 @@ export default function Header() {
     },
   ];
 
-  const navLinks: { href: string; label: string }[] = adminData?.navLinks || [
+  const navLinks: { href: string; label: string }[] = adminData?.navLinks
+    ? adminData.navLinks.map((l: any) => ({
+        href: l.href || (l.path ? `/${l.path}` : '/'),
+        label: l.label || l.text || '',
+      }))
+    : [
     { href: '/About', label: t('header.nav.wrf') },
     { href: '/News', label: t('header.nav.news') },
     { href: '/Vacancies', label: t('header.nav.vacancies') },
@@ -139,15 +160,15 @@ export default function Header() {
   return (
     <header className="relative z-50 overflow-visible bg-white shadow-sm">
       <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-32 items-center justify-between gap-4">
-          <div className="shrink-0">
+        <div className="flex h-20 items-center justify-between gap-2 sm:h-24 sm:gap-4 lg:h-32">
+          <div className="min-w-0 shrink">
             <Link href={localePrefix === '/en' ? '/en' : localePrefix} className="block">
               <Image
                 src={adminData?.logoUrl || '/logo.jpg'}
                 alt={t('header.logo.alt')}
                 width={240}
                 height={96}
-                className="h-24 w-auto max-w-xs object-contain"
+                className="h-14 w-auto max-w-[160px] object-contain sm:h-20 sm:max-w-xs lg:h-24"
                 priority
               />
             </Link>
@@ -187,12 +208,14 @@ export default function Header() {
               </div>
             </form>
 
-            <Link
-              href={`${localePrefix}/${adminData?.donationButtonLink || 'Donate'}`}
-              className="inline-flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-none bg-wrf-coral px-4 py-2 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wrf-coral focus-visible:ring-offset-2 lg:px-5"
-            >
-              {adminData?.donationButtonText || t('header.donate')}
-            </Link>
+            {currentLocale === 'en' && (
+              <Link
+                href={`${localePrefix}/${adminData?.donationButtonLink || 'Donate'}`}
+                className="inline-flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-none bg-wrf-coral px-4 py-2 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wrf-coral focus-visible:ring-offset-2 lg:px-5"
+              >
+                {adminData?.donationButtonText || t('header.donate')}
+              </Link>
+            )}
 
             <div className="relative shrink-0" ref={langDropdownDesktopRef}>
               <button
@@ -255,14 +278,16 @@ export default function Header() {
             </button>
           </div>
 
-          <div className="flex items-center gap-4 lg:hidden">
-            <Link href={`${localePrefix}/${adminData?.donationButtonLink || 'Donate'}`} className="inline-flex h-10 items-center justify-center rounded-none bg-wrf-coral px-4 text-xs font-bold uppercase tracking-wider text-white">
-              {adminData?.donationButtonText || t('header.donateMobile')}
-            </Link>
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4 lg:hidden">
+            {currentLocale === 'en' && (
+              <Link href={`${localePrefix}/${adminData?.donationButtonLink || 'Donate'}`} className="inline-flex h-9 items-center justify-center rounded-none bg-wrf-coral px-2.5 text-[11px] font-bold uppercase tracking-wider text-white sm:h-10 sm:px-4 sm:text-xs">
+                {adminData?.donationButtonText || t('header.donateMobile')}
+              </Link>
+            )}
             <div className="relative" ref={langDropdownMobileRef}>
               <button
                 type="button"
-                className="flex h-10 flex-row items-center justify-center gap-1 rounded-full bg-primary px-4 text-sm font-bold text-white"
+                className="flex h-9 flex-row items-center justify-center gap-1 rounded-full bg-primary px-2.5 text-xs font-bold text-white sm:h-10 sm:px-4 sm:text-sm"
                 aria-expanded={langDropdownOpen}
                 onClick={(e) => {
                   e.preventDefault();
@@ -292,18 +317,18 @@ export default function Header() {
             </div>
             <button
               type="button"
-              className="flex h-12 w-12 items-center justify-center rounded-none bg-wrf-black text-white transition-colors hover:opacity-90"
+              className="flex h-10 w-10 items-center justify-center rounded-none bg-wrf-black text-white transition-colors hover:opacity-90 sm:h-12 sm:w-12"
               aria-label={menuOpen ? t('header.menu.close') : t('header.menu.open')}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen(!menuOpen)}
             >
               {menuOpen ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 sm:h-6 sm:w-6">
                   <path d="M18 6 6 18" />
                   <path d="m6 6 12 12" />
                 </svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 sm:h-6 sm:w-6">
                   <line x1="4" x2="20" y1="12" y2="12" />
                   <line x1="4" x2="20" y1="6" y2="6" />
                   <line x1="4" x2="20" y1="18" y2="18" />
@@ -348,13 +373,15 @@ export default function Header() {
               <div className="flex items-center justify-between border-t border-gray-700 pt-8">
                 <p className="text-lg text-white">{adminData?.megaFooterText || t('header.menu.cta')}</p>
                 <div className="flex items-center gap-6">
-                  <Link
-                    href={`${localePrefix}/${adminData?.megaFooterBtn1Link || 'Donate'}`}
-                    className="flex h-12 items-center bg-wrf-coral px-6 font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
-                    onClick={closeMenu}
-                  >
-                    {adminData?.megaFooterBtn1Text || t('header.donateMobile')}
-                  </Link>
+                  {currentLocale === 'en' && (
+                    <Link
+                      href={`${localePrefix}/${adminData?.megaFooterBtn1Link || 'Donate'}`}
+                      className="flex h-12 items-center bg-wrf-coral px-6 font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+                      onClick={closeMenu}
+                    >
+                      {adminData?.megaFooterBtn1Text || t('header.donateMobile')}
+                    </Link>
+                  )}
                   <Link
                     href={`${localePrefix}/${adminData?.megaFooterBtn2Link || 'Contact'}`}
                     className="flex h-12 items-center bg-wrf-purple px-6 font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
@@ -399,13 +426,15 @@ export default function Header() {
                 </div>
               ))}
               <div className="space-y-4 pt-6">
-                <Link
-                  href={`${localePrefix}/${adminData?.megaFooterBtn1Link || 'Donate'}`}
-                  className="flex h-12 w-full items-center justify-center bg-wrf-coral font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
-                  onClick={closeMenu}
-                >
-                  {adminData?.megaFooterBtn1Text || t('header.donateMobile')}
-                </Link>
+                {currentLocale === 'en' && (
+                  <Link
+                    href={`${localePrefix}/${adminData?.megaFooterBtn1Link || 'Donate'}`}
+                    className="flex h-12 w-full items-center justify-center bg-wrf-coral font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
+                    onClick={closeMenu}
+                  >
+                    {adminData?.megaFooterBtn1Text || t('header.donateMobile')}
+                  </Link>
+                )}
                 <Link
                   href={`${localePrefix}/${adminData?.megaFooterBtn2Link || 'Contact'}`}
                   className="flex h-12 w-full items-center justify-center bg-wrf-purple font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"

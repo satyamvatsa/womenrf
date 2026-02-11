@@ -42,7 +42,7 @@ export default function TeamPage() {
     {
       name: t('team.morten.name'),
       role: t('team.morten.role'),
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=600&h=400&fit=crop',
+      image: '/images/1-Panelist-Morten-Kjaerum-Picture-1.jpg',
       alt: 'Morten Kjaerum',
       bio: t('team.morten.bio'),
       links: [

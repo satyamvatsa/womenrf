@@ -14,11 +14,23 @@ export default function ExploreImpact() {
       .catch(() => {});
   }, []);
 
+  const EI_BG_MAP: Record<string, string> = {
+    'bg-primary': 'bg-wrf-black',
+    'bg-secondary': 'bg-wrf-purple',
+    'bg-accent': 'bg-wrf-coral',
+    'bg-support-1': 'bg-wrf-footer-mauve',
+  };
+  const showPagesShowcase = adminData?.showPagesShowcase !== undefined ? adminData.showPagesShowcase : true;
+  const showcaseTitleBg = EI_BG_MAP[adminData?.pagesShowcaseTitleBg] || 'bg-wrf-black';
+  const showcaseQuoteBg = EI_BG_MAP[adminData?.pagesShowcaseQuoteBg] || 'bg-wrf-coral';
+
+  if (!showPagesShowcase) return null;
+
   return (
     <section id="impact" className="bg-gray-50 py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-left">
-          <div className="mb-4 inline-block bg-wrf-black px-8 py-6">
+          <div className={`mb-4 inline-block ${showcaseTitleBg} px-8 py-6`}>
             <h2 className="text-4xl font-bold text-white">
               {adminData?.pagesShowcaseTitle || t('exploreImpact.title')}
             </h2>
@@ -28,11 +40,11 @@ export default function ExploreImpact() {
           </p>
         </div>
         <div className="grid items-stretch gap-8 lg:grid-cols-5">
-          <div className="relative flex flex-col justify-center bg-wrf-coral p-10 lg:col-span-2">
+          <div className={`relative flex flex-col justify-center ${showcaseQuoteBg} p-10 lg:col-span-2`}>
             <div className="mb-8">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={adminData?.pagesShowcaseQuoteAuthorImage || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=256&h=256&fit=crop&crop=face"}
+                src={adminData?.pagesShowcaseQuoteAuthorImage || "/images/Hanifa_Girowal.jpeg"}
                 alt=""
                 className="mb-6 h-32 w-32 object-cover"
               />

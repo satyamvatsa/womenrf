@@ -9,6 +9,8 @@ type Program = {
   id: string;
   title: string;
   shortDescription: string;
+  longDescription: string;
+  heroImageUrl: string;
   slug: string;
   status: 'active' | 'draft';
   featured: boolean;
@@ -20,6 +22,8 @@ const initialPrograms: Program[] = [
     title: 'Peacebuilding and Social Cohesion',
     shortDescription:
       "Fostering dialogue, understanding, and unity across communities to build lasting peace and strengthen social bonds in conflict-affected regions.",
+    longDescription: '',
+    heroImageUrl: '',
     slug: 'peacebuilding-social-cohesion',
     status: 'active',
     featured: true,
@@ -29,6 +33,8 @@ const initialPrograms: Program[] = [
     title: "Legal Empowerment & International Accountability",
     shortDescription:
       "Strengthening legal frameworks and accountability mechanisms to protect women's rights in Afghanistan and internationally.",
+    longDescription: '',
+    heroImageUrl: '',
     slug: 'legal-empowerment-international-accountability',
     status: 'active',
     featured: true,
@@ -38,6 +44,8 @@ const initialPrograms: Program[] = [
     title: 'Digital Transformation and Open Gender Data',
     shortDescription:
       "Women's Rights First leverages digital tools and open gender data to counter the erasure of Afghan women in real time. Through secure, survivor-led documentation, we transform raw testimonies into verified data that informs international accountability mechanisms and policy responses. Our goal is to build an open, future-proof feminist data ecosystem that protects evidence, strengthens legal action, and ensures Afghan women remain visible, countable, and impossible to ignore.",
+    longDescription: '',
+    heroImageUrl: '',
     slug: 'digital-transformation-open-gender-data',
     status: 'active',
     featured: true,
@@ -47,6 +55,8 @@ const initialPrograms: Program[] = [
     title: 'Representation and Advocacy',
     shortDescription:
       "Amplifying Afghan women's voices on national and international platforms, advocating for policy change and rights protection.",
+    longDescription: '',
+    heroImageUrl: '',
     slug: 'representation-advocacy',
     status: 'active',
     featured: true,
@@ -113,6 +123,8 @@ export default function ProgramManagementPage() {
 
   const [formTitle, setFormTitle] = useState('');
   const [formShortDescription, setFormShortDescription] = useState('');
+  const [formLongDescription, setFormLongDescription] = useState('');
+  const [formHeroImageUrl, setFormHeroImageUrl] = useState('');
   const [formSlug, setFormSlug] = useState('');
   const [formStatus, setFormStatus] = useState<'active' | 'draft'>('active');
   const [formFeatured, setFormFeatured] = useState(false);
@@ -137,6 +149,8 @@ export default function ProgramManagementPage() {
     setEditingId(null);
     setFormTitle('');
     setFormShortDescription('');
+    setFormLongDescription('');
+    setFormHeroImageUrl('');
     setFormSlug('');
     setFormStatus('active');
     setFormFeatured(false);
@@ -147,6 +161,8 @@ export default function ProgramManagementPage() {
     setEditingId(program.id);
     setFormTitle(program.title);
     setFormShortDescription(program.shortDescription);
+    setFormLongDescription(program.longDescription || '');
+    setFormHeroImageUrl(program.heroImageUrl || '');
     setFormSlug(program.slug);
     setFormStatus(program.status);
     setFormFeatured(program.featured);
@@ -169,6 +185,8 @@ export default function ProgramManagementPage() {
           id: String(Date.now()),
           title: formTitle.trim(),
           shortDescription: formShortDescription.trim(),
+          longDescription: formLongDescription.trim(),
+          heroImageUrl: formHeroImageUrl.trim(),
           slug,
           status: formStatus,
           featured: formFeatured,
@@ -181,6 +199,8 @@ export default function ProgramManagementPage() {
               ...p,
               title: formTitle.trim(),
               shortDescription: formShortDescription.trim(),
+              longDescription: formLongDescription.trim(),
+              heroImageUrl: formHeroImageUrl.trim(),
               slug,
               status: formStatus,
               featured: formFeatured,
@@ -321,6 +341,27 @@ export default function ProgramManagementPage() {
                     onChange={(e) => setFormShortDescription(e.target.value)}
                     placeholder="Brief description for the card"
                     rows={3}
+                  />
+                </div>
+                <div>
+                  <label className={labelClass}>Full description (HTML enabled)</label>
+                  <textarea
+                    className={textareaClass + ' mt-1'}
+                    value={formLongDescription}
+                    onChange={(e) => setFormLongDescription(e.target.value)}
+                    placeholder="Detailed program description for the program page..."
+                    rows={6}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Existing programs use default translated content. New programs will use this description.</p>
+                </div>
+                <div>
+                  <label className={labelClass}>Hero Image URL</label>
+                  <input
+                    type="url"
+                    className={inputClass + ' mt-1'}
+                    value={formHeroImageUrl}
+                    onChange={(e) => setFormHeroImageUrl(e.target.value)}
+                    placeholder="https://example.com/program-hero.jpg"
                   />
                 </div>
                 <div>

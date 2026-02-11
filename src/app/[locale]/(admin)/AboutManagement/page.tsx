@@ -166,7 +166,7 @@ export default function AboutManagementPage() {
     'To empower and transform Afghan women and girls by delivering peacebuilding, accountability, and digital transformation services through locally grounded and modernized indigenous approaches.'
   );
   const [imageUrl, setImageUrl] = useState(
-    'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=2088&q=80'
+    '/images/teams.jpeg'
   );
   const [button1Text, setButton1Text] = useState('Join Our Mission');
   const [button1Url, setButton1Url] = useState('Volunteer');
@@ -483,33 +483,45 @@ export default function AboutManagementPage() {
               )}
 
               {activeTab === 'values' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm">
-                  <p className="text-gray-600 font-body">Values section — add form fields as needed.</p>
+                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
+                  <h3 className="text-lg font-semibold">Values Section</h3>
+                  <p className="text-gray-600 font-body">This section displays the organization&apos;s core values. Content is currently managed through the translation files (en.ts, fa.ts, ps.ts) and renders automatically on the About page.</p>
+                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
                 </div>
               )}
               {activeTab === 'quote' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm">
-                  <p className="text-gray-600 font-body">Quote section — add form fields as needed.</p>
+                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
+                  <h3 className="text-lg font-semibold">Quote Section</h3>
+                  <p className="text-gray-600 font-body">This section displays an inspirational quote on the About page. Content is managed through the translation files.</p>
+                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
                 </div>
               )}
               {activeTab === 'history' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm">
-                  <p className="text-gray-600 font-body">History section — add form fields as needed.</p>
+                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
+                  <h3 className="text-lg font-semibold">History / Timeline Section</h3>
+                  <p className="text-gray-600 font-body">This section shows the organization&apos;s journey timeline (2019–2025). Content is managed through the translation files.</p>
+                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
                 </div>
               )}
               {activeTab === 'impact' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm">
-                  <p className="text-gray-600 font-body">Impact section — add form fields as needed.</p>
+                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
+                  <h3 className="text-lg font-semibold">Impact Statistics Section</h3>
+                  <p className="text-gray-600 font-body">This section shows impact metrics (programs, countries, etc.). Content is managed through the translation files.</p>
+                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
                 </div>
               )}
               {activeTab === 'team' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm">
-                  <p className="text-gray-600 font-body">Team section — add form fields as needed.</p>
+                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
+                  <h3 className="text-lg font-semibold">Team Preview Section</h3>
+                  <p className="text-gray-600 font-body">This section shows a brief team preview on the About page. To manage full team profiles, use the <strong>Team Management</strong> page in the sidebar.</p>
+                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — team data is managed separately.</p>
                 </div>
               )}
               {activeTab === 'links' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm">
-                  <p className="text-gray-600 font-body">Links section — add form fields as needed.</p>
+                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
+                  <h3 className="text-lg font-semibold">Get Involved Links Section</h3>
+                  <p className="text-gray-600 font-body">This section shows &quot;Get Involved&quot; action cards (Donate, Partner, Volunteer, Contact). Content is managed through the translation files.</p>
+                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
                 </div>
               )}
             </div>

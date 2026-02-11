@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
 
-const HERO_BG = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=1920&q=80';
+const HERO_BG = '/images/GettyImages-1232002648.jpg';
 
 function SocialIcon({ href, icon, label }: { href: string; icon: string; label: string }) {
   const paths: Record<string, React.ReactNode> = {
@@ -60,7 +60,7 @@ export default function FoundersPage() {
     {
       name: t('founders.shabnam.name'),
       role: t('founders.shabnam.role'),
-      image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=800&h=1000&fit=crop',
+      image: '/images/shabnam%20salehi.jpg',
       alt: 'Shabnam Salehi',
       bio: t('founders.shabnam.bio'),
       expertise: [t('founders.shabnam.exp1'), t('founders.shabnam.exp2'), t('founders.shabnam.exp3')],
@@ -75,7 +75,7 @@ export default function FoundersPage() {
     {
       name: t('founders.hanifa.name'),
       role: t('founders.hanifa.role'),
-      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&h=1000&fit=crop',
+      image: '/images/Hanifa_Girowal.jpeg',
       alt: 'Hanifa Girowal',
       bio: t('founders.hanifa.bio'),
       expertise: [t('founders.hanifa.exp1'), t('founders.hanifa.exp2'), t('founders.hanifa.exp3'), t('founders.hanifa.exp4'), t('founders.hanifa.exp5')],

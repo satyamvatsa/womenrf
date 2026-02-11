@@ -5,19 +5,17 @@ import Link from 'next/link';
 import ScrollReveal from './ScrollReveal';
 
 const HERO_BG =
-  'https://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/IDPQZNEWGZKSXJEX7VTFFBX6OM-scaled.jpg';
+  '/images/00D0CA02-1516-4042-B101-FC127C88E162.jpg';
 const HERO_RIGHT_IMAGE =
-  'https://miladjosofe45.sg-host.com/wp-content/uploads/2025/09/Element-2-03-scaled.png';
+  '/images/Element-2-03-scaled.png';
 
 import AboutSectionNav from './AboutSectionNav';
 import { useTranslation } from '@/lib/TranslationContext';
 
 const TEAM = [
-  { name: 'Hanifa Girowal', role: 'Co-Founder & VP', img: 'https://womensrightsfirst.org/wp-content/uploads/2025/07/WhatsApp-Image-2025-07-11-at-8.06.00-PM-768x1024.jpeg', bg: 'bg-wrf-coral' },
-  { name: 'Shabnam Salehi', role: 'Co-Founder & President', img: 'https://womensrightsfirst.org/wp-content/uploads/elementor/thumbs/WhatsApp-Image-2025-06-30-at-11.05.06-PM-r8p1yk6selhkcr396839okh42kbrblh5j34cucjmgg.jpeg', bg: 'bg-wrf-purple' },
-  { name: 'Morten Kjaerum', role: 'Board Member', img: 'https://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/1-Panelist-Morten-Kjaerum-Picture-1.jpg', bg: 'bg-wrf-purple' },
-  { name: 'Jennifer Lee', role: 'Finance Director', img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face', bg: 'bg-wrf-footer-mauve' },
-  { name: 'Grace Okonkwo', role: 'Regional Coordinator - Africa', img: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=400&fit=crop&crop=face', bg: 'bg-wrf-coral' },
+  { name: 'Hanifa Girowal', role: 'Co-Founder & VP', img: '/images/Hanifa_Girowal.jpeg', bg: 'bg-wrf-coral' },
+  { name: 'Shabnam Salehi', role: 'Co-Founder & President', img: '/images/shabnam%20salehi.jpg', bg: 'bg-wrf-purple' },
+  { name: 'Morten Kjaerum', role: 'Board Member', img: '/images/1-Panelist-Morten-Kjaerum-Picture-1.jpg', bg: 'bg-wrf-purple' },
 ];
 
 export default function AboutPage() {
@@ -151,7 +149,7 @@ export default function AboutPage() {
             </ScrollReveal>
             <ScrollReveal variant="slideRight">
               <img
-                src={adminData?.imageUrl || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80'}
+                src={adminData?.imageUrl || '/images/teams.jpeg'}
                 alt="Our Mission"
                 className="h-96 w-full object-cover shadow-2xl"
               />

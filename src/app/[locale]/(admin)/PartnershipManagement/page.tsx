@@ -348,8 +348,9 @@ export default function PartnershipManagementPage() {
                 <h3 className="text-2xl font-semibold leading-none tracking-tight">Partnerships</h3>
                 <p className="text-sm text-gray-500">Manage active and past partnerships.</p>
               </div>
-              <div className="p-6 pt-0">
-                <p className="text-sm text-gray-600">Partnership list content can be added here.</p>
+              <div className="p-6 pt-0 space-y-2">
+                <p className="text-gray-600">Active partnerships are displayed on the homepage via the <strong>Partner Organizations</strong> section in <strong>Homepage Settings</strong>.</p>
+                <p className="text-sm text-amber-600 font-medium">To manage partner logos and links, go to Homepage Settings &gt; Partner Organizations Section.</p>
               </div>
             </div>
           </div>
@@ -368,8 +369,9 @@ export default function PartnershipManagementPage() {
                 <h3 className="text-2xl font-semibold leading-none tracking-tight">Page Content</h3>
                 <p className="text-sm text-gray-500">Edit the partnership page content and copy.</p>
               </div>
-              <div className="p-6 pt-0">
-                <p className="text-sm text-gray-600">Page content editor can be added here.</p>
+              <div className="p-6 pt-0 space-y-2">
+                <p className="text-gray-600">The Partnership page content (hero, benefits, form, testimonials) is currently managed through the translation files (en.ts, fa.ts, ps.ts) and renders automatically.</p>
+                <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content. Partnership inquiries submitted through the form appear in the &quot;Partnership Inquiries&quot; tab above.</p>
               </div>
             </div>
           </div>

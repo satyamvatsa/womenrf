@@ -4,9 +4,9 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
 
 const HERO_BG =
-  'https://news.cornell.edu/sites/default/files/styles/full_size/public/2024-12/1216_afghan2.jpg?itok=V522FqYL';
+  '/images/FILE%20PHOTO%20Afghan%20women%27s%20rights%20defenders%20and%20civil%20activists%20protest%20to%20call%20on%20the%20Taliban%20for%20the%20preservation%20of%20their%20achievements%20and%20education%2C%20in%20front%20of%20the%20presidential%20palace%20in%20Kabul.jpg';
 const HERO_RIGHT_IMAGE =
-  'http://miladjosofe45.sg-host.com/wp-content/uploads/2025/09/Element-2-03-scaled.png';
+  '/images/Element-2-03-scaled.png';
 
 type CategoryId = 'all' | 'general' | 'programs' | 'involved' | 'contact';
 

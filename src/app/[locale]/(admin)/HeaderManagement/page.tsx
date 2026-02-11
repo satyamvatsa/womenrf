@@ -128,7 +128,7 @@ const defaultMegaColumns: MegaMenuColumn[] = [
 ];
 
 export default function HeaderManagementPage() {
-  const [logoUrl, setLogoUrl] = useState('http://miladjosofe45.sg-host.com/wp-content/uploads/2025/08/Primary-Logo-JPEG-01-scaled.jpg');
+  const [logoUrl, setLogoUrl] = useState('/logo.jpg');
   const [donationButtonText, setDonationButtonText] = useState('Donate Now');
   const [donationButtonLink, setDonationButtonLink] = useState('Donate');
   const [searchPlaceholder, setSearchPlaceholder] = useState('Search...');

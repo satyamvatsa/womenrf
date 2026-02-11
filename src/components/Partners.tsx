@@ -24,19 +24,41 @@ export default function Partners() {
       .catch(() => {});
   }, []);
 
-  const partners = adminData?.partnersList?.length ? adminData.partnersList : PARTNERS;
+  const partners = adminData?.partnersList?.length
+    ? adminData.partnersList.map((p: any) => ({
+        name: p.name,
+        url: p.url || p.websiteUrl || '#',
+        logo: p.logo || p.logoUrl || '',
+      }))
+    : PARTNERS;
+
+  // Read admin settings with fallbacks
+  const showPartners = adminData?.showPartners !== undefined ? adminData.showPartners : true;
+  const partnersTitle = adminData?.partnersTitle || 'Our Partners & Collaborators';
+  const partnersSubtitle = adminData?.partnersSubtitle || 'Working together to create lasting change';
+  const partnersTitleBg = adminData?.partnersTitleBg || 'bg-primary';
+
+  const TITLE_BG_MAP: Record<string, string> = {
+    'bg-primary': 'bg-wrf-black',
+    'bg-secondary': 'bg-wrf-purple',
+    'bg-accent': 'bg-wrf-coral',
+    'bg-support-1': 'bg-wrf-footer-mauve',
+  };
+  const titleBgClass = TITLE_BG_MAP[partnersTitleBg] || 'bg-wrf-black';
+
+  if (!showPartners) return null;
 
   return (
     <section id="partners" className="bg-white py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-left">
-          <div className="mb-4 inline-block bg-wrf-black px-8 py-6">
+          <div className={`mb-4 inline-block ${titleBgClass} px-8 py-6`}>
             <h2 className="text-4xl font-bold text-white">
-              Our Partners & Collaborators
+              {partnersTitle}
             </h2>
           </div>
           <p className="text-lg text-gray-600">
-            Working together to create lasting change
+            {partnersSubtitle}
           </p>
         </div>
         <div className="grid grid-cols-2 items-center gap-8 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">

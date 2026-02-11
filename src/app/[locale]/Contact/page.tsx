@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useTranslation } from '@/lib/TranslationContext';
 
 const HERO_BG =
-  'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=1920&q=80';
+  '/images/8.jpeg';
 
 const SOCIAL_LINKS = [
   { href: 'https://www.facebook.com', label: 'Facebook', icon: 'facebook' },
@@ -14,7 +14,7 @@ const SOCIAL_LINKS = [
   { href: 'https://www.linkedin.com/company/women-s-rights-first-wrf', label: 'LinkedIn', icon: 'linkedin' },
 ];
 
-const QUOTE_IMAGE = 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=face';
+const QUOTE_IMAGE = '/images/Hanifa_Girowal.jpeg';
 
 function SocialIcon({ name }: { name: string }) {
   const cls = 'h-6 w-6';

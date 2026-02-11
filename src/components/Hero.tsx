@@ -26,6 +26,18 @@ export default function Hero() {
       .catch(() => {});
   }, []);
 
+  const HERO_BG_MAP: Record<string, string> = {
+    'bg-primary': 'bg-wrf-black',
+    'bg-secondary': 'bg-wrf-purple',
+    'bg-accent': 'bg-wrf-coral',
+    'bg-support-1': 'bg-wrf-footer-mauve',
+  };
+  const heroTitleBgClass = HERO_BG_MAP[adminData?.heroTitleBg] || adminData?.heroTitleBg || 'bg-wrf-purple';
+  const heroBtn1BgClass = HERO_BG_MAP[adminData?.heroButton1Color] || 'bg-wrf-coral';
+  const heroBtn2BgClass = HERO_BG_MAP[adminData?.heroButton2Color] || 'bg-wrf-black';
+
+  if (adminData?.showHero === false) return null;
+
   return (
     <section
       className="relative overflow-hidden bg-[#CCCCCC] py-20 md:py-32"
@@ -34,7 +46,7 @@ export default function Hero() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <div className={`mb-6 inline-block ${adminData?.heroTitleBg || 'bg-wrf-purple'} px-8 py-6`}>
+            <div className={`mb-6 inline-block ${heroTitleBgClass} px-8 py-6`}>
               <h1 className="mb-4 text-4xl font-bold leading-tight text-white lg:text-6xl">
                 {adminData?.heroTitle || t('hero.title')}
               </h1>
@@ -45,7 +57,7 @@ export default function Hero() {
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
               <Link
                 href={adminData?.heroButton1Link || `${localePrefix}/About`}
-                className="flex items-center justify-center gap-2 rounded-none bg-wrf-coral px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:opacity-90"
+                className={`flex items-center justify-center gap-2 rounded-none ${heroBtn1BgClass} px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:opacity-90`}
               >
                 {adminData?.heroButton1Text || t('hero.learnStory')}
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,7 +67,7 @@ export default function Hero() {
               </Link>
               <Link
                 href={adminData?.heroButton2Link || `${localePrefix}/Programs`}
-                className="flex items-center justify-center gap-2 rounded-none bg-wrf-black px-8 py-4 font-semibold text-white transition-all duration-300 hover:opacity-90"
+                className={`flex items-center justify-center gap-2 rounded-none ${heroBtn2BgClass} px-8 py-4 font-semibold text-white transition-all duration-300 hover:opacity-90`}
               >
                 {adminData?.heroButton2Text || t('hero.ourPrograms')}
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

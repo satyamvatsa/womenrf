@@ -27,9 +27,9 @@ const defaultHero = {
   subtitle:
     "Your generous support enables Women's Rights First to continue our vital work in defending the rights, dignity, and freedom of Afghan women and girls.",
   heroBackgroundImageUrl:
-    'http://miladjosofe46.sg-host.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-23-at-1.51.23-PM.jpeg',
+    '/images/GettyImages-1232002648.jpg',
   heroTriangleImageUrl:
-    'http://miladjosofe45.sg-host.com/wp-content/uploads/2025/09/Element-2-03-scaled.png',
+    '/images/Element-2-03-scaled.png',
   titleBackgroundColor: 'bg-primary',
   titleTextColor: 'text-white',
   subtitleTextColor: 'text-white/90',

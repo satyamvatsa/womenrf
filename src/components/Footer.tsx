@@ -16,6 +16,7 @@ function getLocalePrefix(pathname: string): string {
 export default function Footer() {
   const pathname = usePathname();
   const localePrefix = getLocalePrefix(pathname);
+  const currentLocale = localePrefix.replace('/', '');
   const [subscribed, setSubscribed] = useState(false);
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
   const { t } = useTranslation();
@@ -55,14 +56,29 @@ export default function Footer() {
       className: 'bg-wrf-footer-mauve',
       links: [
         { label: t('footer.sections.getInvolved.volunteer'), href: '/Volunteer' },
-        { label: t('footer.sections.getInvolved.donate'), href: '/Donate' },
+        ...(currentLocale === 'en' ? [{ label: t('footer.sections.getInvolved.donate'), href: '/Donate' }] : []),
         { label: t('footer.sections.getInvolved.partnership'), href: '/Partnership' },
         { label: t('footer.sections.getInvolved.contact'), href: '/Contact' },
       ],
     },
   ];
 
-  const linkColumns = adminData?.linkColumns || defaultLinkColumns;
+  const BG_MAP: Record<string, string> = {
+    secondary: 'bg-wrf-purple',
+    accent: 'bg-wrf-coral',
+    support: 'bg-wrf-footer-mauve',
+  };
+
+  const linkColumns = adminData?.linkColumns
+    ? adminData.linkColumns.map((col: any, idx: number) => ({
+        title: col.title,
+        className: col.className || BG_MAP[col.backgroundColor] || ['bg-wrf-purple', 'bg-wrf-coral', 'bg-wrf-footer-mauve'][idx] || 'bg-wrf-purple',
+        links: (col.links || []).map((l: any) => ({
+          label: l.label || l.text || '',
+          href: l.href || (l.url ? `/${l.url}` : '/'),
+        })),
+      }))
+    : defaultLinkColumns;
 
   const getSocialUrl = (platform: string, fallback: string) => {
     if (adminData?.socialLinks) {

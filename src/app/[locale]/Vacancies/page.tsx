@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
 
-const HERO_BG = 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1920&q=85';
+const HERO_BG = '/images/hr-manager-teamwork-hr-department-hr-process-vector.jpg';
 
 export default function VacanciesPage() {
   const { t } = useTranslation();

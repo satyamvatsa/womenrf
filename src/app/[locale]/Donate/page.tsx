@@ -1,10 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
 
-const HERO_BG = 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=1920&q=80';
+const PAYPAL_CLIENT_ID = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID : '';
+
+const HERO_BG = '/images/GettyImages-1232002648.jpg';
 
 const AMOUNTS = [25, 50, 100, 250];
 
@@ -59,6 +61,15 @@ export default function DonatePage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [otherWaysExpandedId, setOtherWaysExpandedId] = useState<string | null>(null);
+  const [intentStatus, setIntentStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [monthlyAmount, setMonthlyAmount] = useState<number | null>(25);
+  const [monthlyOtherAmount, setMonthlyOtherAmount] = useState('');
+  const [monthlyName, setMonthlyName] = useState('');
+  const [monthlyEmail, setMonthlyEmail] = useState('');
+  const [monthlyIntentStatus, setMonthlyIntentStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const paypalContainerRef = useRef<HTMLDivElement>(null);
+  const amountRef = useRef<{ amount: number | null; otherAmount: string }>({ amount: 50, otherAmount: '' });
+  amountRef.current = { amount, otherAmount };
 
   const [adminDonations, setAdminDonations] = useState<Record<string, any> | null>(null);
   const [adminOptions, setAdminOptions] = useState<Record<string, any> | null>(null);
@@ -73,6 +84,48 @@ export default function DonatePage() {
       .then(d => { if (d && Object.keys(d).length > 0) setAdminOptions(d); })
       .catch(() => {});
   }, []);
+
+  // Load PayPal Donate button when client ID is set
+  useEffect(() => {
+    if (!PAYPAL_CLIENT_ID || !paypalContainerRef.current) return;
+    const src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=CAD&intent=capture`;
+    const runRender = () => {
+      const w = window as unknown as { paypal?: { Buttons: (opts: unknown) => { render: (el: HTMLElement) => void } } };
+      if (!w.paypal?.Buttons || !paypalContainerRef.current) return;
+      paypalContainerRef.current.innerHTML = '';
+      w.paypal.Buttons({
+        style: { label: 'donate', layout: 'vertical' },
+        createOrder(_data: unknown, actions: { order: { create: (opts: { purchase_units: unknown[] }) => Promise<string> } }) {
+          const { amount: amt, otherAmount: other } = amountRef.current;
+          const value = other.trim()
+            ? Math.max(0, parseFloat(other) || 0)
+            : (amt ?? 0);
+          const finalValue = value > 0 ? value : 25;
+          return actions.order.create({
+            purchase_units: [{
+              amount: { currency_code: 'CAD', value: finalValue.toFixed(2) },
+              description: "One-time donation to Women's Rights First",
+            }],
+          });
+        },
+        onApprove() {},
+      }).render(paypalContainerRef.current);
+    };
+    const existing = document.querySelector('script[src*="paypal.com/sdk/js"]');
+    if (existing) {
+      runRender();
+      return () => { if (paypalContainerRef.current) paypalContainerRef.current.innerHTML = ''; };
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = runRender;
+    document.body.appendChild(script);
+    return () => {
+      if (script.parentNode) script.parentNode.removeChild(script);
+      if (paypalContainerRef.current) paypalContainerRef.current.innerHTML = '';
+    };
+  }, [tab]);
 
   const OTHER_WAYS: OtherWayItem[] = [
     {
@@ -269,9 +322,74 @@ export default function DonatePage() {
                 </div>
 
                 <div className="pt-4">
-                  <div className="min-h-[120px] rounded border-2 border-dashed border-gray-200 bg-gray-50/50 p-6 text-center text-gray-500">
-                    {t('donate.form.paypalNote')}
-                  </div>
+                  {PAYPAL_CLIENT_ID ? (
+                    <div className="rounded border border-gray-200 bg-gray-50/50 p-6">
+                      <p className="mb-4 text-sm text-gray-600">
+                        Select an amount above, then use the button below to pay securely with PayPal.
+                      </p>
+                      <div ref={paypalContainerRef} className="min-h-[120px]" />
+                    </div>
+                  ) : (
+                    <div className="rounded border-2 border-dashed border-gray-200 bg-gray-50/50 p-6">
+                      <p className="mb-4 text-gray-600">
+                        {t('donate.form.paypalNote')}
+                      </p>
+                      {intentStatus === 'success' ? (
+                        <div className="rounded bg-green-50 p-4 text-green-800">
+                          Thank you. We have received your donation request and will contact you shortly to complete your gift.
+                        </div>
+                      ) : intentStatus === 'error' ? (
+                        <div className="rounded bg-red-50 p-4 text-red-800">
+                          Something went wrong. Please try again or contact us.
+                        </div>
+                      ) : (
+                        <form
+                          onSubmit={async (e) => {
+                            e.preventDefault();
+                            const value = otherAmount.trim()
+                              ? parseFloat(otherAmount) || 0
+                              : (amount ?? 0);
+                            if (value <= 0) return;
+                            setIntentStatus('sending');
+                            try {
+                              const res = await fetch('/api/submit/donation-intents', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  type: 'one-time',
+                                  amount: value,
+                                  currency: 'CAD',
+                                  fullName: name,
+                                  email,
+                                }),
+                              });
+                              if (res.ok) setIntentStatus('success');
+                              else setIntentStatus('error');
+                            } catch {
+                              setIntentStatus('error');
+                            }
+                          }}
+                          className="space-y-4"
+                        >
+                          <p className="text-sm text-gray-600">
+                            Submit your details and we will contact you to complete your donation (e.g. by link or phone).
+                          </p>
+                          <button
+                            type="submit"
+                            disabled={
+                              intentStatus === 'sending' ||
+                              !name.trim() ||
+                              !email.trim() ||
+                              (otherAmount.trim() ? parseFloat(otherAmount) || 0 : amount ?? 0) <= 0
+                            }
+                            className="inline-flex items-center justify-center rounded-none bg-wrf-purple px-8 py-3 font-semibold text-white transition-colors hover:bg-wrf-purple/90 disabled:opacity-50"
+                          >
+                            {intentStatus === 'sending' ? 'Sending…' : 'Submit donation request'}
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -283,8 +401,123 @@ export default function DonatePage() {
                   <h3 className="mb-2 text-lg font-semibold text-wrf-coral">{t('donate.form.monthlyTitle')}</h3>
                   <p className="text-gray-700">{t('donate.form.monthlyDesc')}</p>
                 </div>
-                <div className="min-h-[120px] rounded border-2 border-dashed border-gray-200 bg-gray-50/50 p-6 text-center text-gray-500">
-                  {t('donate.form.monthlyNote')}
+
+                <div>
+                  <label className="text-lg font-bold">Choose a Monthly Amount (CAD)</label>
+                  <div className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-5">
+                    {[10, 25, 50, 100].map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => { setMonthlyAmount(value); setMonthlyOtherAmount(''); }}
+                        className={`inline-flex h-16 items-center justify-center rounded-none text-xl font-medium transition-all ${
+                          monthlyAmount === value && !monthlyOtherAmount.trim()
+                            ? 'bg-wrf-coral text-white'
+                            : 'bg-gray-100 text-wrf-black hover:bg-wrf-purple hover:text-white'
+                        }`}
+                      >
+                        ${value}/mo
+                      </button>
+                    ))}
+                    <input
+                      type="number"
+                      placeholder={t('donate.form.other')}
+                      value={monthlyOtherAmount}
+                      onChange={(e) => {
+                        setMonthlyOtherAmount(e.target.value);
+                        setMonthlyAmount(null);
+                      }}
+                      className="h-16 rounded-none border-2 border-gray-300 text-center text-xl focus:border-wrf-coral focus:outline-none focus:ring-2 focus:ring-wrf-coral/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label htmlFor="monthly-donor-name" className="text-sm font-medium">
+                      {t('donate.form.fullName')}
+                    </label>
+                    <input
+                      id="monthly-donor-name"
+                      type="text"
+                      required
+                      value={monthlyName}
+                      onChange={(e) => setMonthlyName(e.target.value)}
+                      className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-wrf-coral focus:outline-none focus:ring-2 focus:ring-wrf-coral/20"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="monthly-donor-email" className="text-sm font-medium">
+                      {t('donate.form.email')}
+                    </label>
+                    <input
+                      id="monthly-donor-email"
+                      type="email"
+                      required
+                      value={monthlyEmail}
+                      onChange={(e) => setMonthlyEmail(e.target.value)}
+                      className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-wrf-coral focus:outline-none focus:ring-2 focus:ring-wrf-coral/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <div className="rounded border-2 border-dashed border-gray-200 bg-gray-50/50 p-6">
+                    {monthlyIntentStatus === 'success' ? (
+                      <div className="rounded bg-green-50 p-4 text-green-800">
+                        Thank you! We have received your monthly donation request. We will contact you shortly to set up your recurring gift.
+                      </div>
+                    ) : monthlyIntentStatus === 'error' ? (
+                      <div className="rounded bg-red-50 p-4 text-red-800">
+                        Something went wrong. Please try again or contact us.
+                      </div>
+                    ) : (
+                      <form
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const value = monthlyOtherAmount.trim()
+                            ? parseFloat(monthlyOtherAmount) || 0
+                            : (monthlyAmount ?? 0);
+                          if (value <= 0) return;
+                          setMonthlyIntentStatus('sending');
+                          try {
+                            const res = await fetch('/api/submit/donation-intents', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                type: 'monthly',
+                                amount: value,
+                                currency: 'CAD',
+                                fullName: monthlyName,
+                                email: monthlyEmail,
+                              }),
+                            });
+                            if (res.ok) setMonthlyIntentStatus('success');
+                            else setMonthlyIntentStatus('error');
+                          } catch {
+                            setMonthlyIntentStatus('error');
+                          }
+                        }}
+                        className="space-y-4"
+                      >
+                        <p className="text-sm text-gray-600">
+                          Submit your details and we will contact you to set up your monthly recurring donation.
+                        </p>
+                        <button
+                          type="submit"
+                          disabled={
+                            monthlyIntentStatus === 'sending' ||
+                            !monthlyName.trim() ||
+                            !monthlyEmail.trim() ||
+                            (monthlyOtherAmount.trim() ? parseFloat(monthlyOtherAmount) || 0 : monthlyAmount ?? 0) <= 0
+                          }
+                          className="inline-flex items-center justify-center rounded-none bg-wrf-coral px-8 py-3 font-semibold text-white transition-colors hover:bg-wrf-coral/90 disabled:opacity-50"
+                        >
+                          {monthlyIntentStatus === 'sending' ? 'Sending…' : 'Start monthly giving'}
+                        </button>
+                      </form>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
