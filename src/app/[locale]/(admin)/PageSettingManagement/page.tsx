@@ -21,6 +21,87 @@ const PAGE_OPTIONS = [
   { value: 'privacy', label: 'Privacy Policy' },
 ];
 
+type PageSettings = {
+  pageTitle: string;
+  pageSubtitle: string;
+  heroBgImageUrl: string;
+  heroTriangleImageUrl: string;
+  heroTitleBgColor: string;
+  heroTitleTextColor: string;
+  heroSubtitleTextColor: string;
+  facebookUrl: string;
+  twitterUrl: string;
+  instagramUrl: string;
+  linkedinUrl: string;
+  quoteText: string;
+  quoteAuthorName: string;
+  quoteAuthorTitle: string;
+  quoteAuthorImageUrl: string;
+  ogShareTitle: string;
+  ogShareImage: string;
+  ogShareDescription: string;
+  twitterTitle: string;
+  twitterImage: string;
+  twitterDescription: string;
+  metaTitle: string;
+  metaDescription: string;
+};
+
+const PAGE_DEFAULT_TITLES: Record<string, { pageTitle: string; metaTitle: string }> = {
+  home: { pageTitle: "Women's Rights First", metaTitle: "Women's Rights First" },
+  about: { pageTitle: 'About Us', metaTitle: 'About Us | Women\'s Rights First' },
+  programs: { pageTitle: 'Our Programs', metaTitle: 'Our Programs | Women\'s Rights First' },
+  contact: { pageTitle: 'Contact Us', metaTitle: 'Contact Us | Women\'s Rights First' },
+  donate: { pageTitle: 'Donate', metaTitle: 'Donate | Women\'s Rights First' },
+  news: { pageTitle: 'News & Updates', metaTitle: 'News | Women\'s Rights First' },
+  team: { pageTitle: 'Our Team', metaTitle: 'Our Team | Women\'s Rights First' },
+  faq: { pageTitle: 'FAQ', metaTitle: 'FAQ | Women\'s Rights First' },
+  founders: { pageTitle: 'Our Founders', metaTitle: 'Our Founders | Women\'s Rights First' },
+  volunteer: { pageTitle: 'Volunteer', metaTitle: 'Volunteer | Women\'s Rights First' },
+  partnership: { pageTitle: 'Partnership', metaTitle: 'Partnership | Women\'s Rights First' },
+  vacancies: { pageTitle: 'Vacancies', metaTitle: 'Vacancies | Women\'s Rights First' },
+  privacy: { pageTitle: 'Privacy Policy', metaTitle: 'Privacy Policy | Women\'s Rights First' },
+};
+
+const defaultPageSettings = (pageKey?: string): PageSettings => {
+  const titles = (pageKey && PAGE_DEFAULT_TITLES[pageKey]) || PAGE_DEFAULT_TITLES.home;
+  return {
+    pageTitle: titles.pageTitle,
+    pageSubtitle: '',
+    heroBgImageUrl: '/images/GettyImages-1232002648.jpg',
+    heroTriangleImageUrl: '/images/Element-2-03-scaled.png',
+    heroTitleBgColor: 'bg-secondary',
+    heroTitleTextColor: 'text-white',
+    heroSubtitleTextColor: 'text-white/90',
+    facebookUrl: '',
+    twitterUrl: '',
+    instagramUrl: '',
+    linkedinUrl: '',
+    quoteText: '',
+    quoteAuthorName: '',
+    quoteAuthorTitle: '',
+    quoteAuthorImageUrl: '',
+    ogShareTitle: '',
+    ogShareImage: '',
+    ogShareDescription: '',
+    twitterTitle: '',
+    twitterImage: '',
+    twitterDescription: '',
+    metaTitle: titles.metaTitle,
+    metaDescription: '',
+  };
+};
+
+function mergePageSettings(partial: Record<string, any> | null | undefined, pageKey?: string): PageSettings {
+  const d = defaultPageSettings(pageKey);
+  if (!partial || typeof partial !== 'object') return d;
+  const out = { ...d };
+  (Object.keys(d) as (keyof PageSettings)[]).forEach((k) => {
+    if (partial[k] !== undefined && partial[k] !== null) (out as any)[k] = partial[k];
+  });
+  return out;
+}
+
 const HERO_TITLE_BG_OPTIONS = [
   { value: 'bg-primary', label: 'Primary (Dark)' },
   { value: 'bg-secondary', label: 'Secondary (Purple)' },
@@ -61,99 +142,63 @@ function SettingsIcon({ className }: { className?: string }) {
   );
 }
 
+function getInitialSettingsByPage(): Record<string, PageSettings> {
+  const init: Record<string, PageSettings> = {};
+  PAGE_OPTIONS.forEach((o) => {
+    init[o.value] = defaultPageSettings(o.value);
+  });
+  return init;
+}
+
 export default function PageSettingManagementPage() {
   const params = useParams();
   const locale = (params?.locale as string) || 'en';
 
   const [activeTab, setActiveTab] = useState<'individual' | 'sitewide'>('individual');
   const [selectedPage, setSelectedPage] = useState('home');
-
-  // Home page content
-  const [pageTitle, setPageTitle] = useState("Women's Rights First");
-  const [pageSubtitle, setPageSubtitle] = useState('');
-
-  // Hero section design
-  const [heroBgImageUrl, setHeroBgImageUrl] = useState(
-    '/images/GettyImages-1232002648.jpg'
-  );
-  const [heroTriangleImageUrl, setHeroTriangleImageUrl] = useState(
-    '/images/Element-2-03-scaled.png'
-  );
-  const [heroTitleBgColor, setHeroTitleBgColor] = useState('bg-secondary');
-  const [heroTitleTextColor, setHeroTitleTextColor] = useState('text-white');
-  const [heroSubtitleTextColor, setHeroSubtitleTextColor] = useState('text-white/90');
-
-  // Social media links
-  const [facebookUrl, setFacebookUrl] = useState('');
-  const [twitterUrl, setTwitterUrl] = useState('');
-  const [instagramUrl, setInstagramUrl] = useState('');
-  const [linkedinUrl, setLinkedinUrl] = useState('');
-
-  // Featured quote
-  const [quoteText, setQuoteText] = useState('');
-  const [quoteAuthorName, setQuoteAuthorName] = useState('');
-  const [quoteAuthorTitle, setQuoteAuthorTitle] = useState('');
-  const [quoteAuthorImageUrl, setQuoteAuthorImageUrl] = useState('');
-
-  // Social media sharing - Open Graph
-  const [ogShareTitle, setOgShareTitle] = useState('');
-  const [ogShareImage, setOgShareImage] = useState('');
-  const [ogShareDescription, setOgShareDescription] = useState('');
-
-  // Twitter Cards
-  const [twitterTitle, setTwitterTitle] = useState('');
-  const [twitterImage, setTwitterImage] = useState('');
-  const [twitterDescription, setTwitterDescription] = useState('');
-
-  // SEO & Meta
-  const [metaTitle, setMetaTitle] = useState("Women's Rights First");
-  const [metaDescription, setMetaDescription] = useState('');
-
+  const [settingsByPage, setSettingsByPage] = useState<Record<string, PageSettings>>(getInitialSettingsByPage);
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
 
+  const currentSettings = mergePageSettings(settingsByPage[selectedPage], selectedPage);
+  const selectedPageLabel = PAGE_OPTIONS.find((o) => o.value === selectedPage)?.label ?? selectedPage;
+
+  const updateCurrentPage = (updates: Partial<PageSettings>) => {
+    setSettingsByPage((prev) => ({
+      ...prev,
+      [selectedPage]: mergePageSettings({ ...(prev[selectedPage] || {}), ...updates }, selectedPage),
+    }));
+  };
+
   useEffect(() => {
-    loadAdminData<Record<string, any>>('page-settings').then(data => {
+    loadAdminData<Record<string, any>>('page-settings').then((data) => {
       if (!data) return;
-      if (data.selectedPage !== undefined) setSelectedPage(data.selectedPage);
-      if (data.pageTitle !== undefined) setPageTitle(data.pageTitle);
-      if (data.pageSubtitle !== undefined) setPageSubtitle(data.pageSubtitle);
-      if (data.heroBgImageUrl !== undefined) setHeroBgImageUrl(data.heroBgImageUrl);
-      if (data.heroTriangleImageUrl !== undefined) setHeroTriangleImageUrl(data.heroTriangleImageUrl);
-      if (data.heroTitleBgColor !== undefined) setHeroTitleBgColor(data.heroTitleBgColor);
-      if (data.heroTitleTextColor !== undefined) setHeroTitleTextColor(data.heroTitleTextColor);
-      if (data.heroSubtitleTextColor !== undefined) setHeroSubtitleTextColor(data.heroSubtitleTextColor);
-      if (data.facebookUrl !== undefined) setFacebookUrl(data.facebookUrl);
-      if (data.twitterUrl !== undefined) setTwitterUrl(data.twitterUrl);
-      if (data.instagramUrl !== undefined) setInstagramUrl(data.instagramUrl);
-      if (data.linkedinUrl !== undefined) setLinkedinUrl(data.linkedinUrl);
-      if (data.quoteText !== undefined) setQuoteText(data.quoteText);
-      if (data.quoteAuthorName !== undefined) setQuoteAuthorName(data.quoteAuthorName);
-      if (data.quoteAuthorTitle !== undefined) setQuoteAuthorTitle(data.quoteAuthorTitle);
-      if (data.quoteAuthorImageUrl !== undefined) setQuoteAuthorImageUrl(data.quoteAuthorImageUrl);
-      if (data.ogShareTitle !== undefined) setOgShareTitle(data.ogShareTitle);
-      if (data.ogShareImage !== undefined) setOgShareImage(data.ogShareImage);
-      if (data.ogShareDescription !== undefined) setOgShareDescription(data.ogShareDescription);
-      if (data.twitterTitle !== undefined) setTwitterTitle(data.twitterTitle);
-      if (data.twitterImage !== undefined) setTwitterImage(data.twitterImage);
-      if (data.twitterDescription !== undefined) setTwitterDescription(data.twitterDescription);
-      if (data.metaTitle !== undefined) setMetaTitle(data.metaTitle);
-      if (data.metaDescription !== undefined) setMetaDescription(data.metaDescription);
+      if (data.pages && typeof data.pages === 'object') {
+        const pages: Record<string, PageSettings> = {};
+        PAGE_OPTIONS.forEach((o) => {
+          pages[o.value] = mergePageSettings(data.pages[o.value], o.value);
+        });
+        setSettingsByPage(pages);
+        if (data.selectedPage && PAGE_OPTIONS.some((p) => p.value === data.selectedPage))
+          setSelectedPage(data.selectedPage);
+      } else {
+        const legacy = mergePageSettings(data, 'home');
+        setSettingsByPage((prev) => {
+          const next: Record<string, PageSettings> = {};
+          PAGE_OPTIONS.forEach((o) => {
+            next[o.value] = o.value === 'home' ? legacy : mergePageSettings(prev[o.value], o.value);
+          });
+          return next;
+        });
+        if (data.selectedPage) setSelectedPage(data.selectedPage);
+      }
     });
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveStatus('saving');
-    const data = {
-      selectedPage, pageTitle, pageSubtitle,
-      heroBgImageUrl, heroTriangleImageUrl, heroTitleBgColor, heroTitleTextColor, heroSubtitleTextColor,
-      facebookUrl, twitterUrl, instagramUrl, linkedinUrl,
-      quoteText, quoteAuthorName, quoteAuthorTitle, quoteAuthorImageUrl,
-      ogShareTitle, ogShareImage, ogShareDescription,
-      twitterTitle, twitterImage, twitterDescription,
-      metaTitle, metaDescription,
-    };
-    const ok = await saveAdminData('page-settings', data);
+    const payload = { pages: settingsByPage, selectedPage };
+    const ok = await saveAdminData('page-settings', payload);
     setSaveStatus(ok ? 'saved' : 'error');
     setTimeout(() => setSaveStatus('idle'), 3000);
   };
@@ -242,14 +287,14 @@ export default function PageSettingManagementPage() {
             </div>
 
             <div className="space-y-6">
-              {/* Home Page Content */}
+              {/* Page Content - title reflects selected page */}
               <div className={sectionClass}>
                 <div className={cardHeaderClass}>
                   <h3 className={`${cardTitleClass} font-heading flex items-center gap-2`}>
                     <SettingsIcon className="lucide lucide-settings2 w-5 h-5" />
-                    Home Page Content
+                    {selectedPageLabel} Page Content
                   </h3>
-                  <p className={cardDescClass}>Configure the main content displayed on the Home page</p>
+                  <p className={cardDescClass}>Configure the main content displayed on the {selectedPageLabel} page</p>
                 </div>
                 <div className={spaceY6Class}>
                   <div className="space-y-2">
@@ -257,8 +302,8 @@ export default function PageSettingManagementPage() {
                     <input
                       className={inputClass}
                       placeholder="Enter the main page title"
-                      value={pageTitle}
-                      onChange={(e) => setPageTitle(e.target.value)}
+                      value={currentSettings.pageTitle}
+                      onChange={(e) => updateCurrentPage({ pageTitle: e.target.value })}
                     />
                     <p className="text-xs text-gray-500">The main heading visible at the top of the page.</p>
                   </div>
@@ -268,8 +313,8 @@ export default function PageSettingManagementPage() {
                       className={textareaClass}
                       placeholder="Enter a descriptive subtitle"
                       rows={3}
-                      value={pageSubtitle}
-                      onChange={(e) => setPageSubtitle(e.target.value)}
+                      value={currentSettings.pageSubtitle}
+                      onChange={(e) => updateCurrentPage({ pageSubtitle: e.target.value })}
                     />
                     <p className="text-xs text-gray-500">The descriptive text that appears below the main title.</p>
                   </div>
@@ -288,8 +333,8 @@ export default function PageSettingManagementPage() {
                     <input
                       className={inputClass}
                       placeholder="https://example.com/hero-image.jpg"
-                      value={heroBgImageUrl}
-                      onChange={(e) => setHeroBgImageUrl(e.target.value)}
+                      value={currentSettings.heroBgImageUrl}
+                      onChange={(e) => updateCurrentPage({ heroBgImageUrl: e.target.value })}
                     />
                     <p className="text-xs text-gray-500">Background image for the header section of the page.</p>
                   </div>
@@ -298,8 +343,8 @@ export default function PageSettingManagementPage() {
                     <input
                       className={inputClass}
                       placeholder="https://example.com/triangle-image.jpg"
-                      value={heroTriangleImageUrl}
-                      onChange={(e) => setHeroTriangleImageUrl(e.target.value)}
+                      value={currentSettings.heroTriangleImageUrl}
+                      onChange={(e) => updateCurrentPage({ heroTriangleImageUrl: e.target.value })}
                     />
                     <p className="text-xs text-gray-500">Triangle-shaped overlay image for the right side of the hero section.</p>
                   </div>
@@ -308,8 +353,8 @@ export default function PageSettingManagementPage() {
                       <label className={labelClass}>Hero Title Background Color</label>
                       <select
                         className={selectClass}
-                        value={heroTitleBgColor}
-                        onChange={(e) => setHeroTitleBgColor(e.target.value)}
+                        value={currentSettings.heroTitleBgColor}
+                        onChange={(e) => updateCurrentPage({ heroTitleBgColor: e.target.value })}
                       >
                         {HERO_TITLE_BG_OPTIONS.map((o) => (
                           <option key={o.value} value={o.value}>
@@ -322,8 +367,8 @@ export default function PageSettingManagementPage() {
                       <label className={labelClass}>Hero Title Text Color</label>
                       <select
                         className={selectClass}
-                        value={heroTitleTextColor}
-                        onChange={(e) => setHeroTitleTextColor(e.target.value)}
+                        value={currentSettings.heroTitleTextColor}
+                        onChange={(e) => updateCurrentPage({ heroTitleTextColor: e.target.value })}
                       >
                         {HERO_TEXT_COLOR_OPTIONS.map((o) => (
                           <option key={o.value} value={o.value}>
@@ -337,8 +382,8 @@ export default function PageSettingManagementPage() {
                     <label className={labelClass}>Hero Subtitle Text Color</label>
                     <select
                       className={`${selectClass} w-full md:w-1/2`}
-                      value={heroSubtitleTextColor}
-                      onChange={(e) => setHeroSubtitleTextColor(e.target.value)}
+                      value={currentSettings.heroSubtitleTextColor}
+                      onChange={(e) => updateCurrentPage({ heroSubtitleTextColor: e.target.value })}
                     >
                       {HERO_SUBTITLE_COLOR_OPTIONS.map((o) => (
                         <option key={o.value} value={o.value}>
@@ -363,8 +408,8 @@ export default function PageSettingManagementPage() {
                       <input
                         className={inputClass}
                         placeholder="https://facebook.com/wrf"
-                        value={facebookUrl}
-                        onChange={(e) => setFacebookUrl(e.target.value)}
+                        value={currentSettings.facebookUrl}
+                        onChange={(e) => updateCurrentPage({ facebookUrl: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -372,8 +417,8 @@ export default function PageSettingManagementPage() {
                       <input
                         className={inputClass}
                         placeholder="https://twitter.com/wrf"
-                        value={twitterUrl}
-                        onChange={(e) => setTwitterUrl(e.target.value)}
+                        value={currentSettings.twitterUrl}
+                        onChange={(e) => updateCurrentPage({ twitterUrl: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -381,8 +426,8 @@ export default function PageSettingManagementPage() {
                       <input
                         className={inputClass}
                         placeholder="https://instagram.com/wrf"
-                        value={instagramUrl}
-                        onChange={(e) => setInstagramUrl(e.target.value)}
+                        value={currentSettings.instagramUrl}
+                        onChange={(e) => updateCurrentPage({ instagramUrl: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -390,8 +435,8 @@ export default function PageSettingManagementPage() {
                       <input
                         className={inputClass}
                         placeholder="https://linkedin.com/company/wrf"
-                        value={linkedinUrl}
-                        onChange={(e) => setLinkedinUrl(e.target.value)}
+                        value={currentSettings.linkedinUrl}
+                        onChange={(e) => updateCurrentPage({ linkedinUrl: e.target.value })}
                       />
                     </div>
                   </div>
@@ -411,8 +456,8 @@ export default function PageSettingManagementPage() {
                       className={textareaClass}
                       placeholder="Enter an inspiring quote"
                       rows={3}
-                      value={quoteText}
-                      onChange={(e) => setQuoteText(e.target.value)}
+                      value={currentSettings.quoteText}
+                      onChange={(e) => updateCurrentPage({ quoteText: e.target.value })}
                     />
                   </div>
                   <div className={gridClass}>
@@ -421,8 +466,8 @@ export default function PageSettingManagementPage() {
                       <input
                         className={inputClass}
                         placeholder="Author Name"
-                        value={quoteAuthorName}
-                        onChange={(e) => setQuoteAuthorName(e.target.value)}
+                        value={currentSettings.quoteAuthorName}
+                        onChange={(e) => updateCurrentPage({ quoteAuthorName: e.target.value })}
                       />
                     </div>
                     <div className="space-y-2">
@@ -430,8 +475,8 @@ export default function PageSettingManagementPage() {
                       <input
                         className={inputClass}
                         placeholder="CEO, Founder, etc."
-                        value={quoteAuthorTitle}
-                        onChange={(e) => setQuoteAuthorTitle(e.target.value)}
+                        value={currentSettings.quoteAuthorTitle}
+                        onChange={(e) => updateCurrentPage({ quoteAuthorTitle: e.target.value })}
                       />
                     </div>
                   </div>
@@ -440,8 +485,8 @@ export default function PageSettingManagementPage() {
                     <input
                       className={inputClass}
                       placeholder="https://example.com/author-photo.jpg"
-                      value={quoteAuthorImageUrl}
-                      onChange={(e) => setQuoteAuthorImageUrl(e.target.value)}
+                      value={currentSettings.quoteAuthorImageUrl}
+                      onChange={(e) => updateCurrentPage({ quoteAuthorImageUrl: e.target.value })}
                     />
                   </div>
                 </div>
@@ -462,8 +507,8 @@ export default function PageSettingManagementPage() {
                         <input
                           className={inputClass}
                           placeholder="Title when shared (leave empty to use page title)"
-                          value={ogShareTitle}
-                          onChange={(e) => setOgShareTitle(e.target.value)}
+                          value={currentSettings.ogShareTitle}
+                          onChange={(e) => updateCurrentPage({ ogShareTitle: e.target.value })}
                         />
                       </div>
                       <div className="space-y-2">
@@ -471,8 +516,8 @@ export default function PageSettingManagementPage() {
                         <input
                           className={inputClass}
                           placeholder="https://example.com/share-image.jpg"
-                          value={ogShareImage}
-                          onChange={(e) => setOgShareImage(e.target.value)}
+                          value={currentSettings.ogShareImage}
+                          onChange={(e) => updateCurrentPage({ ogShareImage: e.target.value })}
                         />
                         <p className="text-xs text-gray-500">Recommended: 1200x630px</p>
                       </div>
@@ -483,8 +528,8 @@ export default function PageSettingManagementPage() {
                         className={textareaClass}
                         placeholder="Description when shared (leave empty to use meta description)"
                         rows={2}
-                        value={ogShareDescription}
-                        onChange={(e) => setOgShareDescription(e.target.value)}
+                        value={currentSettings.ogShareDescription}
+                        onChange={(e) => updateCurrentPage({ ogShareDescription: e.target.value })}
                       />
                     </div>
                   </div>
@@ -496,8 +541,8 @@ export default function PageSettingManagementPage() {
                         <input
                           className={inputClass}
                           placeholder="Twitter-specific title (optional)"
-                          value={twitterTitle}
-                          onChange={(e) => setTwitterTitle(e.target.value)}
+                          value={currentSettings.twitterTitle}
+                          onChange={(e) => updateCurrentPage({ twitterTitle: e.target.value })}
                         />
                       </div>
                       <div className="space-y-2">
@@ -505,8 +550,8 @@ export default function PageSettingManagementPage() {
                         <input
                           className={inputClass}
                           placeholder="https://example.com/twitter-image.jpg"
-                          value={twitterImage}
-                          onChange={(e) => setTwitterImage(e.target.value)}
+                          value={currentSettings.twitterImage}
+                          onChange={(e) => updateCurrentPage({ twitterImage: e.target.value })}
                         />
                         <p className="text-xs text-gray-500">Recommended: 1200x675px</p>
                       </div>
@@ -517,8 +562,8 @@ export default function PageSettingManagementPage() {
                         className={textareaClass}
                         placeholder="Twitter-specific description (optional)"
                         rows={2}
-                        value={twitterDescription}
-                        onChange={(e) => setTwitterDescription(e.target.value)}
+                        value={currentSettings.twitterDescription}
+                        onChange={(e) => updateCurrentPage({ twitterDescription: e.target.value })}
                       />
                     </div>
                   </div>
@@ -537,8 +582,8 @@ export default function PageSettingManagementPage() {
                     <input
                       className={inputClass}
                       placeholder="SEO-optimized page title"
-                      value={metaTitle}
-                      onChange={(e) => setMetaTitle(e.target.value)}
+                      value={currentSettings.metaTitle}
+                      onChange={(e) => updateCurrentPage({ metaTitle: e.target.value })}
                     />
                     <p className="text-xs text-gray-500">Appears in browser tabs and search results. Keep under 60 characters.</p>
                   </div>
@@ -548,8 +593,8 @@ export default function PageSettingManagementPage() {
                       className={textareaClass}
                       placeholder="Brief description for search engines"
                       rows={3}
-                      value={metaDescription}
-                      onChange={(e) => setMetaDescription(e.target.value)}
+                      value={currentSettings.metaDescription}
+                      onChange={(e) => updateCurrentPage({ metaDescription: e.target.value })}
                     />
                     <p className="text-xs text-gray-500">Appears in search engine results. Keep under 160 characters.</p>
                   </div>

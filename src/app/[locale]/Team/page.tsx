@@ -36,7 +36,7 @@ function SocialIcon({ href, icon, label }: { href: string; icon: string; label: 
 }
 
 export default function TeamPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const BOARD_MEMBERS = [
     {
@@ -60,7 +60,7 @@ export default function TeamPage() {
       .catch(() => {});
   }, []);
 
-  const displayMembers = adminData && adminData.members?.length > 0
+  const displayMembers = adminData && adminData.members?.length > 0 && locale === 'en'
     ? adminData.members.map((m: any) => {
         const links: { label: string; href: string; icon: string }[] = [];
         if (m.linkedinUrl) links.push({ label: 'LinkedIn', href: m.linkedinUrl, icon: 'linkedin' });
@@ -77,7 +77,7 @@ export default function TeamPage() {
       })
     : BOARD_MEMBERS;
 
-  const teamSections = adminData && adminData.categories?.length > 0
+  const teamSections = adminData && adminData.categories?.length > 0 && locale === 'en'
     ? adminData.categories.map((cat: any) => ({
         title: cat.name,
         description: cat.description || '',

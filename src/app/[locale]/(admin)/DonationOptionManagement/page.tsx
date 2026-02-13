@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AdminShell } from '@/components/AdminShell';
 import { loadAdminData, saveAdminData } from '@/lib/adminApi';
 
@@ -58,11 +58,22 @@ export default function DonationOptionManagementPage() {
   const [isActive, setIsActive] = useState(true);
 
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
+  const formCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadAdminData<{ options: DonationOption[] }>('donation-options').then(data => {
-      if (!data) return;
-      if (data.options !== undefined) setOptions(data.options);
+      if (!data || !Array.isArray(data.options)) return;
+      const normalized = data.options.map((o: any) => ({
+        id: String(o.id ?? o.order ?? Math.random()),
+        order: Number(o.order) || 0,
+        title: o.title ?? '',
+        content: o.content ?? '',
+        iconName: o.iconName ?? 'Mail',
+        colorClass: o.colorClass ?? 'bg-primary',
+        displayOrder: Number(o.displayOrder ?? o.order ?? 0),
+        isActive: o.isActive !== false,
+      }));
+      setOptions(normalized);
     });
   }, []);
 
@@ -86,9 +97,10 @@ export default function DonationOptionManagementPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let updatedOptions: DonationOption[];
-    if (editingId) {
+    const editingIdStr = editingId ? String(editingId) : null;
+    if (editingIdStr) {
       updatedOptions = options.map((opt) =>
-        opt.id === editingId
+        String(opt.id) === editingIdStr
           ? { ...opt, title, content, iconName, colorClass, displayOrder, isActive }
           : opt
       );
@@ -114,19 +126,21 @@ export default function DonationOptionManagementPage() {
   };
 
   const handleEdit = (opt: DonationOption) => {
-    setEditingId(opt.id);
-    setTitle(opt.title);
-    setContent(opt.content);
-    setIconName(opt.iconName);
-    setColorClass(opt.colorClass);
-    setDisplayOrder(opt.displayOrder);
-    setIsActive(opt.isActive);
+    setEditingId(String(opt.id));
+    setTitle(opt.title ?? '');
+    setContent(opt.content ?? '');
+    setIconName(opt.iconName ?? 'Mail');
+    setColorClass(opt.colorClass ?? 'bg-primary');
+    setDisplayOrder(opt.displayOrder ?? 0);
+    setIsActive(opt.isActive !== false);
+    formCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   const handleDelete = async (id: string) => {
-    const updatedOptions = options.filter((o) => o.id !== id);
+    const idStr = String(id);
+    const updatedOptions = options.filter((o) => String(o.id) !== idStr);
     setOptions(updatedOptions);
-    if (editingId === id) resetForm();
+    if (editingId !== null && String(editingId) === idStr) resetForm();
     await persistOptions(updatedOptions);
   };
 
@@ -146,7 +160,7 @@ export default function DonationOptionManagementPage() {
     <AdminShell>
       <div className="space-y-6">
         {/* Create New Donation Option */}
-        <div className={cardClass}>
+        <div ref={formCardRef} className={cardClass}>
           <div className="flex flex-col space-y-1.5 p-6">
             <h3 className="text-2xl font-semibold leading-none tracking-tight">
               {editingId ? 'Edit Donation Option' : 'Create New Donation Option'}
@@ -165,7 +179,6 @@ export default function DonationOptionManagementPage() {
               <textarea
                 className={textareaClass}
                 placeholder="Content/Instructions (HTML supported)"
-                required
                 rows={4}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}

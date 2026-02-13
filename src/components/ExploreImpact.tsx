@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
 
 export default function ExploreImpact() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
   useEffect(() => {
@@ -32,11 +32,11 @@ export default function ExploreImpact() {
         <div className="mb-12 text-left">
           <div className={`mb-4 inline-block ${showcaseTitleBg} px-8 py-6`}>
             <h2 className="text-4xl font-bold text-white">
-              {adminData?.pagesShowcaseTitle || t('exploreImpact.title')}
+              {(locale === 'en' && adminData?.pagesShowcaseTitle) || t('exploreImpact.title')}
             </h2>
           </div>
           <p className="text-lg text-gray-600">
-            {adminData?.pagesShowcaseSubtitle || t('exploreImpact.description')}
+            {(locale === 'en' && adminData?.pagesShowcaseSubtitle) || t('exploreImpact.description')}
           </p>
         </div>
         <div className="grid items-stretch gap-8 lg:grid-cols-5">
@@ -57,7 +57,7 @@ export default function ExploreImpact() {
                 &ldquo;
               </div>
               <blockquote className="relative z-10 mb-6 pl-8 text-2xl italic leading-relaxed text-white">
-                {adminData?.pagesShowcaseQuote || t('exploreImpact.quote')}
+                {(locale === 'en' && adminData?.pagesShowcaseQuote) || t('exploreImpact.quote')}
               </blockquote>
               <div
                 className="absolute -bottom-2 right-0 select-none text-8xl font-bold leading-none text-white/90"

@@ -143,11 +143,28 @@ const icons: Record<string, React.ReactNode> = {
 
 const TABS = ['mission', 'values', 'quote', 'history', 'impact', 'team', 'links'] as const;
 const COLOR_OPTIONS = [
-  { value: 'primary', label: 'Primary (Dark)' },
-  { value: 'secondary', label: 'Secondary (Purple)' },
-  { value: 'white', label: 'White' },
-  { value: 'accent', label: 'Accent (Pink)' },
+  { value: 'wrf-black', label: 'WRF Dark (#1a1a1a)' },
+  { value: 'wrf-purple', label: 'WRF Purple (#6B5B95)' },
+  { value: 'wrf-coral', label: 'WRF Coral (#E07A7A)' },
+  { value: 'wrf-footer-mauve', label: 'WRF Mauve (#b88a9e)' },
+  { value: 'white', label: 'White (#ffffff)' },
 ];
+
+/** Maps admin color names to actual CSS hex values */
+const COLOR_HEX_MAP: Record<string, string> = {
+  'primary': '#1a1a1a',
+  'secondary': '#6B5B95',
+  'accent': '#E07A7A',
+  'white': '#ffffff',
+  'wrf-black': '#1a1a1a',
+  'wrf-purple': '#6B5B95',
+  'wrf-coral': '#E07A7A',
+  'wrf-footer-mauve': '#b88a9e',
+};
+
+function resolveColor(name: string, fallback: string): string {
+  return COLOR_HEX_MAP[name] || name || fallback;
+}
 
 export default function AboutManagementPage() {
   const router = useRouter();
@@ -160,7 +177,7 @@ export default function AboutManagementPage() {
 
   // Mission section state
   const [sectionTitle, setSectionTitle] = useState('Our Mission & History');
-  const [titleBgColor, setTitleBgColor] = useState('primary');
+  const [titleBgColor, setTitleBgColor] = useState('wrf-black');
   const [titleTextColor, setTitleTextColor] = useState('white');
   const [content, setContent] = useState(
     'To empower and transform Afghan women and girls by delivering peacebuilding, accountability, and digital transformation services through locally grounded and modernized indigenous approaches.'
@@ -170,10 +187,16 @@ export default function AboutManagementPage() {
   );
   const [button1Text, setButton1Text] = useState('Join Our Mission');
   const [button1Url, setButton1Url] = useState('Volunteer');
-  const [button1Color, setButton1Color] = useState('secondary');
+  const [button1Color, setButton1Color] = useState('wrf-purple');
   const [button2Text, setButton2Text] = useState('Explore Programs');
   const [button2Url, setButton2Url] = useState('Programs');
-  const [button2Color, setButton2Color] = useState('accent');
+  const [button2Color, setButton2Color] = useState('wrf-coral');
+  // Core values description state
+  const [valuesEqualityDesc, setValuesEqualityDesc] = useState('');
+  const [valuesEmpowermentDesc, setValuesEmpowermentDesc] = useState('');
+  const [valuesCommunityDesc, setValuesCommunityDesc] = useState('');
+  const [valuesInnovationDesc, setValuesInnovationDesc] = useState('');
+
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
 
   const base = `/${locale}`;
@@ -211,6 +234,11 @@ export default function AboutManagementPage() {
       if (data.button2Text !== undefined) setButton2Text(data.button2Text);
       if (data.button2Url !== undefined) setButton2Url(data.button2Url);
       if (data.button2Color !== undefined) setButton2Color(data.button2Color);
+      // Core values descriptions
+      if (data.valuesEqualityDesc !== undefined) setValuesEqualityDesc(data.valuesEqualityDesc);
+      if (data.valuesEmpowermentDesc !== undefined) setValuesEmpowermentDesc(data.valuesEmpowermentDesc);
+      if (data.valuesCommunityDesc !== undefined) setValuesCommunityDesc(data.valuesCommunityDesc);
+      if (data.valuesInnovationDesc !== undefined) setValuesInnovationDesc(data.valuesInnovationDesc);
     });
   }, []);
 
@@ -226,6 +254,8 @@ export default function AboutManagementPage() {
       sectionTitle, titleBgColor, titleTextColor, content, imageUrl,
       button1Text, button1Url, button1Color,
       button2Text, button2Url, button2Color,
+      valuesEqualityDesc, valuesEmpowermentDesc,
+      valuesCommunityDesc, valuesInnovationDesc,
     };
     const ok = await saveAdminData('about', data);
     setSaveStatus(ok ? 'saved' : 'error');
@@ -408,7 +438,7 @@ export default function AboutManagementPage() {
                     </div>
                     <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
                       <div className="space-y-4">
-                        <h3 className="font-semibold">Button 1</h3>
+                        <h3 className="font-semibold">Button 1 (Join Our Mission)</h3>
                         <div>
                           <label className="text-sm font-medium leading-none">Text</label>
                           <input
@@ -419,11 +449,12 @@ export default function AboutManagementPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-sm font-medium leading-none">URL</label>
+                          <label className="text-sm font-medium leading-none">URL (page name, e.g. &quot;Volunteer&quot;)</label>
                           <input
                             type="text"
                             value={button1Url}
                             onChange={(e) => setButton1Url(e.target.value)}
+                            placeholder="Volunteer"
                             className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base mt-1 focus:outline-none focus:ring-2 focus:ring-primary md:text-sm"
                           />
                         </div>
@@ -443,7 +474,7 @@ export default function AboutManagementPage() {
                         </div>
                       </div>
                       <div className="space-y-4">
-                        <h3 className="font-semibold">Button 2</h3>
+                        <h3 className="font-semibold">Button 2 (Explore Programs)</h3>
                         <div>
                           <label className="text-sm font-medium leading-none">Text</label>
                           <input
@@ -454,11 +485,12 @@ export default function AboutManagementPage() {
                           />
                         </div>
                         <div>
-                          <label className="text-sm font-medium leading-none">URL</label>
+                          <label className="text-sm font-medium leading-none">URL (page name, e.g. &quot;ProgramPage/legal&quot;)</label>
                           <input
                             type="text"
                             value={button2Url}
                             onChange={(e) => setButton2Url(e.target.value)}
+                            placeholder="ProgramPage/legal"
                             className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base mt-1 focus:outline-none focus:ring-2 focus:ring-primary md:text-sm"
                           />
                         </div>
@@ -478,15 +510,129 @@ export default function AboutManagementPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Live Preview */}
+                    <div className="pt-6 border-t border-gray-200">
+                      <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wider mb-4">Live Preview</h3>
+                      <div className="rounded-lg border border-gray-200 bg-white p-6 overflow-hidden">
+                        <div className="grid items-center gap-8 lg:grid-cols-2">
+                          <div className="text-left">
+                            <div
+                              className="inline-block p-4"
+                              style={{ backgroundColor: resolveColor(titleBgColor, '#1a1a1a') }}
+                            >
+                              <h2 className="text-2xl font-bold" style={{ color: resolveColor(titleTextColor, '#ffffff') }}>
+                                {sectionTitle || 'Our Mission & History'}
+                              </h2>
+                            </div>
+                            <p className="mb-6 mt-4 text-sm leading-relaxed text-gray-700 max-w-md">
+                              {content ? content.slice(0, 200) + (content.length > 200 ? '...' : '') : 'Content will appear here...'}
+                            </p>
+                            <div className="flex flex-wrap gap-3">
+                              <span
+                                className="inline-flex items-center rounded-none px-5 py-2 text-sm font-semibold text-white"
+                                style={{ backgroundColor: resolveColor(button1Color, '#6B5B95') }}
+                              >
+                                {button1Text || 'Join Our Mission'}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 h-4 w-4">
+                                  <path d="M5 12h14" />
+                                  <path d="m12 5 7 7-7 7" />
+                                </svg>
+                              </span>
+                              <span
+                                className="inline-flex items-center rounded-none px-5 py-2 text-sm font-semibold text-white"
+                                style={{ backgroundColor: resolveColor(button2Color, '#E07A7A') }}
+                              >
+                                {button2Text || 'Explore Programs'}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 h-4 w-4">
+                                  <path d="M5 12h14" />
+                                  <path d="m12 5 7 7-7 7" />
+                                </svg>
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            {imageUrl ? (
+                              <img src={imageUrl} alt="Preview" className="h-48 w-full rounded object-cover shadow" />
+                            ) : (
+                              <div className="flex h-48 w-full items-center justify-center rounded bg-gray-100 text-gray-400 text-sm">
+                                Image preview
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
 
               {activeTab === 'values' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
-                  <h3 className="text-lg font-semibold">Values Section</h3>
-                  <p className="text-gray-600 font-body">This section displays the organization&apos;s core values. Content is currently managed through the translation files (en.ts, fa.ts, ps.ts) and renders automatically on the About page.</p>
-                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                  <div className="flex flex-col space-y-1.5 p-6">
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                      </svg>
+                      Core Values Descriptions
+                    </h3>
+                    <p className="text-sm text-gray-500">Edit the short descriptions that appear when users click on each core value. Leave empty to use the default translated text.</p>
+                  </div>
+                  <div className="p-6 pt-0 space-y-6">
+                    <div className="rounded-md border border-gray-200 p-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block w-3 h-3 rounded-full bg-wrf-black" />
+                        <label className="text-sm font-semibold leading-none">Equality &amp; Justice</label>
+                      </div>
+                      <textarea
+                        value={valuesEqualityDesc}
+                        onChange={(e) => setValuesEqualityDesc(e.target.value)}
+                        rows={3}
+                        placeholder="We believe every woman deserves equal rights, opportunities, and access to justice..."
+                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      />
+                    </div>
+                    <div className="rounded-md border border-gray-200 p-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block w-3 h-3 rounded-full bg-wrf-purple" />
+                        <label className="text-sm font-semibold leading-none">Empowerment &amp; Leadership</label>
+                      </div>
+                      <textarea
+                        value={valuesEmpowermentDesc}
+                        onChange={(e) => setValuesEmpowermentDesc(e.target.value)}
+                        rows={3}
+                        placeholder="We invest in women's potential by providing education, mentorship, and resources..."
+                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      />
+                    </div>
+                    <div className="rounded-md border border-gray-200 p-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block w-3 h-3 rounded-full bg-wrf-coral" />
+                        <label className="text-sm font-semibold leading-none">Community &amp; Solidarity</label>
+                      </div>
+                      <textarea
+                        value={valuesCommunityDesc}
+                        onChange={(e) => setValuesCommunityDesc(e.target.value)}
+                        rows={3}
+                        placeholder="We stand united with women across borders, cultures, and backgrounds..."
+                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      />
+                    </div>
+                    <div className="rounded-md border border-gray-200 p-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-block w-3 h-3 rounded-full bg-wrf-footer-mauve" />
+                        <label className="text-sm font-semibold leading-none">Innovation &amp; Sustainability</label>
+                      </div>
+                      <textarea
+                        value={valuesInnovationDesc}
+                        onChange={(e) => setValuesInnovationDesc(e.target.value)}
+                        rows={3}
+                        placeholder="We embrace creative solutions and modern approaches to create lasting change..."
+                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400">Tip: These descriptions expand when a visitor clicks on the value card on the About page. If left empty, the default translated text is used.</p>
+                  </div>
                 </div>
               )}
               {activeTab === 'quote' && (

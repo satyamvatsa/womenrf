@@ -9,18 +9,25 @@ export default function VacanciesPage() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [applyVacancy, setApplyVacancy] = useState<any | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [form, setForm] = useState({ fullName: '', email: '', phone: '', coverLetter: '', resumeUrl: '' });
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const [adminData, setAdminData] = useState<Record<string, any> | any[] | null>(null);
   useEffect(() => {
     fetch('/api/data/vacancies', { cache: 'no-store' })
       .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
+      .then(d => { if (d != null) setAdminData(d); })
       .catch(() => {});
   }, []);
 
-  const openVacancies = adminData && adminData.vacancies?.length > 0
-    ? adminData.vacancies.filter((v: any) => v.status === 'open')
-    : [];
+  const vacanciesList = Array.isArray(adminData)
+    ? adminData
+    : (adminData && Array.isArray((adminData as Record<string, any>).vacancies)
+      ? (adminData as Record<string, any>).vacancies
+      : []);
+  const openVacancies = vacanciesList.filter((v: any) => v.status === 'open');
 
   const filteredVacancies = openVacancies.filter((v: any) => {
     if (searchQuery.trim()) {
@@ -32,7 +39,49 @@ export default function VacanciesPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Search logic can be wired later
+  };
+
+  const openApply = (v: any) => {
+    setApplyVacancy(v);
+    setSubmitSuccess(false);
+    setForm({ fullName: '', email: '', phone: '', coverLetter: '', resumeUrl: '' });
+  };
+
+  const closeApply = () => {
+    setApplyVacancy(null);
+    setSubmitting(false);
+    setSubmitSuccess(false);
+  };
+
+  const handleApplySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!applyVacancy) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch('/api/submit/job-applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: form.fullName.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          position: applyVacancy.title || applyVacancy.id,
+          vacancyId: applyVacancy.id,
+          coverLetter: form.coverLetter.trim(),
+          resumeUrl: form.resumeUrl.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setSubmitSuccess(true);
+        setTimeout(() => closeApply(), 2000);
+      } else {
+        alert(data?.error || 'Something went wrong. Please try again.');
+      }
+    } catch {
+      alert('Something went wrong. Please try again.');
+    }
+    setSubmitting(false);
   };
 
   return (
@@ -147,6 +196,15 @@ export default function VacanciesPage() {
                       </span>
                     )}
                   </div>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => openApply(v)}
+                      className="w-full rounded-none bg-wrf-black px-4 py-3 font-semibold text-white transition-colors hover:bg-black focus:outline-none focus:ring-2 focus:ring-wrf-black focus:ring-offset-2"
+                    >
+                      {t('vacancies.apply.button')}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -173,6 +231,62 @@ export default function VacanciesPage() {
           )}
         </div>
       </section>
+
+      {/* Apply modal */}
+      {applyVacancy && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={closeApply} role="dialog" aria-modal="true" aria-labelledby="apply-modal-title">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-none border border-gray-200 bg-white shadow-xl" onClick={e => e.stopPropagation()}>
+            <div className="sticky top-0 border-b border-gray-200 bg-white px-6 py-4">
+              <h2 id="apply-modal-title" className="text-xl font-bold text-wrf-black">
+                {t('vacancies.apply.title')} — {applyVacancy.title}
+              </h2>
+              <p className="mt-1 text-sm text-gray-500">{t('vacancies.apply.subtitle')}</p>
+            </div>
+            <form onSubmit={handleApplySubmit} className="space-y-4 p-6">
+              {submitSuccess ? (
+                <p className="rounded border border-green-200 bg-green-50 p-4 text-green-800">{t('vacancies.apply.success')}</p>
+              ) : (
+                <>
+                  <div>
+                    <label htmlFor="apply-fullName" className="mb-1 block text-sm font-medium text-gray-700">{t('vacancies.apply.fullName')}</label>
+                    <input id="apply-fullName" type="text" required value={form.fullName} onChange={e => setForm(f => ({ ...f, fullName: e.target.value }))}
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-wrf-black focus:outline-none focus:ring-1 focus:ring-wrf-black" />
+                  </div>
+                  <div>
+                    <label htmlFor="apply-email" className="mb-1 block text-sm font-medium text-gray-700">{t('vacancies.apply.email')}</label>
+                    <input id="apply-email" type="email" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-wrf-black focus:outline-none focus:ring-1 focus:ring-wrf-black" />
+                  </div>
+                  <div>
+                    <label htmlFor="apply-phone" className="mb-1 block text-sm font-medium text-gray-700">{t('vacancies.apply.phone')}</label>
+                    <input id="apply-phone" type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-wrf-black focus:outline-none focus:ring-1 focus:ring-wrf-black" />
+                  </div>
+                  <div>
+                    <label htmlFor="apply-coverLetter" className="mb-1 block text-sm font-medium text-gray-700">{t('vacancies.apply.coverLetter')}</label>
+                    <textarea id="apply-coverLetter" rows={4} required value={form.coverLetter} onChange={e => setForm(f => ({ ...f, coverLetter: e.target.value }))}
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-wrf-black focus:outline-none focus:ring-1 focus:ring-wrf-black" />
+                  </div>
+                  <div>
+                    <label htmlFor="apply-resumeUrl" className="mb-1 block text-sm font-medium text-gray-700">{t('vacancies.apply.resumeUrl')}</label>
+                    <input id="apply-resumeUrl" type="url" placeholder="https://..." value={form.resumeUrl} onChange={e => setForm(f => ({ ...f, resumeUrl: e.target.value }))}
+                      className="w-full rounded-none border border-gray-300 px-3 py-2 focus:border-wrf-black focus:outline-none focus:ring-1 focus:ring-wrf-black" />
+                  </div>
+                  <div className="flex gap-3 pt-2">
+                    <button type="submit" disabled={submitting}
+                      className="flex-1 rounded-none bg-wrf-black px-4 py-3 font-semibold text-white hover:bg-black disabled:opacity-70">
+                      {submitting ? t('vacancies.apply.submitting') : t('vacancies.apply.submit')}
+                    </button>
+                    <button type="button" onClick={closeApply} className="rounded-none border border-gray-300 bg-white px-4 py-3 font-semibold text-gray-700 hover:bg-gray-50">
+                      {t('vacancies.apply.cancel')}
+                    </button>
+                  </div>
+                </>
+              )}
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

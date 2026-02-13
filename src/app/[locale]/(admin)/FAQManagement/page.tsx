@@ -55,65 +55,55 @@ const SvgX = ({ className }: { className?: string }) => (
   </svg>
 );
 
-type FAQCategory = { id: string; name: string; colorClass: string };
-type FAQ = { id: string; question: string; answer: string; categoryId: string; isActive: boolean };
+type FAQCategory = { id: string; name: string; colorClass: string; displayOrder?: number };
+type FAQ = {
+  id: string;
+  question: string;
+  answer: string;
+  categoryId: string;
+  isActive: boolean;
+  backgroundColor?: string;
+  textColor?: string;
+  displayOrder?: number;
+};
 
-const defaultCategories: FAQCategory[] = [
-  { id: 'cat-1', name: 'General Questions', colorClass: 'bg-secondary' },
-  { id: 'cat-2', name: 'Programs & Services', colorClass: 'bg-accent' },
-  { id: 'cat-3', name: 'Getting Involved', colorClass: 'bg-support-1' },
-  { id: 'cat-4', name: 'Contact & Support', colorClass: 'bg-primary' },
+const FAQ_BG_OPTIONS = [
+  { value: 'bg-wrf-purple', label: 'Purple' },
+  { value: 'bg-wrf-purple-dark', label: 'Dark Purple' },
+  { value: 'bg-wrf-footer-mauve', label: 'Mauve / Pink' },
+  { value: 'bg-wrf-coral', label: 'Coral / Red' },
+  { value: 'bg-wrf-footer-dark', label: 'Dark Charcoal' },
+  { value: 'bg-wrf-black', label: 'Black' },
+];
+const FAQ_TEXT_OPTIONS = [
+  { value: 'text-white', label: 'White' },
+  { value: 'text-white/90', label: 'White (90%)' },
 ];
 
+const CATEGORY_COLOR_OPTIONS = [
+  { value: 'bg-wrf-purple', label: 'Purple' },
+  { value: 'bg-wrf-purple-dark', label: 'Dark Purple' },
+  { value: 'bg-wrf-footer-mauve', label: 'Mauve / Pink' },
+  { value: 'bg-wrf-coral', label: 'Coral / Red' },
+  { value: 'bg-wrf-footer-dark', label: 'Dark Charcoal' },
+  { value: 'bg-wrf-black', label: 'Black' },
+];
+
+const defaultCategories: FAQCategory[] = [
+  { id: 'cat-1', name: 'General Questions', colorClass: 'bg-wrf-purple', displayOrder: 1 },
+  { id: 'cat-2', name: 'Programs & Services', colorClass: 'bg-wrf-coral', displayOrder: 2 },
+  { id: 'cat-3', name: 'Getting Involved', colorClass: 'bg-wrf-footer-mauve', displayOrder: 3 },
+  { id: 'cat-4', name: 'Contact & Support', colorClass: 'bg-wrf-black', displayOrder: 4 },
+];
+
+/** Reference order (top to bottom): 1.What is WRF, 2.How volunteer, 3.Get in touch, 4.Programs, 5.How long, 6.Donation */
 const defaultFAQs: FAQ[] = [
-  {
-    id: 'faq-1',
-    question: "What is Women's Rights First (WRF)?",
-    answer:
-      "Women's Rights First is an Afghan women–led organization committed to defending, restoring, and advancing the rights and dignity of Afghan women and girls. We document human rights violations as legal evidence, support survivor-led advocacy for justice and accountability, and empower local women peacebuilders to lead dialogue, mediation, and community resilience efforts. We work to ensure that Afghan women are not erased, that their voices shape the future of Afghanistan, and that no peace or policy is ever made in their absence.",
-    categoryId: 'cat-1',
-    isActive: true,
-  },
-  {
-    id: 'faq-2',
-    question: 'How long has WRF been operating?',
-    answer:
-      'WRF was founded in 2022 and has been actively serving since then, working to defend and advance the rights of Afghan women and girls through documentation, peacebuilding, advocacy, and digital protection.',
-    categoryId: 'cat-1',
-    isActive: true,
-  },
-  {
-    id: 'faq-3',
-    question: 'What programs does WRF offer?',
-    answer:
-      'WRF runs four key programs:\n• Accountability & Documentation — gathering legal evidence of human rights violations\n• Peacebuilding — training and supporting Afghan women as mediators and negotiators\n• Digital Transformation & Open Gender Data — using technology to protect evidence and visibility\n• Advocacy & Representation — amplifying Afghan women\'s voices in global decision-making spaces',
-    categoryId: 'cat-2',
-    isActive: true,
-  },
-  {
-    id: 'faq-4',
-    question: 'How can I volunteer with WRF?',
-    answer:
-      "WRF welcomes volunteers who are dedicated to advancing the rights, dignity, and agency of Afghan women and girls. We particularly value expertise in research, legal analysis, translation, digital security, advocacy, communications, and survivor-centered documentation. If you are interested in contributing, please contact us through our website or email us with a brief summary of your skills, area of interest, and availability. Volunteer opportunities are reviewed on a rolling basis, with careful consideration for safety, confidentiality, and alignment with our mission.",
-    categoryId: 'cat-3',
-    isActive: true,
-  },
-  {
-    id: 'faq-5',
-    question: "Can I make a donation to support WRF's work?",
-    answer:
-      'Yes, donations are greatly appreciated and help us continue our vital work. You can donate online through our secure portal, by check, or through recurring monthly donations.',
-    categoryId: 'cat-4',
-    isActive: true,
-  },
-  {
-    id: 'faq-6',
-    question: 'How do I get in touch with WRF?',
-    answer:
-      'You can reach us via email, phone, or through our contact form on the website. Our team typically responds within 24-48 hours during business days.',
-    categoryId: 'cat-4',
-    isActive: true,
-  },
+  { id: 'faq-1', question: "What is Women's Rights First (WRF)?", answer: "Women's Rights First is an Afghan women–led organization committed to defending, restoring, and advancing the rights and dignity of Afghan women and girls. We document human rights violations as legal evidence, support survivor-led advocacy for justice and accountability, and empower local women peacebuilders to lead dialogue, mediation, and community resilience efforts. We work to ensure that Afghan women are not erased, that their voices shape the future of Afghanistan, and that no peace or policy is ever made in their absence.", categoryId: 'cat-1', isActive: true, backgroundColor: 'bg-wrf-purple', textColor: 'text-white', displayOrder: 1 },
+  { id: 'faq-4', question: 'How can I volunteer with WRF?', answer: "WRF welcomes volunteers who are dedicated to advancing the rights, dignity, and agency of Afghan women and girls. We particularly value expertise in research, legal analysis, translation, digital security, advocacy, communications, and survivor-centered documentation. If you are interested in contributing, please contact us through our website or email us with a brief summary of your skills, area of interest, and availability. Volunteer opportunities are reviewed on a rolling basis, with careful consideration for safety, confidentiality, and alignment with our mission.", categoryId: 'cat-3', isActive: true, backgroundColor: 'bg-wrf-purple-dark', textColor: 'text-white', displayOrder: 2 },
+  { id: 'faq-6', question: 'How do I get in touch with WRF?', answer: 'You can reach us via email, phone, or through our contact form on the website. Our team typically responds within 24-48 hours during business days.', categoryId: 'cat-4', isActive: true, backgroundColor: 'bg-wrf-footer-mauve', textColor: 'text-white', displayOrder: 3 },
+  { id: 'faq-3', question: 'What programs does WRF offer?', answer: 'WRF runs four key programs:\n• Accountability & Documentation — gathering legal evidence of human rights violations\n• Peacebuilding — training and supporting Afghan women as mediators and negotiators\n• Digital Transformation & Open Gender Data — using technology to protect evidence and visibility\n• Advocacy & Representation — amplifying Afghan women\'s voices in global decision-making spaces', categoryId: 'cat-2', isActive: true, backgroundColor: 'bg-wrf-coral', textColor: 'text-white', displayOrder: 4 },
+  { id: 'faq-2', question: 'How long has WRF been operating?', answer: 'WRF was founded in 2022 and has been actively serving since then, working to defend and advance the rights of Afghan women and girls through documentation, peacebuilding, advocacy, and digital protection.', categoryId: 'cat-1', isActive: true, backgroundColor: 'bg-wrf-footer-dark', textColor: 'text-white', displayOrder: 5 },
+  { id: 'faq-5', question: "Can I make a donation to support WRF's work?", answer: 'Yes, donations are greatly appreciated and help us continue our vital work. You can donate online through our secure portal, by check, or through recurring monthly donations.', categoryId: 'cat-4', isActive: true, backgroundColor: 'bg-wrf-black', textColor: 'text-white', displayOrder: 6 },
 ];
 
 export default function FAQManagementPage() {
@@ -127,8 +117,11 @@ export default function FAQManagementPage() {
   const [answer, setAnswer] = useState('');
   const [faqCategoryId, setFaqCategoryId] = useState('');
   const [faqIsActive, setFaqIsActive] = useState(true);
+  const [faqBackgroundColor, setFaqBackgroundColor] = useState('bg-wrf-purple');
+  const [faqTextColor, setFaqTextColor] = useState('text-white');
+  const [faqDisplayOrder, setFaqDisplayOrder] = useState(1);
   const [newCategoryName, setNewCategoryName] = useState('');
-  const [newCategoryColor, setNewCategoryColor] = useState('bg-secondary');
+  const [newCategoryColor, setNewCategoryColor] = useState('bg-wrf-purple');
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
 
   useEffect(() => {
@@ -151,6 +144,10 @@ export default function FAQManagementPage() {
     setAnswer('');
     setFaqCategoryId(categories[0]?.id ?? '');
     setFaqIsActive(true);
+    setFaqBackgroundColor('bg-wrf-purple');
+    setFaqTextColor('text-white');
+    const maxOrder = faqs.length ? Math.max(...faqs.map((f) => f.displayOrder ?? 0)) : 0;
+    setFaqDisplayOrder(maxOrder + 1);
     setFaqDialogOpen(true);
   };
 
@@ -160,6 +157,9 @@ export default function FAQManagementPage() {
     setAnswer(faq.answer);
     setFaqCategoryId(faq.categoryId);
     setFaqIsActive(faq.isActive);
+    setFaqBackgroundColor(faq.backgroundColor ?? 'bg-wrf-purple');
+    setFaqTextColor(faq.textColor ?? 'text-white');
+    setFaqDisplayOrder(faq.displayOrder ?? 999);
     setFaqDialogOpen(true);
   };
 
@@ -170,17 +170,18 @@ export default function FAQManagementPage() {
 
   const handleSaveFaq = (e: React.FormEvent) => {
     e.preventDefault();
+    const order = Math.max(1, Math.floor(Number(faqDisplayOrder)) || 1);
     let updatedFaqs: FAQ[];
     if (editingFaqId) {
       updatedFaqs = faqs.map((f) =>
         f.id === editingFaqId
-          ? { ...f, question, answer, categoryId: faqCategoryId, isActive: faqIsActive }
+          ? { ...f, question, answer, categoryId: faqCategoryId, isActive: faqIsActive, backgroundColor: faqBackgroundColor, textColor: faqTextColor, displayOrder: order }
           : f
       );
     } else {
       updatedFaqs = [
         ...faqs,
-        { id: 'faq-' + Date.now(), question, answer, categoryId: faqCategoryId, isActive: faqIsActive },
+        { id: 'faq-' + Date.now(), question, answer, categoryId: faqCategoryId, isActive: faqIsActive, backgroundColor: faqBackgroundColor, textColor: faqTextColor, displayOrder: order },
       ];
     }
     setFaqs(updatedFaqs);
@@ -197,11 +198,12 @@ export default function FAQManagementPage() {
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
     const id = 'cat-' + Date.now();
-    const updatedCategories = [...categories, { id, name: newCategoryName.trim(), colorClass: newCategoryColor }];
+    const maxOrder = categories.length ? Math.max(...categories.map((c) => c.displayOrder ?? 0)) : 0;
+    const updatedCategories = [...categories, { id, name: newCategoryName.trim(), colorClass: newCategoryColor, displayOrder: maxOrder + 1 }];
     setCategories(updatedCategories);
     persist(updatedCategories, faqs);
     setNewCategoryName('');
-    setNewCategoryColor('bg-secondary');
+    setNewCategoryColor('bg-wrf-purple');
   };
 
   const handleDeleteCategory = (id: string) => {
@@ -310,7 +312,7 @@ export default function FAQManagementPage() {
               </button>
             </div>
             <div className="grid gap-4">
-              {faqs.map((faq) => {
+              {[...faqs].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999)).map((faq) => {
                 const cat = getCategoryById(faq.categoryId);
                 return (
                   <div key={faq.id} className={cardClass}>
@@ -382,10 +384,9 @@ export default function FAQManagementPage() {
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCategory())}
               />
               <select className={`${inputClass} w-[180px]`} value={newCategoryColor} onChange={(e) => setNewCategoryColor(e.target.value)}>
-                <option value="bg-primary">Primary</option>
-                <option value="bg-secondary">Secondary</option>
-                <option value="bg-accent">Accent</option>
-                <option value="bg-support-1">Support</option>
+                {CATEGORY_COLOR_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
               </select>
               <button type="button" onClick={handleAddCategory} className={btnPrimary}>
                 Add
@@ -445,6 +446,28 @@ export default function FAQManagementPage() {
                     <option key={c.id} value={c.id}>
                       {c.name}
                     </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className={labelClass}>Display order</label>
+                <input type="number" min={1} className={inputClass} value={faqDisplayOrder} onChange={(e) => setFaqDisplayOrder(Number(e.target.value) || 1)} />
+                <p className="text-xs text-muted-foreground mt-1">Lower numbers appear first on the public FAQ page</p>
+              </div>
+              <div>
+                <label className={labelClass}>Background colour</label>
+                <select className={inputClass} value={faqBackgroundColor} onChange={(e) => setFaqBackgroundColor(e.target.value)}>
+                  {FAQ_BG_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted-foreground mt-1">Colour of the FAQ card on the public page</p>
+              </div>
+              <div>
+                <label className={labelClass}>Text colour</label>
+                <select className={inputClass} value={faqTextColor} onChange={(e) => setFaqTextColor(e.target.value)}>
+                  {FAQ_TEXT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
                   ))}
                 </select>
               </div>

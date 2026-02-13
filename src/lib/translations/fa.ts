@@ -59,12 +59,28 @@ const fa: Record<string, string> = {
   'programs.advocacy.title': 'نمایندگی و حمایت',
   'programs.advocacy.description': 'تقویت صدای زنان افغان در پلتفرم‌های ملی و بین‌المللی، حمایت از تغییرات سیاستی و حفاظت از حقوق.',
 
+  // ─── Testimonials (homepage) ───
+  'testimonials.title': 'نظرات مردم',
+  'testimonials.subtitle': 'صداهایی از جامعه و شرکای ما.',
+
+  // ─── Latest News (homepage) ───
+  'latestNews.title': 'آخرین به‌روزرسانی‌ها',
+  'latestNews.subtitle': 'از اخبار، رویدادها و اطلاعیه‌های ما مطلع شوید.',
+  'latestNews.viewAll': 'مشاهده همه اخبار',
+
+  // ─── Careers (homepage) ───
+  'careers.title': 'به تیم ما بپیوندید',
+  'careers.subtitle': 'در زندگی زنان در سراسر جهان تفاوت ایجاد کنید. فرصت‌های شغلی ما را بررسی کنید.',
+  'careers.viewAll': 'مشاهده همه فرصت‌ها',
+  'careers.noOpenings': 'در حال حاضر موقعیت شغلی باز نیست. لطفاً بعداً مراجعه کنید!',
+
   // ─── Footer ───
   'footer.contact.title': 'تماس با ما',
   'footer.contact.description': 'آخرین اخبار درباره برنامه‌ها و تأثیر ما را دریافت کنید',
   'footer.contact.emailPlaceholder': 'ایمیل خود را وارد کنید',
   'footer.contact.subscribe': 'عضویت',
   'footer.contact.subscribed': 'عضو شدید!',
+  'footer.contact.successMessage': 'متشکریم! شما با موفقیت در خبرنامه ما ثبت نام شدید.',
   'footer.social.title': 'ما را در شبکه‌های اجتماعی دنبال کنید',
   'footer.social.description': 'با ما در شبکه‌های اجتماعی ارتباط برقرار کنید',
   'footer.sections.wrfInfo': 'WRF و اطلاعات',
@@ -92,6 +108,11 @@ const fa: Record<string, string> = {
   'footer.termsOfService': 'شرایط خدمات',
 
   // ─── About Page ───
+  'about.nav.mission': 'مأموریت و تاریخچه ما',
+  'about.nav.values': 'ارزش‌های اصلی ما',
+  'about.nav.journey': 'مسیر ما',
+  'about.nav.impact': 'تأثیر ما در اعداد',
+  'about.nav.people': 'با تیم ما آشنا شوید',
   'about.hero.title': 'زنان افغان در خط مقدم عدالت و تغییر',
   'about.hero.description': 'ما تلاش می‌کنیم تا اطمینان حاصل شود که زنان افغان با پیشبرد پاسخگویی، حفاظت دیجیتال و رهبری زنان در صلح و سیاست، حذف نشوند.',
   'about.mission.title': 'مأموریت و تاریخچه ما',
@@ -101,9 +122,13 @@ const fa: Record<string, string> = {
   'about.values.title': 'ارزش‌های اصلی ما',
   'about.values.description': 'این اصول راهنمای هر تصمیم و اقدام ماست. آنها پایه‌ای هستند که سازمان ما بر آن استوار است و قطب‌نمایی که مسیر ما را هدایت می‌کند.',
   'about.values.equality': 'برابری و عدالت',
+  'about.values.equality.desc': 'ما باور داریم که هر زن سزاوار حقوق برابر، فرصت‌های یکسان و دسترسی به عدالت است. ما برای از بین بردن موانع سیستماتیک و حمایت از سیاست‌هایی که از زنان در تمام عرصه‌های زندگی حمایت می‌کنند، تلاش می‌کنیم.',
   'about.values.empowerment': 'توانمندسازی و رهبری',
+  'about.values.empowerment.desc': 'ما با ارائه آموزش، راهنمایی و منابع، در توانمندی زنان سرمایه‌گذاری می‌کنیم تا آنها بتوانند با اعتماد به نفس رهبری کنند. وقتی زنان رهبری می‌کنند، جوامع شکوفا می‌شوند.',
   'about.values.community': 'جامعه و همبستگی',
+  'about.values.community.desc': 'ما با زنان فراتر از مرزها، فرهنگ‌ها و پیشینه‌ها متحد هستیم. از طریق اقدام جمعی و حمایت متقابل، شبکه‌هایی از قدرت می‌سازیم که صدای هر فرد را تقویت می‌کند.',
   'about.values.innovation': 'نوآوری و پایداری',
+  'about.values.innovation.desc': 'ما از راه‌حل‌های خلاقانه و رویکردهای مدرن برای ایجاد تغییرات پایدار استقبال می‌کنیم. برنامه‌های ما به گونه‌ای طراحی شده‌اند که پایدار، مقیاس‌پذیر و سازگار با نیازهای در حال تحول جوامعی که به آنها خدمت می‌کنیم، باشند.',
   'about.quote': 'آینده حقوق زنان فقط درباره تغییرات سیاستی یا پیروزی‌های حقوقی نیست — بلکه درباره ایجاد جهانی است که هر دختری با این آگاهی بزرگ شود که می‌تواند هر آنچه آرزویش را دارد باشد.',
   'about.journey.title': 'سفر ما',
   'about.journey.description': 'از آغازهای ساده تا تأثیر جهانی، داستان ما داستان پشتکار، رشد و تعهد بی‌وقفه به حقوق زنان است.',
@@ -156,6 +181,16 @@ const fa: Record<string, string> = {
   'contact.faq.link': 'صفحه سوالات متداول',
   'contact.social.title': 'ما را دنبال کنید',
   'contact.social.description': 'با ما ارتباط برقرار کنید و سفر ما را دنبال کنید',
+  'contact.form.title': 'برای ما پیام بفرستید',
+  'contact.form.description': 'فرم زیر را پر کنید و ما در اسرع وقت با شما تماس خواهیم گرفت.',
+  'contact.form.name': 'نام کامل',
+  'contact.form.email': 'ایمیل',
+  'contact.form.subject': 'موضوع',
+  'contact.form.message': 'پیام',
+  'contact.form.send': 'ارسال پیام',
+  'contact.form.submitting': 'در حال ارسال...',
+  'contact.form.success': 'متشکریم! پیام شما با موفقیت ارسال شد.',
+  'contact.form.error': 'مشکلی پیش آمد. لطفاً دوباره تلاش کنید.',
 
   // ─── Donate Page ───
   'donate.hero.title': 'از مأموریت ما حمایت کنید',
@@ -251,7 +286,7 @@ const fa: Record<string, string> = {
   'team.board.description': 'رهبران دوراندیش ما که جهت‌گیری استراتژیک و حکمرانی WRF را هدایت می‌کنند.',
   'team.morten.name': 'مورتن کیروم',
   'team.morten.role': 'عضو هیئت مدیره',
-  'team.morten.bio': 'مورتن کیروم استاد وابسته در دانشگاه آلبورگ دانمارک و محقق وابسته در مؤسسه رائول والنبرگ سوئد است.',
+  'team.morten.bio': 'مورتن کیروم استاد وابسته در دانشگاه آلبورگ دانمارک و محقق وابسته در مؤسسه رائول والنبرگ سوئد است. ۲۰۱۵ تا ۲۰۲۴ مدیر مؤسسه رائول والنبرگ، ۲۰۰۸ تا ۲۰۱۵ مدیر آژانس اتحادیه اروپا برای حقوق بنیادین، ۱۹۹۱ تا ۲۰۰۸ مدیر مؤسسه دانمارکی حقوق بشر؛ عضو کمیته سازمان ملل برای رفع تبعیض نژادی ۲۰۰۲ تا ۲۰۰۸. ۲۰۱۸ تا ۲۰۲۰ رئیس هیئت امنای صندوق داوطلبانه سازمان ملل برای همکاری فنی در زمینه حقوق بشر و صندوق امانی بررسی دوره‌ای جهانی برای کمک‌های مالی و فنی. از ۲۰۱۵ تا ۲۰۲۳ رئیس شورای اروپایی پناهندگان و تبعیدیان بود. او به طور گسترده در مورد مسائل حقوق بشر نوشته و در دانشگاه‌های سراسر جهان تدریس کرده است.',
 
   // ─── Vacancies Page ───
   'vacancies.hero.title': 'همین حالا به تیم ما بپیوندید',
@@ -262,6 +297,18 @@ const fa: Record<string, string> = {
   'vacancies.filter.all': 'همه دسته‌ها',
   'vacancies.empty.title': 'فرصت شغلی مطابقی یافت نشد',
   'vacancies.empty.description': 'لطفاً معیارهای جستجو یا فیلتر خود را تنظیم کنید.',
+  'vacancies.apply.button': 'درخواست',
+  'vacancies.apply.title': 'درخواست برای این موقعیت',
+  'vacancies.apply.subtitle': 'درخواست خود را ارسال کنید. ما آن را بررسی کرده و با شما تماس خواهیم گرفت.',
+  'vacancies.apply.fullName': 'نام کامل',
+  'vacancies.apply.email': 'ایمیل',
+  'vacancies.apply.phone': 'تلفن',
+  'vacancies.apply.coverLetter': 'نامه همراه',
+  'vacancies.apply.resumeUrl': 'لینک رزومه (اختیاری)',
+  'vacancies.apply.submit': 'ارسال درخواست',
+  'vacancies.apply.submitting': 'در حال ارسال…',
+  'vacancies.apply.cancel': 'انصراف',
+  'vacancies.apply.success': 'متشکریم! درخواست شما ارسال شد. به زودی با شما تماس خواهیم گرفت.',
 
   // ─── Volunteer Page ───
   'volunteer.hero.title': 'تغییر باشید: با WRF داوطلب شوید',
@@ -363,6 +410,7 @@ const fa: Record<string, string> = {
   'volunteer.form.previous': 'قبلی',
   'volunteer.form.next': 'بعدی',
   'volunteer.form.submit': 'ارسال درخواست',
+  'volunteer.form.successMessage': 'متشکریم! درخواست داوطلبی شما با موفقیت ثبت شد. ظرف ۵ تا ۷ روز کاری با شما تماس خواهیم گرفت.',
 
   // ─── Partnership Page ───
   'partnership.hero.title': 'با ما شریک شوید: تأثیر خود را تقویت کنید',
@@ -418,6 +466,8 @@ const fa: Record<string, string> = {
   'partnership.form.message': 'پیام *',
   'partnership.form.messagePlaceholder': 'درباره سازمان خود و نحوه مشارکت بگویید...',
   'partnership.form.submit': 'ارسال درخواست',
+  'partnership.form.success': 'متشکریم! درخواست مشارکت شما ثبت شد. تیم ما به زودی با شما تماس خواهد گرفت.',
+  'partnership.form.error': 'مشکلی پیش آمد. لطفاً دوباره تلاش کنید.',
 
   // ─── Privacy Policy Page ───
   'privacy.hero.title': 'سیاست حفظ حریم خصوصی',
@@ -451,6 +501,9 @@ const fa: Record<string, string> = {
   'programPage.behindTheScenes': 'پشت صحنه',
   'programPage.programAreas': 'حوزه‌های برنامه',
   'programPage.notFound': 'برنامه یافت نشد',
+  'programPage.allPrograms': 'برنامه‌های ما',
+  'programPage.allProgramsDesc': 'برنامه‌های ما را که به دفاع، بازسازی و ارتقای حقوق و کرامت زنان و دختران افغان اختصاص دارد، کاوش کنید.',
+  'programPage.learnMore': 'بیشتر بخوانید',
 
   // ─── Program: Legal Empowerment ───
   'program.legal.title': 'توانمندسازی حقوقی و پاسخگویی بین‌المللی',
@@ -502,6 +555,7 @@ const fa: Record<string, string> = {
   'program.digital.storyAuthor': 'زهرا محمدی',
   'program.digital.storyRole': 'فارغ‌التحصیل مهارت‌های دیجیتال',
   'program.digital.partner1': 'یونسکو',
+  'program.digital.partner1Full': 'سازمان آموزشی، علمی و فرهنگی ملل متحد',
   'program.digital.resource1': 'راهنمای برنامه درسی سواد دیجیتال',
   'program.digital.behind': 'راه‌اندازی مراکز یادگیری',
   'program.digital.faq1.q': 'چگونه محیط‌های یادگیری امن را تضمین می‌کنید؟',

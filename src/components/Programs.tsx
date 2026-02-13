@@ -16,6 +16,7 @@ function getLocalePrefix(pathname: string): string {
 export default function Programs() {
   const pathname = usePathname();
   const localePrefix = getLocalePrefix(pathname);
+  const currentLocale = localePrefix.replace('/', '');
   const { t } = useTranslation();
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
@@ -62,7 +63,7 @@ export default function Programs() {
     },
   ];
 
-  const programs: { id: string; image: string; title: string; description: string; theme: 'primary' | 'secondary' }[] = adminData?.programs?.length
+  const programs: { id: string; image: string; title: string; description: string; theme: 'primary' | 'secondary' }[] = adminData?.programs?.length && currentLocale === 'en'
     ? adminData.programs
         .filter((p: any) => p.status === 'active' && p.featured)
         .slice(0, 4)
@@ -82,8 +83,8 @@ export default function Programs() {
     'bg-support-1': 'bg-wrf-footer-mauve',
   };
   const showPrograms = homepageData?.showPrograms !== undefined ? homepageData.showPrograms : true;
-  const progTitle = homepageData?.programsTitle || t('programs.title');
-  const progSubtitle = homepageData?.programsSubtitle || t('programs.description');
+  const progTitle = (currentLocale === 'en' && homepageData?.programsTitle) || t('programs.title');
+  const progSubtitle = (currentLocale === 'en' && homepageData?.programsSubtitle) || t('programs.description');
   const progTitleBg = PROG_BG_MAP[homepageData?.programsTitleBg] || 'bg-wrf-purple';
 
   if (!showPrograms) return null;

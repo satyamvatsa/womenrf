@@ -52,21 +52,35 @@ const SvgMessageSquare = ({ className }: { className?: string }) => (
   </svg>
 );
 
-type InquiryType = 'Corporate' | 'NGO';
 type InquiryStatus = 'New' | 'In Review' | 'Contacted' | 'Accepted' | 'Declined';
-type OrgSize = 'Small (1-50)' | 'Medium (51-250)' | 'Large (250+)';
 
 type Inquiry = {
   id: string;
   organizationName: string;
   contactName: string;
   contactEmail: string;
-  type: InquiryType;
+  type: string;
   status: InquiryStatus;
-  size: OrgSize;
+  size: string;
   message: string;
   phone?: string;
   submittedDate: string;
+  /** ISO string for persisting when saving */
+  submittedAt?: string;
+};
+
+/** Shape stored by the public form submit API (partnership-inquiries) */
+type RawInquiry = {
+  id: string;
+  organization_name: string;
+  contact_person: string;
+  email: string;
+  phone?: string;
+  partnership_type: string;
+  organization_size?: string;
+  message: string;
+  submittedAt: string;
+  status: string;
 };
 
 const STATUS_OPTIONS: { value: InquiryStatus; label: string }[] = [
@@ -77,67 +91,47 @@ const STATUS_OPTIONS: { value: InquiryStatus; label: string }[] = [
   { value: 'Declined', label: 'Declined' },
 ];
 
-const defaultInquiries: Inquiry[] = [
-  {
-    id: '1',
-    organizationName: 'Shabnam Salehi',
-    contactName: ';dfj;slakdjSA;KDJ',
-    contactEmail: 'SDSDJKH@LIVE.COM',
-    type: 'Corporate',
-    status: 'New',
-    size: 'Medium (51-250)',
-    message: 'SDFSDFSDAFSADFSADFSADFSDFSDSDFSDFSDFSDF',
-    phone: '3284023984329',
-    submittedDate: '9/11/2025',
-  },
-  {
-    id: '2',
-    organizationName: 'Newoga',
-    contactName: 'newcontact',
-    contactEmail: '0923482394@live.om',
-    type: 'NGO',
-    status: 'New',
-    size: 'Medium (51-250)',
-    message: 'dsfsdafasdfasdfsadfsdf',
-    phone: '328492736894',
-    submittedDate: '9/6/2025',
-  },
-  {
-    id: '3',
-    organizationName: 'organisation',
-    contactName: 'contadxt',
-    contactEmail: 'email@sssm.com',
-    type: 'NGO',
-    status: 'New',
-    size: 'Large (250+)',
-    message: 'dsfsdfd about text',
-    phone: '061888888',
-    submittedDate: '9/6/2025',
-  },
-  {
-    id: '4',
-    organizationName: 'dsfdsf',
-    contactName: 'sdfsdf',
-    contactEmail: 'sdfsdfsdfd@live4.com',
-    type: 'Corporate',
-    status: 'New',
-    size: 'Medium (51-250)',
-    message: 'dfsdfsdafsdf',
-    submittedDate: '9/6/2025',
-  },
-  {
-    id: '5',
-    organizationName: 'cxcxcxvcxv',
-    contactName: 'xcvxcv',
-    contactEmail: 'cxvcxv@live.com',
-    type: 'Corporate',
-    status: 'New',
-    size: 'Small (1-50)',
-    message: 'dfgdfgdfgdfgdfg',
-    phone: '435345',
-    submittedDate: '9/6/2025',
-  },
-];
+function formatSubmittedDate(iso: string | undefined): string {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? iso : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch {
+    return iso;
+  }
+}
+
+function mapRawToInquiry(r: RawInquiry): Inquiry {
+  const status = r.status === 'new' ? 'New' : (r.status as InquiryStatus);
+  return {
+    id: r.id,
+    organizationName: r.organization_name ?? '',
+    contactName: r.contact_person ?? '',
+    contactEmail: r.email ?? '',
+    type: r.partnership_type ?? '',
+    status: STATUS_OPTIONS.some(o => o.value === status) ? status : 'New',
+    size: r.organization_size ?? '',
+    message: r.message ?? '',
+    phone: r.phone,
+    submittedDate: formatSubmittedDate(r.submittedAt),
+    submittedAt: r.submittedAt,
+  };
+}
+
+function mapInquiryToRaw(i: Inquiry): RawInquiry {
+  return {
+    id: i.id,
+    organization_name: i.organizationName,
+    contact_person: i.contactName,
+    email: i.contactEmail,
+    phone: i.phone,
+    partnership_type: i.type,
+    organization_size: i.size || undefined,
+    message: i.message,
+    submittedAt: i.submittedAt ?? new Date().toISOString(),
+    status: i.status === 'New' ? 'new' : i.status,
+  };
+}
 
 const btnSecondary =
   'inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 py-2';
@@ -146,20 +140,26 @@ const selectClass =
 
 export default function PartnershipManagementPage() {
   const [activeTab, setActiveTab] = useState<'inquiries' | 'partnerships' | 'content'>('inquiries');
-  const [inquiries, setInquiries] = useState<Inquiry[]>(defaultInquiries);
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [loading, setLoading] = useState(true);
   const [pageSettingsOpen, setPageSettingsOpen] = useState(false);
   const [messageDialogInquiry, setMessageDialogInquiry] = useState<Inquiry | null>(null);
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
 
   useEffect(() => {
-    loadAdminData<{ inquiries: Inquiry[] }>('partnerships').then(data => {
-      if (data?.inquiries) setInquiries(data.inquiries);
+    setLoading(true);
+    loadAdminData<RawInquiry[]>('partnership-inquiries').then(data => {
+      const list = Array.isArray(data) ? data : [];
+      setInquiries(list.map(mapRawToInquiry));
+      setLoading(false);
     });
   }, []);
 
   const persist = async (updatedInquiries: Inquiry[]) => {
     setSaveStatus('saving');
-    const ok = await saveAdminData('partnerships', { inquiries: updatedInquiries });
+    const raw = updatedInquiries.map(mapInquiryToRaw);
+    const ok = await saveAdminData('partnership-inquiries', raw);
+    if (ok) setInquiries(updatedInquiries);
     setSaveStatus(ok ? 'saved' : 'error');
     setTimeout(() => setSaveStatus('idle'), 3000);
   };
@@ -266,6 +266,11 @@ export default function PartnershipManagementPage() {
                 </p>
               </div>
               <div className="p-6 pt-0">
+                {loading ? (
+                  <p className="text-gray-500">Loading inquiries...</p>
+                ) : inquiries.length === 0 ? (
+                  <p className="text-gray-500">No partnership inquiries yet. Inquiries submitted via the Partnership page form will appear here.</p>
+                ) : (
                 <div className="space-y-6">
                   {inquiries.map((inquiry) => (
                     <div
@@ -330,6 +335,7 @@ export default function PartnershipManagementPage() {
                     </div>
                   ))}
                 </div>
+                )}
               </div>
             </div>
           </div>

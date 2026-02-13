@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import ScrollReveal from './ScrollReveal';
 
@@ -12,15 +12,37 @@ const HERO_RIGHT_IMAGE =
 import AboutSectionNav from './AboutSectionNav';
 import { useTranslation } from '@/lib/TranslationContext';
 
+/** Maps admin-saved color names to actual CSS hex values */
+const COLOR_MAP: Record<string, string> = {
+  'primary': '#1a1a1a',
+  'secondary': '#6B5B95',
+  'accent': '#E07A7A',
+  'white': '#ffffff',
+  'wrf-black': '#1a1a1a',
+  'wrf-purple': '#6B5B95',
+  'wrf-coral': '#E07A7A',
+  'wrf-footer-mauve': '#b88a9e',
+};
+
+function resolveColor(colorName: string | undefined, fallback: string): string {
+  if (!colorName) return fallback;
+  return COLOR_MAP[colorName] || colorName;
+}
+
 const TEAM = [
   { name: 'Hanifa Girowal', role: 'Co-Founder & VP', img: '/images/Hanifa_Girowal.jpeg', bg: 'bg-wrf-coral' },
-  { name: 'Shabnam Salehi', role: 'Co-Founder & President', img: '/images/shabnam%20salehi.jpg', bg: 'bg-wrf-purple' },
+  { name: 'Shabnam Salehi', role: 'Co-Founder & President', img: '/images/Shabnam_Salehi.jpeg', bg: 'bg-wrf-purple' },
   { name: 'Morten Kjaerum', role: 'Board Member', img: '/images/1-Panelist-Morten-Kjaerum-Picture-1.jpg', bg: 'bg-wrf-purple' },
 ];
 
 export default function AboutPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const [openValue, setOpenValue] = useState<string | null>(null);
+
+  const toggleValue = useCallback((key: string) => {
+    setOpenValue((prev) => (prev === key ? null : key));
+  }, []);
 
   useEffect(() => {
     fetch('/api/data/about', { cache: 'no-store' })
@@ -110,35 +132,37 @@ export default function AboutPage() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <ScrollReveal variant="slideLeft" className="text-left">
               <div
-                className={`inline-block p-4 ${!adminData?.titleBgColor ? 'bg-wrf-black' : ''}`}
-                style={adminData?.titleBgColor ? { backgroundColor: adminData.titleBgColor } : undefined}
+                className="inline-block p-4"
+                style={{ backgroundColor: resolveColor(adminData?.titleBgColor, '#1a1a1a') }}
               >
-                <h2 className="text-3xl font-bold text-white">{adminData?.sectionTitle || t('about.mission.title')}</h2>
+                <h2 className="text-3xl font-bold text-white">
+                  {(locale === 'en' && adminData?.sectionTitle) || t('about.mission.title')}
+                </h2>
               </div>
               <p className="mb-8 mt-6 max-w-3xl text-lg leading-relaxed text-gray-700">
-                {adminData?.content || t('about.mission.description')}
+                {(locale === 'en' && adminData?.content) || t('about.mission.description')}
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Link href={adminData?.button1Url || '/Volunteer'}>
+                <Link href={`/${locale}/${(adminData?.button1Url || 'Volunteer').replace(/^\//, '')}`}>
                   <button
                     type="button"
-                    className={`inline-flex items-center rounded-none px-8 py-3 font-semibold text-white transition-none ${!adminData?.button1Color ? 'bg-wrf-purple' : ''}`}
-                    style={adminData?.button1Color ? { backgroundColor: adminData.button1Color } : undefined}
+                    className="inline-flex items-center rounded-none px-8 py-3 font-semibold text-white transition-none"
+                    style={{ backgroundColor: resolveColor(adminData?.button1Color, '#6B5B95') }}
                   >
-                    {adminData?.button1Text || t('about.mission.join')}
+                    {(locale === 'en' && adminData?.button1Text) || t('about.mission.join')}
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 h-5 w-5">
                       <path d="M5 12h14" />
                       <path d="m12 5 7 7-7 7" />
                     </svg>
                   </button>
                 </Link>
-                <Link href={adminData?.button2Url || '/Programs'}>
+                <Link href={`/${locale}/${(adminData?.button2Url || 'ProgramPage/legal').replace(/^\//, '')}`}>
                   <button
                     type="button"
-                    className={`inline-flex items-center rounded-none px-8 py-3 font-semibold text-white transition-none ${!adminData?.button2Color ? 'bg-wrf-coral' : ''}`}
-                    style={adminData?.button2Color ? { backgroundColor: adminData.button2Color } : undefined}
+                    className="inline-flex items-center rounded-none px-8 py-3 font-semibold text-white transition-none"
+                    style={{ backgroundColor: resolveColor(adminData?.button2Color, '#E07A7A') }}
                   >
-                    {adminData?.button2Text || t('about.mission.explore')}
+                    {(locale === 'en' && adminData?.button2Text) || t('about.mission.explore')}
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 h-5 w-5">
                       <path d="M5 12h14" />
                       <path d="m12 5 7 7-7 7" />
@@ -171,21 +195,43 @@ export default function AboutPage() {
           </ScrollReveal>
           <div className="grid gap-1 md:grid-cols-2">
             {[
-              { title: t('about.values.equality'), bg: 'bg-wrf-black' },
-              { title: t('about.values.empowerment'), bg: 'bg-wrf-purple' },
-              { title: t('about.values.community'), bg: 'bg-wrf-coral' },
-              { title: t('about.values.innovation'), bg: 'bg-wrf-footer-mauve' },
+              { key: 'equality', title: t('about.values.equality'), desc: (locale === 'en' && adminData?.valuesEqualityDesc) || t('about.values.equality.desc'), bg: 'bg-wrf-black' },
+              { key: 'empowerment', title: t('about.values.empowerment'), desc: (locale === 'en' && adminData?.valuesEmpowermentDesc) || t('about.values.empowerment.desc'), bg: 'bg-wrf-purple' },
+              { key: 'community', title: t('about.values.community'), desc: (locale === 'en' && adminData?.valuesCommunityDesc) || t('about.values.community.desc'), bg: 'bg-wrf-coral' },
+              { key: 'innovation', title: t('about.values.innovation'), desc: (locale === 'en' && adminData?.valuesInnovationDesc) || t('about.values.innovation.desc'), bg: 'bg-wrf-footer-mauve' },
             ].map((item) => (
-              <ScrollReveal key={item.title} variant="slideUpSm">
+              <ScrollReveal key={item.key} variant="slideUpSm">
                 <div className={`overflow-hidden shadow-inner ${item.bg}`}>
-                  <button type="button" className="w-full p-6 text-left text-white transition-none">
+                  <button
+                    type="button"
+                    onClick={() => toggleValue(item.key)}
+                    className="w-full p-6 text-left text-white transition-none"
+                  >
                     <div className="flex items-center justify-between">
                       <h3 className="text-xl font-bold">{item.title}</h3>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        className={`h-6 w-6 transition-transform duration-300 ${openValue === item.key ? 'rotate-180' : ''}`}
+                      >
                         <path d="m6 9 6 6 6-6" />
                       </svg>
                     </div>
                   </button>
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      openValue === item.key ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+                    }`}
+                  >
+                    <p className="px-6 pb-6 text-white/90 leading-relaxed">
+                      {item.desc}
+                    </p>
+                  </div>
                 </div>
               </ScrollReveal>
             ))}

@@ -59,12 +59,28 @@ const ps: Record<string, string> = {
   'programs.advocacy.title': 'استازیتوب او ملاتړ',
   'programs.advocacy.description': 'په ملي او نړیوالو ډګرونو کې د افغان ښځو غږ پیاوړول، د پالیسۍ بدلون او د حقوقو ساتنې ملاتړ.',
 
+  // ─── Testimonials (homepage) ───
+  'testimonials.title': 'خلک څه وایي',
+  'testimonials.subtitle': 'زموږ د ټولنې او ملګرو غږونه.',
+
+  // ─── Latest News (homepage) ───
+  'latestNews.title': 'وروستي تازه معلومات',
+  'latestNews.subtitle': 'زموږ د خبرونو، پیښو او اعلانونو په اړه خبر شئ.',
+  'latestNews.viewAll': 'ټول خبرونه وګورئ',
+
+  // ─── Careers (homepage) ───
+  'careers.title': 'زموږ ټیم سره یوځای شئ',
+  'careers.subtitle': 'په ټوله نړۍ کې د ښځو په ژوند کې توپیر رامنځته کړئ. زموږ وروستي دندې وګورئ.',
+  'careers.viewAll': 'ټولې دندې وګورئ',
+  'careers.noOpenings': 'اوس مهال هیڅ خلاص دنده نشته. مهرباني وکړئ وروسته بیا راشئ!',
+
   // ─── Footer ───
   'footer.contact.title': 'له موږ سره اړیکه',
   'footer.contact.description': 'زموږ د پروګرامونو او اغیز په اړه وروستي خبرونه ترلاسه کړئ',
   'footer.contact.emailPlaceholder': 'خپل بریښنالیک ولیکئ',
   'footer.contact.subscribe': 'ګډون',
   'footer.contact.subscribed': 'ګډون وشو!',
+  'footer.contact.successMessage': 'مننه! تاسو په بریالیتوب سره زموږ په خبرلیک کې ګمارل شوي.',
   'footer.social.title': 'موږ په ټولنیزو رسنیو کې تعقیب کړئ',
   'footer.social.description': 'په ټولنیزو رسنیو کې له موږ سره یوځای شئ',
   'footer.sections.wrfInfo': 'WRF او معلومات',
@@ -92,6 +108,11 @@ const ps: Record<string, string> = {
   'footer.termsOfService': 'د خدمتونو شرایط',
 
   // ─── About Page ───
+  'about.nav.mission': 'زموږ ماموریت او تاریخچه',
+  'about.nav.values': 'زموږ اصلي ارزښتونه',
+  'about.nav.journey': 'زموږ سفر',
+  'about.nav.impact': 'په شمیرو کې زموږ اغیز',
+  'about.nav.people': 'زموږ خلک وپیژنئ',
   'about.hero.title': 'د عدالت او بدلون د مخکښ کرښې افغان ښځې',
   'about.hero.description': 'موږ کار کوو ترڅو ډاډ ترلاسه شي چې افغان ښځې د ځواب ویلو، ډیجیټلې ساتنې او په سوله او پالیسۍ کې د ښځو د مشرتابه پیاوړي سره نه ورکیږي.',
   'about.mission.title': 'زموږ ماموریت او تاریخچه',
@@ -101,9 +122,13 @@ const ps: Record<string, string> = {
   'about.values.title': 'زموږ اساسي ارزښتونه',
   'about.values.description': 'دا اصول هر پریکړه او عمل زموږ لارښود کوي.',
   'about.values.equality': 'برابري او عدالت',
+  'about.values.equality.desc': 'موږ باور لرو چې هره ښځه د مساوي حقونو، فرصتونو او عدالت ته لاسرسي وړ ده. موږ د سیستماتیکو خنډونو د له منځه وړلو او د هغو پالیسیو ملاتړ لپاره کار کوو چې ښځې د ژوند په ټولو برخو کې ساتي او پورته کوي.',
   'about.values.empowerment': 'پیاوړتیا او مشرتابه',
+  'about.values.empowerment.desc': 'موږ د زده‌کړې، لارښوونې او سرچینو په وړاندې کولو سره د ښځو په وړتیا پانګونه کوو ترڅو دوی د باور سره مشرتابه وکړي. کله چې ښځې مشري کوي، ټولنې ودانیږي.',
   'about.values.community': 'ټولنه او همبستګي',
+  'about.values.community.desc': 'موږ د پولو، کلتورونو او شالیدونو هاخوا له ښځو سره یو‌ځای ولاړ یو. د ګډ عمل او متقابل ملاتړ له لارې، موږ د ځواک شبکې جوړوو چې د هر چا غږ پیاوړی کوي.',
   'about.values.innovation': 'نوښت او دوامداري',
+  'about.values.innovation.desc': 'موږ د دوامداره بدلون رامنځته کولو لپاره خلاقانه لارې چارې او عصري طریقې غوره کوو. زموږ پروګرامونه داسې ډیزاین شوي چې دوامداره، پراخېدونکي او د هغو ټولنو بدلېدونکو اړتیاوو سره سمون خوري چې موږ ورته خدمت کوو.',
   'about.quote': 'د ښځو د حقوقو راتلونکی یوازې د پالیسۍ بدلونونو یا حقوقي بریاوو په اړه نه دی — بلکې د داسې نړۍ جوړولو په اړه دی چېرته هره نجلۍ پوهیږي چې هرڅه کیدای شي.',
   'about.journey.title': 'زموږ سفر',
   'about.journey.description': 'له ساده پیلونو څخه تر نړیوال اغیز پورې، زموږ کیسه د ثبات، ودې او د ښځو حقوقو ته د بی‌خنډه ژمنتیا کیسه ده.',
@@ -156,6 +181,16 @@ const ps: Record<string, string> = {
   'contact.faq.link': 'د متداولو پوښتنو پاڼه',
   'contact.social.title': 'موږ تعقیب کړئ',
   'contact.social.description': 'له موږ سره اړیکه وساتئ او زموږ سفر تعقیب کړئ',
+  'contact.form.title': 'موږ ته پیغام واستوئ',
+  'contact.form.description': 'لاندې فورم ډک کړئ او موږ به ژر تر ژره له تاسو سره اړیکه ونیسو.',
+  'contact.form.name': 'بشپړ نوم',
+  'contact.form.email': 'بریښنالیک',
+  'contact.form.subject': 'موضوع',
+  'contact.form.message': 'پیغام',
+  'contact.form.send': 'پیغام واستوئ',
+  'contact.form.submitting': 'لیږل کیږي...',
+  'contact.form.success': 'مننه! ستاسو پیغام په بریالیتوب سره واستول شو.',
+  'contact.form.error': 'یوه ستونزه رامنځته شوه. مهرباني وکړئ بیا هڅه وکړئ.',
 
   // ─── Donate Page ───
   'donate.hero.title': 'زموږ ماموریت ملاتړ وکړئ',
@@ -251,7 +286,7 @@ const ps: Record<string, string> = {
   'team.board.description': 'زموږ لید لرونکي مشران چې د WRF ستراتیژیک لوري او حکومتداري لارښوونه کوي.',
   'team.morten.name': 'مورتن کیروم',
   'team.morten.role': 'د اداره مجلس غړی',
-  'team.morten.bio': 'مورتن کیروم د ډنمارک د آلبورګ پوهنتون وابسته پروفیسر او د سویډن رائول والنبرګ مؤسسې وابسته عالم دی.',
+  'team.morten.bio': 'مورتن کیروم د ډنمارک د آلبورګ پوهنتون وابسته پروفیسر او د سویډن رائول والنبرګ مؤسسې وابسته عالم دی. ۲۰۱۵ تر ۲۰۲۴ پورې د رائول والنبرګ مؤسسې رئیس، ۲۰۰۸ تر ۲۰۱۵ پورې د اروپايي ټولنې د بنسټیزو حقونو ادارې رئیس، ۱۹۹۱ تر ۲۰۰۸ پورې د ډنمارک د بشري حقونو مؤسسې رئیس؛ د ملګرو ملتونو د نسلي تبعیض د له منځه وړلو کمیټې غړی ۲۰۰۲ تر ۲۰۰۸. ۲۰۱۸ تر ۲۰۲۰ پورې د ملګرو ملتونو د بشري حقونو په برخه کې د تخنیکي همکارۍ رضاکارانه صندوق امانتدارانو بورډ رئیس. له ۲۰۱۵ تر ۲۰۲۳ پورې د کډوالو او جلاوطنو اروپايي شورا رئیس وو. هغه په پراخه کچه د بشري حقونو په مسلو لیکلي او د نړۍ په پوهنتونونو کې یې لیکچرونه ورکړي دي.',
 
   // ─── Vacancies Page ───
   'vacancies.hero.title': 'اوس زموږ ټیم سره یوځای شئ',
@@ -262,6 +297,18 @@ const ps: Record<string, string> = {
   'vacancies.filter.all': 'ټولې کتګورۍ',
   'vacancies.empty.title': 'هیڅ مناسب بست ونه موندل شو',
   'vacancies.empty.description': 'مهرباني وکړئ خپل لټون یا فلټر معیارونه تنظیم کړئ.',
+  'vacancies.apply.button': 'غوښتنلیک',
+  'vacancies.apply.title': 'د دې دندې لپاره غوښتنلیک',
+  'vacancies.apply.subtitle': 'خپل غوښتنلیک وسپارئ. موږ به یې وڅیړو او ستاسو سره اړیکه ونیسو.',
+  'vacancies.apply.fullName': 'بشپړ نوم',
+  'vacancies.apply.email': 'بریښنالیک',
+  'vacancies.apply.phone': 'تلیفون',
+  'vacancies.apply.coverLetter': 'د پوښ لیږد',
+  'vacancies.apply.resumeUrl': 'د رزومې لینک (اختیاري)',
+  'vacancies.apply.submit': 'غوښتنلیک وسپارئ',
+  'vacancies.apply.submitting': 'سپارښت…',
+  'vacancies.apply.cancel': 'لغوه',
+  'vacancies.apply.success': 'مننه! ستاسو غوښتنلیک وسپارل شو. موږ به له تاسو سره اړیکه ونیسو.',
 
   // ─── Volunteer Page ───
   'volunteer.hero.title': 'بدلون اوسئ: له WRF سره رضاکار شئ',
@@ -363,6 +410,7 @@ const ps: Record<string, string> = {
   'volunteer.form.previous': 'مخکینی',
   'volunteer.form.next': 'راتلونکی',
   'volunteer.form.submit': 'غوښتنلیک وسپارئ',
+  'volunteer.form.successMessage': 'مننه! ستاسو د رضاکار غوښتنلیک په بریالیتوب سره وسپارل شو. موږ به په ۵-۷ کارې ورځو کې له تاسو سره اړیکه ونیسو.',
 
   // ─── Partnership Page ───
   'partnership.hero.title': 'له موږ سره شریک شئ: خپل اغیز پیاوړی کړئ',
@@ -418,6 +466,8 @@ const ps: Record<string, string> = {
   'partnership.form.message': 'پیغام *',
   'partnership.form.messagePlaceholder': 'د خپل سازمان او د شراکت کولو په اړه ووایاست...',
   'partnership.form.submit': 'غوښتنلیک وسپارئ',
+  'partnership.form.success': 'مننه! ستاسو د شراکت غوښتنلیک وسپارل شو. زموږ ټیم به ډیر ژر له تاسو سره اړیکه ونیسي.',
+  'partnership.form.error': 'یوه ستونزه رامینځته شوه. مهرباني وکړئ بیا هڅه وکړئ.',
 
   // ─── Privacy Policy Page ───
   'privacy.hero.title': 'د محرمیت تګلاره',
@@ -451,6 +501,9 @@ const ps: Record<string, string> = {
   'programPage.behindTheScenes': 'تر پردې شا',
   'programPage.programAreas': 'د پروګرام ساحې',
   'programPage.notFound': 'پروګرام ونه موندل شو',
+  'programPage.allPrograms': 'زموږ پروګرامونه',
+  'programPage.allProgramsDesc': 'زموږ پروګرامونه وپلټئ چې د افغان ښځو او نجونو د حقونو او کرامت دفاع، بیا رغونې او پرمختګ ته وقف شوي دي.',
+  'programPage.learnMore': 'نور ولولئ',
 
   // ─── Program: Legal ───
   'program.legal.title': 'حقوقي پیاوړتیا او نړیوال ځواب ویل',
@@ -502,6 +555,7 @@ const ps: Record<string, string> = {
   'program.digital.storyAuthor': 'زهرا محمدي',
   'program.digital.storyRole': 'د ډیجیټل مهارتونو فارغه',
   'program.digital.partner1': 'یونسکو',
+  'program.digital.partner1Full': 'د ملګرو ملتونو تعلیمي، علمي او کلتوري سازمان',
   'program.digital.resource1': 'د ډیجیټل سواد نصاب لارښود',
   'program.digital.behind': 'د زده کړو مرکزونو جوړول',
   'program.digital.faq1.q': 'تاسو څنګه خوندي زده کړې چاپیریالونه تضمینوئ؟',

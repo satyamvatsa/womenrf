@@ -300,11 +300,12 @@ export default function HomepageManagementPage() {
               </div>
               <div className="md:col-span-2">
                 <label className={labelClass}>Background Image URL</label>
-                <input className={inputClass + ' mt-2'} name="hero_image_url" value={heroImageUrl} onChange={(e) => setHeroImageUrl(e.target.value)} />
+                <input className={inputClass + ' mt-2'} name="hero_image_url" value={heroImageUrl} onChange={(e) => setHeroImageUrl(e.target.value)} placeholder="/images/hero_background.jpeg" />
+                <p className="text-xs text-gray-500 mt-1">Upload hero image to <code className="bg-gray-100 px-1">public/images/</code> and use e.g. <code className="bg-gray-100 px-1">/images/hero_background.jpeg</code></p>
               </div>
               <div className="md:col-span-2">
                 <label className={labelClass}>Triangle Image URL (Right Side)</label>
-                <input className={inputClass + ' mt-2'} name="hero_image_triangle_url" value={heroTriangleUrl} onChange={(e) => setHeroTriangleUrl(e.target.value)} />
+                <input className={inputClass + ' mt-2'} name="hero_image_triangle_url" value={heroTriangleUrl} onChange={(e) => setHeroTriangleUrl(e.target.value)} placeholder="/images/hero_background.jpeg" />
               </div>
               <div>
                 <label className={labelClass}>Button 1 Text</label>
@@ -391,7 +392,8 @@ export default function HomepageManagementPage() {
                 </div>
                 <div>
                   <label className={labelClass}>Author Image URL</label>
-                  <input className={inputClass + ' mt-2'} placeholder="https://example.com/author.jpg" name="pages_showcase_quote_author_image" value={pagesShowcaseQuoteAuthorImage} onChange={(e) => setPagesShowcaseQuoteAuthorImage(e.target.value)} />
+                  <input className={inputClass + ' mt-2'} placeholder="/images/Hanifa_Girowal.jpeg" name="pages_showcase_quote_author_image" value={pagesShowcaseQuoteAuthorImage} onChange={(e) => setPagesShowcaseQuoteAuthorImage(e.target.value)} />
+                <p className="text-xs text-gray-500 mt-1">e.g. <code className="bg-gray-100 px-1">/images/Hanifa_Girowal.jpeg</code></p>
                 </div>
                 <div>
                   <label className={labelClass}>Quote Background Color</label>

@@ -2,14 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import NavIcon from './NavIcon';
-
-const NAV_LINKS = [
-  { href: '#mission', label: 'Our Mission & History', icon: 'hand-heart' },
-  { href: '#values', label: 'Our Core Values', icon: 'book-open' },
-  { href: '#history', label: 'Our Journey', icon: 'milestone' },
-  { href: '#impact', label: 'Our Impact in Numbers', icon: 'chart-column' },
-  { href: '#team', label: 'Meet Our People', icon: 'users' },
-];
+import { useTranslation } from '@/lib/TranslationContext';
 
 function getHash() {
   if (typeof window === 'undefined') return '#mission';
@@ -17,7 +10,16 @@ function getHash() {
 }
 
 export default function AboutSectionNav() {
+  const { t } = useTranslation();
   const [activeHash, setActiveHash] = useState('#mission');
+
+  const NAV_LINKS = [
+    { href: '#mission', label: t('about.nav.mission'), icon: 'hand-heart' },
+    { href: '#values', label: t('about.nav.values'), icon: 'book-open' },
+    { href: '#history', label: t('about.nav.journey'), icon: 'milestone' },
+    { href: '#impact', label: t('about.nav.impact'), icon: 'chart-column' },
+    { href: '#team', label: t('about.nav.people'), icon: 'users' },
+  ];
 
   useEffect(() => {
     setActiveHash(getHash());

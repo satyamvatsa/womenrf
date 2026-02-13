@@ -34,6 +34,7 @@ const config: Config = {
           'top-strip': '#e8e0d0',
           'footer-mauve': '#b88a9e',
           'footer-dark': '#2d2d2d',
+          'rose-dark': '#7B5B68',
           whatsapp: '#25D366',
           'logo-beige': '#E8D4C4',
         },

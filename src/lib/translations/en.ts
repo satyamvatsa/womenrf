@@ -59,12 +59,28 @@ const en: Record<string, string> = {
   'programs.advocacy.title': 'Representation and Advocacy',
   'programs.advocacy.description': "Amplifying Afghan women's voices on national and international platforms, advocating for policy change and rights protection.",
 
+  // ─── Testimonials (homepage) ───
+  'testimonials.title': 'What People Say',
+  'testimonials.subtitle': 'Voices from our community and partners.',
+
+  // ─── Latest News (homepage) ───
+  'latestNews.title': 'Latest Updates',
+  'latestNews.subtitle': 'Stay informed about our news, events, and announcements.',
+  'latestNews.viewAll': 'View All News',
+
+  // ─── Careers (homepage) ───
+  'careers.title': 'Join Our Team',
+  'careers.subtitle': "Make a difference in women's lives around the world. Explore our latest career opportunities.",
+  'careers.viewAll': 'View All Openings',
+  'careers.noOpenings': 'No open positions at the moment. Check back soon!',
+
   // ─── Footer ───
   'footer.contact.title': 'Contact us',
   'footer.contact.description': 'Get the latest news about our programs and impact',
   'footer.contact.emailPlaceholder': 'Enter your email',
   'footer.contact.subscribe': 'Subscribe',
   'footer.contact.subscribed': 'Subscribed!',
+  'footer.contact.successMessage': 'Thank you! You have been successfully subscribed to our newsletter.',
   'footer.social.title': 'Follow us on social media',
   'footer.social.description': 'Connect with us on social media',
   'footer.sections.wrfInfo': 'WRF & Information',
@@ -92,6 +108,11 @@ const en: Record<string, string> = {
   'footer.termsOfService': 'Terms of Service',
 
   // ─── About Page ───
+  'about.nav.mission': 'Our Mission & History',
+  'about.nav.values': 'Our Core Values',
+  'about.nav.journey': 'Our Journey',
+  'about.nav.impact': 'Our Impact in Numbers',
+  'about.nav.people': 'Meet Our People',
   'about.hero.title': 'Afghan Women at the Frontline of Justice and Change',
   'about.hero.description': 'We work to ensure Afghan women are not erased by advancing accountability, digital protection, and women\'s leadership in peace and policy.',
   'about.mission.title': 'Our Mission & History',
@@ -101,9 +122,13 @@ const en: Record<string, string> = {
   'about.values.title': 'Our Core Values',
   'about.values.description': 'These principles guide every decision we make and every action we take. They are the foundation upon which our organization stands and the compass that directs our path forward.',
   'about.values.equality': 'Equality & Justice',
+  'about.values.equality.desc': 'We believe every woman deserves equal rights, opportunities, and access to justice. We work to dismantle systemic barriers and advocate for policies that protect and uplift women in all spheres of life.',
   'about.values.empowerment': 'Empowerment & Leadership',
+  'about.values.empowerment.desc': 'We invest in women\'s potential by providing education, mentorship, and resources that enable them to lead with confidence. When women lead, communities thrive.',
   'about.values.community': 'Community & Solidarity',
+  'about.values.community.desc': 'We stand united with women across borders, cultures, and backgrounds. Through collective action and mutual support, we build networks of strength that amplify every voice.',
   'about.values.innovation': 'Innovation & Sustainability',
+  'about.values.innovation.desc': 'We embrace creative solutions and modern approaches to create lasting change. Our programs are designed to be sustainable, scalable, and adaptable to the evolving needs of the communities we serve.',
   'about.quote': "The future of women's rights isn't just about policy changes or legal victories—it's about creating a world where every girl grows up knowing she can be anything she dreams of becoming.",
   'about.journey.title': 'Our Journey',
   'about.journey.description': 'From humble beginnings to global impact, our story is one of perseverance, growth, and unwavering commitment to women\'s rights. Each milestone represents countless hours of dedication and the support of our incredible community.',
@@ -156,6 +181,16 @@ const en: Record<string, string> = {
   'contact.faq.link': 'FAQ page',
   'contact.social.title': 'Follow Us',
   'contact.social.description': 'Stay connected and follow our journey',
+  'contact.form.title': 'Send Us a Message',
+  'contact.form.description': 'Fill out the form below and we will get back to you as soon as possible.',
+  'contact.form.name': 'Full Name',
+  'contact.form.email': 'Email',
+  'contact.form.subject': 'Subject',
+  'contact.form.message': 'Message',
+  'contact.form.send': 'Send Message',
+  'contact.form.submitting': 'Sending...',
+  'contact.form.success': 'Thank you! Your message has been sent successfully.',
+  'contact.form.error': 'Something went wrong. Please try again.',
 
   // ─── Donate Page ───
   'donate.hero.title': 'Support Our Mission',
@@ -262,6 +297,18 @@ const en: Record<string, string> = {
   'vacancies.filter.all': 'All Categories',
   'vacancies.empty.title': 'No Matching Vacancies',
   'vacancies.empty.description': 'Please try adjusting your search or filter criteria.',
+  'vacancies.apply.button': 'Apply',
+  'vacancies.apply.title': 'Apply for this position',
+  'vacancies.apply.subtitle': 'Submit your application. We will review it and get back to you.',
+  'vacancies.apply.fullName': 'Full name',
+  'vacancies.apply.email': 'Email',
+  'vacancies.apply.phone': 'Phone',
+  'vacancies.apply.coverLetter': 'Cover letter',
+  'vacancies.apply.resumeUrl': 'Resume link (optional)',
+  'vacancies.apply.submit': 'Submit application',
+  'vacancies.apply.submitting': 'Submitting…',
+  'vacancies.apply.cancel': 'Cancel',
+  'vacancies.apply.success': 'Thank you! Your application has been submitted. We will be in touch.',
 
   // ─── Volunteer Page ───
   'volunteer.hero.title': 'Be the Change: Volunteer with WRF',
@@ -363,6 +410,7 @@ const en: Record<string, string> = {
   'volunteer.form.previous': 'Previous',
   'volunteer.form.next': 'Next',
   'volunteer.form.submit': 'Submit Application',
+  'volunteer.form.successMessage': 'Thank you! Your volunteer application has been submitted successfully. We will be in touch within 5–7 business days.',
 
   // ─── Partnership Page ───
   'partnership.hero.title': 'Partner with Us: Amplify Your Impact',
@@ -418,6 +466,8 @@ const en: Record<string, string> = {
   'partnership.form.message': 'Message *',
   'partnership.form.messagePlaceholder': "Tell us about your organization and how you'd like to partner with us...",
   'partnership.form.submit': 'Submit Inquiry',
+  'partnership.form.success': 'Thank you! Your partnership inquiry has been submitted. Our team will get in touch with you shortly.',
+  'partnership.form.error': 'Something went wrong. Please try again.',
 
   // ─── Privacy Policy Page ───
   'privacy.hero.title': 'Privacy Policy',
@@ -451,6 +501,9 @@ const en: Record<string, string> = {
   'programPage.behindTheScenes': 'Behind the Scenes',
   'programPage.programAreas': 'Program Areas',
   'programPage.notFound': 'Program not found',
+  'programPage.allPrograms': 'Our Programs',
+  'programPage.allProgramsDesc': 'Explore our programs dedicated to defending, restoring, and advancing the rights and dignity of Afghan women and girls.',
+  'programPage.learnMore': 'Learn More',
 
   // ─── Program: Legal Empowerment ───
   'program.legal.title': 'Legal Empowerment & International Accountability',
@@ -502,6 +555,7 @@ const en: Record<string, string> = {
   'program.digital.storyAuthor': 'Zara Mohammadi',
   'program.digital.storyRole': 'Digital Skills Graduate',
   'program.digital.partner1': 'UNESCO',
+  'program.digital.partner1Full': 'United Nations Educational, Scientific and Cultural Organization',
   'program.digital.resource1': 'Digital Literacy Curriculum Guide',
   'program.digital.behind': 'Setting Up Learning Centers',
   'program.digital.faq1.q': 'How do you ensure safe learning environments?',

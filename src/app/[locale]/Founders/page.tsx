@@ -54,13 +54,13 @@ function SocialIcon({ href, icon, label }: { href: string; icon: string; label: 
 }
 
 export default function FoundersPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const FOUNDERS = [
     {
       name: t('founders.shabnam.name'),
       role: t('founders.shabnam.role'),
-      image: '/images/shabnam%20salehi.jpg',
+      image: '/images/Shabnam_Salehi.jpeg',
       alt: 'Shabnam Salehi',
       bio: t('founders.shabnam.bio'),
       expertise: [t('founders.shabnam.exp1'), t('founders.shabnam.exp2'), t('founders.shabnam.exp3')],
@@ -98,7 +98,7 @@ export default function FoundersPage() {
       .catch(() => {});
   }, []);
 
-  const displayFounders = adminData && adminData.founders?.length > 0
+  const displayFounders = adminData && adminData.founders?.length > 0 && locale === 'en'
     ? adminData.founders.map((f: any, i: number) => ({
         name: f.name,
         role: f.title || '',

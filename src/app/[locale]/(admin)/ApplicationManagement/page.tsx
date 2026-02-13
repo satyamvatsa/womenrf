@@ -28,6 +28,16 @@ const STATUS_COLORS: Record<JobApplication['status'], string> = {
 
 const FILTER_TABS = ['all', ...STATUS_OPTIONS] as const;
 
+function formatSubmittedAt(iso: string | undefined): string {
+  if (!iso) return '—';
+  try {
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? iso : d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch {
+    return iso;
+  }
+}
+
 export default function ApplicationManagementPage() {
   const [applications, setApplications] = useState<JobApplication[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,8 +47,8 @@ export default function ApplicationManagementPage() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    const data = await loadAdminData<JobApplication[]>('job-applications');
-    if (data) setApplications(data);
+    const data = await loadAdminData<JobApplication[] | Record<string, unknown>>('job-applications');
+    setApplications(Array.isArray(data) ? data : []);
     setLoading(false);
   }, []);
 
@@ -120,7 +130,7 @@ export default function ApplicationManagementPage() {
                         {STATUS_OPTIONS.map(o => <option key={o} value={o} className="bg-white text-gray-900">{o}</option>)}
                       </select>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{app.submittedAt}</td>
+                    <td className="px-4 py-3 text-gray-600">{formatSubmittedAt(app.submittedAt)}</td>
                     <td className="px-4 py-3 text-right">
                       <button onClick={() => setViewApp(app)} className="rounded-none font-semibold text-sm px-3 py-1 bg-[#725D92] hover:bg-[#635081] text-white">View</button>
                     </td>
@@ -160,7 +170,7 @@ export default function ApplicationManagementPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Submitted</label>
-                  <p className="text-gray-900">{viewApp.submittedAt}</p>
+                  <p className="text-gray-900">{formatSubmittedAt(viewApp.submittedAt)}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-500">Resume</label>

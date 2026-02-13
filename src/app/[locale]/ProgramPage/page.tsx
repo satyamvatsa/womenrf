@@ -173,7 +173,7 @@ function OtherProgramsSidebar({ currentSlug }: { currentSlug: string }) {
 }
 
 function LegalEmpowermentContent({ adminProgram }: { adminProgram?: any }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const scrollTo = (id: string) => {
@@ -215,10 +215,10 @@ function LegalEmpowermentContent({ adminProgram }: { adminProgram?: any }) {
           <div className="max-w-4xl">
             <div className="bg-wrf-black p-8 shadow-2xl">
               <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-                {adminProgram?.title || t('program.legal.title')}
+                {(locale === 'en' && adminProgram?.title) || t('program.legal.title')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {adminProgram?.description || t('program.legal.heroDesc')}
+                {(locale === 'en' && adminProgram?.description) || t('program.legal.heroDesc')}
               </p>
             </div>
           </div>
@@ -358,10 +358,14 @@ function LegalEmpowermentContent({ adminProgram }: { adminProgram?: any }) {
             {/* Partners & Supporters */}
             <div id="partners" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('programPage.partnersAndSupporters')}</h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center justify-center border border-gray-200 bg-wrf-black p-4 shadow-sm">
-                  <span className="mb-2 text-2xl font-bold text-white">ICJ</span>
-                  <p className="text-center text-sm font-medium">{t('program.legal.partner1')}</p>
+              <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+                <div className="group overflow-hidden border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div className="flex h-24 items-center justify-center bg-wrf-black">
+                    <span className="text-2xl font-bold tracking-wide text-white">ICJ</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-center text-sm font-semibold text-wrf-black">{t('program.legal.partner1')}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -426,7 +430,7 @@ function LegalEmpowermentContent({ adminProgram }: { adminProgram?: any }) {
 }
 
 function DigitalTransformationContent({ adminProgram }: { adminProgram?: any }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const scrollTo = (id: string) => {
@@ -465,10 +469,10 @@ function DigitalTransformationContent({ adminProgram }: { adminProgram?: any }) 
           <div className="max-w-4xl">
             <div className="bg-wrf-purple p-8 shadow-2xl">
               <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-                {adminProgram?.title || t('program.digital.title')}
+                {(locale === 'en' && adminProgram?.title) || t('program.digital.title')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {adminProgram?.description || t('program.digital.introDesc')}
+                {(locale === 'en' && adminProgram?.description) || t('program.digital.introDesc')}
               </p>
             </div>
           </div>
@@ -537,10 +541,14 @@ function DigitalTransformationContent({ adminProgram }: { adminProgram?: any }) 
             {/* Partners & Supporters */}
             <div id="partners" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('programPage.partnersAndSupporters')}</h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center justify-center border border-gray-200 bg-wrf-coral p-4 shadow-sm">
-                  <span className="mb-2 text-lg font-bold text-white">Partner</span>
-                  <p className="text-center text-sm font-medium">{t('program.digital.partner1')}</p>
+              <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+                <div className="group overflow-hidden border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div className="flex h-24 items-center justify-center bg-wrf-coral">
+                    <span className="text-2xl font-bold tracking-wide text-white">{t('program.digital.partner1')}</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-center text-sm font-semibold text-wrf-black">{t('program.digital.partner1Full')}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -606,7 +614,7 @@ function DigitalTransformationContent({ adminProgram }: { adminProgram?: any }) 
 }
 
 function RepresentationAdvocacyContent({ adminProgram }: { adminProgram?: any }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const scrollTo = (id: string) => {
@@ -647,10 +655,10 @@ function RepresentationAdvocacyContent({ adminProgram }: { adminProgram?: any })
           <div className="max-w-4xl">
             <div className="bg-wrf-purple p-8 shadow-2xl">
               <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-                {adminProgram?.title || t('program.advocacy.title')}
+                {(locale === 'en' && adminProgram?.title) || t('program.advocacy.title')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {adminProgram?.description || t('program.advocacy.heroDesc')}
+                {(locale === 'en' && adminProgram?.description) || t('program.advocacy.heroDesc')}
               </p>
             </div>
           </div>
@@ -753,14 +761,22 @@ function RepresentationAdvocacyContent({ adminProgram }: { adminProgram?: any })
             {/* Partners & Supporters */}
             <div id="partners" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('programPage.partnersAndSupporters')}</h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center justify-center border border-gray-200 bg-[#003399] p-4 shadow-sm">
-                  <span className="mb-2 text-lg font-bold text-white">EU Parliament</span>
-                  <p className="text-center text-sm font-medium">European Parliament</p>
+              <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+                <div className="group overflow-hidden border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div className="flex h-24 items-center justify-center bg-[#003399]">
+                    <span className="text-lg font-bold tracking-wide text-white">EU Parliament</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-center text-sm font-semibold text-wrf-black">European Parliament</p>
+                  </div>
                 </div>
-                <div className="flex flex-col items-center justify-center border border-gray-200 bg-wrf-purple p-4 shadow-sm">
-                  <span className="mb-2 text-lg font-bold text-white">WILPF</span>
-                  <p className="text-center text-sm font-medium">Women&apos;s International League</p>
+                <div className="group overflow-hidden border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div className="flex h-24 items-center justify-center bg-wrf-purple">
+                    <span className="text-lg font-bold tracking-wide text-white">WILPF</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-center text-sm font-semibold text-wrf-black">Women&apos;s International League</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -827,7 +843,7 @@ function RepresentationAdvocacyContent({ adminProgram }: { adminProgram?: any })
 }
 
 function PeacebuildingContent({ adminProgram }: { adminProgram?: any }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
 
   const scrollTo = (id: string) => {
@@ -868,10 +884,10 @@ function PeacebuildingContent({ adminProgram }: { adminProgram?: any }) {
           <div className="max-w-4xl">
             <div className="bg-wrf-purple p-8 shadow-2xl">
               <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-                {adminProgram?.title || t('program.peace.heroTitle')}
+                {(locale === 'en' && adminProgram?.title) || t('program.peace.heroTitle')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {adminProgram?.description || t('program.peace.heroDesc')}
+                {(locale === 'en' && adminProgram?.description) || t('program.peace.heroDesc')}
               </p>
             </div>
           </div>
@@ -1008,14 +1024,22 @@ function PeacebuildingContent({ adminProgram }: { adminProgram?: any }) {
             {/* Peace Partners */}
             <div id="partners" className="bg-white p-8 shadow-lg">
               <h2 className="mb-6 text-2xl font-bold text-wrf-black">{t('program.peace.nav.partners')}</h2>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                <div className="flex flex-col items-center justify-center border border-gray-200 bg-[#0066cc] p-4 shadow-sm">
-                  <span className="mb-2 text-xl font-bold text-white">UN PBF</span>
-                  <p className="text-center text-sm font-medium">{t('program.peace.partner1')}</p>
+              <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+                <div className="group overflow-hidden border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div className="flex h-24 items-center justify-center bg-[#0066cc]">
+                    <span className="text-2xl font-bold tracking-wide text-white">UN PBF</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-center text-sm font-semibold text-wrf-black">{t('program.peace.partner1')}</p>
+                  </div>
                 </div>
-                <div className="flex flex-col items-center justify-center border border-gray-200 bg-[#228B22] p-4 shadow-sm">
-                  <span className="mb-2 text-xl font-bold text-white">IPI</span>
-                  <p className="text-center text-sm font-medium">{t('program.peace.partner2')}</p>
+                <div className="group overflow-hidden border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md">
+                  <div className="flex h-24 items-center justify-center bg-[#228B22]">
+                    <span className="text-2xl font-bold tracking-wide text-white">IPI</span>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-center text-sm font-semibold text-wrf-black">{t('program.peace.partner2')}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1118,20 +1142,85 @@ function ProgramPageInner() {
     return <PeacebuildingContent adminProgram={adminProgram} />;
   }
 
+  const allPrograms = [
+    {
+      slug: 'peacebuilding-social-cohesion',
+      title: t('programs.peacebuilding.title'),
+      description: t('programs.peacebuilding.description'),
+      bg: 'bg-wrf-purple',
+      heroImg: PEACEBUILDING_HERO_BG,
+    },
+    {
+      slug: 'legal-empowerment-international-accountability',
+      title: t('programs.legal.title'),
+      description: t('programs.legal.description'),
+      bg: 'bg-wrf-black',
+      heroImg: LEGAL_HERO_BG,
+    },
+    {
+      slug: 'Digital-Transformation-and -Open -Gender -Data',
+      title: t('programs.digital.title'),
+      description: t('programs.digital.description'),
+      bg: 'bg-wrf-coral',
+      heroImg: DIGITAL_HERO_BG,
+    },
+    {
+      slug: 'representation-advocacy',
+      title: t('programs.advocacy.title'),
+      description: t('programs.advocacy.description'),
+      bg: 'bg-wrf-footer-mauve',
+      heroImg: REPRESENTATION_HERO_BG,
+    },
+  ];
+
   return (
-    <div className="bg-gray-50 py-24">
-      <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-        <h1 className="text-2xl font-bold text-wrf-black">{t('programPage.notFound')}</h1>
-        <p className="mt-2 text-gray-600">
-          {slug || '(no slug)'}
-        </p>
-        <Link
-          href="/ProgramPage?slug=peacebuilding-social-cohesion"
-          className="mt-6 inline-block bg-wrf-coral px-6 py-2 font-medium text-white hover:opacity-90"
-        >
-          {t('programs.peacebuilding.title')}
-        </Link>
-      </div>
+    <div className="bg-gray-50">
+      {/* Hero */}
+      <section className="bg-wrf-purple py-16 md:py-24">
+        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <h1 className="mb-4 text-4xl font-bold text-white lg:text-5xl">
+            {t('programPage.allPrograms')}
+          </h1>
+          <p className="mx-auto max-w-3xl text-lg leading-relaxed text-white/90">
+            {t('programPage.allProgramsDesc')}
+          </p>
+        </div>
+      </section>
+
+      {/* Program Cards */}
+      <section className="py-12 md:py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 md:grid-cols-2">
+            {allPrograms.map((prog) => (
+              <Link
+                key={prog.slug}
+                href={`/ProgramPage?slug=${encodeURIComponent(prog.slug)}`}
+                className="group overflow-hidden bg-white shadow-lg transition-shadow hover:shadow-xl"
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={prog.heroImg}
+                    alt={prog.title}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/40" />
+                </div>
+                <div className={`${prog.bg} p-6 text-white`}>
+                  <h2 className="mb-3 text-xl font-bold">{prog.title}</h2>
+                  <p className="line-clamp-3 text-sm leading-relaxed opacity-90">{prog.description}</p>
+                  <div className="mt-4 flex items-center gap-2 text-sm font-semibold">
+                    {t('programPage.learnMore')}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14" />
+                      <path d="m12 5 7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

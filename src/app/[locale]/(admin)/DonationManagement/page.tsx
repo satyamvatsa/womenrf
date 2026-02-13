@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { AdminShell } from '@/components/AdminShell';
-import { loadAdminData, saveAdminData } from '@/lib/adminApi';
+import { loadAdminData, saveAdminData, uploadAdminImage } from '@/lib/adminApi';
 
 const TITLE_BG_OPTIONS = [
+  { value: 'bg-wrf-black', label: 'Black (design default)' },
   { value: 'bg-primary', label: 'Primary' },
   { value: 'bg-secondary', label: 'Secondary' },
   { value: 'bg-accent', label: 'Accent' },
@@ -30,9 +31,15 @@ const defaultHero = {
     '/images/GettyImages-1232002648.jpg',
   heroTriangleImageUrl:
     '/images/Element-2-03-scaled.png',
-  titleBackgroundColor: 'bg-primary',
+  titleBackgroundColor: 'bg-wrf-black',
   titleTextColor: 'text-white',
   subtitleTextColor: 'text-white/90',
+};
+
+const defaultOtherWays = {
+  otherWaysTitle: 'Other Ways to Give',
+  otherWaysDescription:
+    "Beyond online donations, there are many meaningful ways to support our mission and create lasting impact.",
 };
 
 export default function DonationManagementPage() {
@@ -45,7 +52,12 @@ export default function DonationManagementPage() {
   const [titleTextColor, setTitleTextColor] = useState(defaultHero.titleTextColor);
   const [subtitleTextColor, setSubtitleTextColor] = useState(defaultHero.subtitleTextColor);
 
+  const [otherWaysTitle, setOtherWaysTitle] = useState(defaultOtherWays.otherWaysTitle);
+  const [otherWaysDescription, setOtherWaysDescription] = useState(defaultOtherWays.otherWaysDescription);
+
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
+  const [saveOtherWaysStatus, setSaveOtherWaysStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
+  const [uploadingField, setUploadingField] = useState<'hero' | 'triangle' | null>(null);
 
   useEffect(() => {
     loadAdminData<Record<string, any>>('donations').then(data => {
@@ -57,6 +69,8 @@ export default function DonationManagementPage() {
       if (data.titleBackgroundColor !== undefined) setTitleBackgroundColor(data.titleBackgroundColor);
       if (data.titleTextColor !== undefined) setTitleTextColor(data.titleTextColor);
       if (data.subtitleTextColor !== undefined) setSubtitleTextColor(data.subtitleTextColor);
+      if (data.otherWaysTitle !== undefined) setOtherWaysTitle(data.otherWaysTitle);
+      if (data.otherWaysDescription !== undefined) setOtherWaysDescription(data.otherWaysDescription);
     });
   }, []);
 
@@ -67,10 +81,25 @@ export default function DonationManagementPage() {
       pageTitle, subtitle,
       heroBackgroundImageUrl, heroTriangleImageUrl,
       titleBackgroundColor, titleTextColor, subtitleTextColor,
+      otherWaysTitle, otherWaysDescription,
     };
     const ok = await saveAdminData('donations', data);
     setSaveStatus(ok ? 'saved' : 'error');
     setTimeout(() => setSaveStatus('idle'), 3000);
+  };
+
+  const handleSaveOtherWays = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaveOtherWaysStatus('saving');
+    const data = {
+      pageTitle, subtitle,
+      heroBackgroundImageUrl, heroTriangleImageUrl,
+      titleBackgroundColor, titleTextColor, subtitleTextColor,
+      otherWaysTitle, otherWaysDescription,
+    };
+    const ok = await saveAdminData('donations', data);
+    setSaveOtherWaysStatus(ok ? 'saved' : 'error');
+    setTimeout(() => setSaveOtherWaysStatus('idle'), 3000);
   };
 
   const inputClass =
@@ -163,24 +192,76 @@ export default function DonationManagementPage() {
                     />
                   </div>
                   <div>
-                    <label className={labelClass}>Hero Background Image URL</label>
-                    <input
-                      type="url"
-                      className={inputClass}
-                      placeholder="https://example.com/hero-image.jpg"
-                      value={heroBackgroundImageUrl}
-                      onChange={(e) => setHeroBackgroundImageUrl(e.target.value)}
-                    />
+                    <label className={labelClass}>Hero Background Image</label>
+                    <p className="text-xs text-gray-500 mb-2">Use a path like /images/hero_background.jpeg or upload a file.</p>
+                    <div className="flex gap-2 flex-wrap items-start">
+                      <input
+                        type="text"
+                        className={`${inputClass} flex-1 min-w-[200px]`}
+                        placeholder="/images/hero_background.jpeg"
+                        value={heroBackgroundImageUrl}
+                        onChange={(e) => setHeroBackgroundImageUrl(e.target.value)}
+                      />
+                      <label className="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium h-9 px-3 py-2 border border-input bg-background hover:bg-gray-50 cursor-pointer disabled:opacity-50">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp"
+                          className="sr-only"
+                          disabled={uploadingField !== null}
+                          onChange={async (e) => {
+                            const f = e.target.files?.[0];
+                            if (!f) return;
+                            setUploadingField('hero');
+                            const url = await uploadAdminImage(f);
+                            if (url) setHeroBackgroundImageUrl(url);
+                            setUploadingField(null);
+                            e.target.value = '';
+                          }}
+                        />
+                        {uploadingField === 'hero' ? 'Uploading…' : 'Upload image'}
+                      </label>
+                    </div>
+                    {heroBackgroundImageUrl && (
+                      <div className="mt-2 rounded border overflow-hidden bg-gray-100 inline-block max-w-[280px]">
+                        <img src={heroBackgroundImageUrl} alt="Hero background preview" className="max-h-32 w-auto object-cover" />
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <label className={labelClass}>Hero Triangle Image URL</label>
-                    <input
-                      type="url"
-                      className={inputClass}
-                      placeholder="https://example.com/triangle-image.jpg"
-                      value={heroTriangleImageUrl}
-                      onChange={(e) => setHeroTriangleImageUrl(e.target.value)}
-                    />
+                    <label className={labelClass}>Hero Triangle Image (diagonal area)</label>
+                    <p className="text-xs text-gray-500 mb-2">Path like /images/hero_background.jpeg or same as background. Optional.</p>
+                    <div className="flex gap-2 flex-wrap items-start">
+                      <input
+                        type="text"
+                        className={`${inputClass} flex-1 min-w-[200px]`}
+                        placeholder="/images/hero_background.jpeg"
+                        value={heroTriangleImageUrl}
+                        onChange={(e) => setHeroTriangleImageUrl(e.target.value)}
+                      />
+                      <label className="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium h-9 px-3 py-2 border border-input bg-background hover:bg-gray-50 cursor-pointer disabled:opacity-50">
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/gif,image/webp"
+                          className="sr-only"
+                          disabled={uploadingField !== null}
+                          onChange={async (e) => {
+                            const f = e.target.files?.[0];
+                            if (!f) return;
+                            setUploadingField('triangle');
+                            const url = await uploadAdminImage(f);
+                            if (url) setHeroTriangleImageUrl(url);
+                            setUploadingField(null);
+                            e.target.value = '';
+                          }}
+                        />
+                        {uploadingField === 'triangle' ? 'Uploading…' : 'Upload image'}
+                      </label>
+                    </div>
+                    {heroTriangleImageUrl && (
+                      <div className="mt-2 rounded border overflow-hidden bg-gray-100 inline-block max-w-[280px]">
+                        <img src={heroTriangleImageUrl} alt="Triangle area preview" className="max-h-32 w-auto object-cover" />
+                      </div>
+                    )}
                   </div>
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
@@ -250,11 +331,38 @@ export default function DonationManagementPage() {
               <div className="flex flex-col space-y-1.5 p-6">
                 <h3 className="text-2xl font-semibold leading-none tracking-tight">Other Ways to Give</h3>
                 <p className="text-sm text-gray-500">
-                  Configure alternative giving options and content for this section.
+                  Configure the section title and intro text shown on the donation page.
                 </p>
               </div>
               <div className="p-6 pt-0">
-                <p className="text-sm text-gray-500">Content settings for this section can be added here.</p>
+                <form onSubmit={handleSaveOtherWays} className="space-y-4">
+                  <div>
+                    <label className={labelClass}>Section Title</label>
+                    <input
+                      type="text"
+                      className={inputClass}
+                      placeholder="Other Ways to Give"
+                      value={otherWaysTitle}
+                      onChange={(e) => setOtherWaysTitle(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className={labelClass}>Section Description</label>
+                    <textarea
+                      className={textareaClass}
+                      placeholder="Beyond online donations, there are many meaningful ways..."
+                      rows={4}
+                      value={otherWaysDescription}
+                      onChange={(e) => setOtherWaysDescription(e.target.value)}
+                    />
+                  </div>
+                  <button type="submit" className={btnPrimary}>
+                    Save Other Ways to Give
+                  </button>
+                  {saveOtherWaysStatus === 'saving' && <span className="text-sm text-gray-500 ml-3">Saving...</span>}
+                  {saveOtherWaysStatus === 'saved' && <span className="text-sm text-green-600 ml-3">Saved successfully!</span>}
+                  {saveOtherWaysStatus === 'error' && <span className="text-sm text-red-600 ml-3">Error saving. Try again.</span>}
+                </form>
               </div>
             </div>
           </div>

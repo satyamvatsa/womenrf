@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from '@/lib/TranslationContext';
 
 const PARTNERS = [
   { name: 'Google', url: 'https://google.com', logo: 'https://logo.clearbit.com/google.com' },
@@ -16,6 +17,7 @@ const PARTNERS = [
 ];
 
 export default function Partners() {
+  const { t, locale } = useTranslation();
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
   useEffect(() => {
     fetch('/api/data/homepage', { cache: 'no-store' })
@@ -34,8 +36,8 @@ export default function Partners() {
 
   // Read admin settings with fallbacks
   const showPartners = adminData?.showPartners !== undefined ? adminData.showPartners : true;
-  const partnersTitle = adminData?.partnersTitle || 'Our Partners & Collaborators';
-  const partnersSubtitle = adminData?.partnersSubtitle || 'Working together to create lasting change';
+  const partnersTitle = (locale === 'en' && adminData?.partnersTitle) || t('partners.title');
+  const partnersSubtitle = (locale === 'en' && adminData?.partnersSubtitle) || t('partners.description');
   const partnersTitleBg = adminData?.partnersTitleBg || 'bg-primary';
 
   const TITLE_BG_MAP: Record<string, string> = {

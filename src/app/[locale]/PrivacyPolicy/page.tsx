@@ -24,7 +24,7 @@ function ChevronDown({ className }: { className?: string }) {
 
 export default function PrivacyPolicyPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const articles: Array<{
     title: string;
@@ -96,9 +96,21 @@ export default function PrivacyPolicyPage() {
       }))
     : articles;
 
-  const pageTitle = adminData?.pageTitle || t('privacy.hero.title');
-  const introduction = adminData?.introduction || t('privacy.hero.description');
-  const lastUpdated = adminData?.lastUpdated || t('privacy.lastUpdated');
+  const pageTitle = (locale === 'en' && adminData?.pageTitle) || t('privacy.hero.title');
+  const introduction = adminData?.introduction;
+  const introductionIsHtml = typeof introduction === 'string' && (introduction.trim().startsWith('<'));
+  const lastUpdatedRaw = adminData?.lastUpdated;
+
+  function formatLastUpdated(dateStr: string | undefined): string {
+    if (!dateStr) return t('privacy.lastUpdated');
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return `Last Updated: ${dateStr}`;
+      return `Last Updated: ${d.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}`;
+    } catch {
+      return `Last Updated: ${dateStr}`;
+    }
+  }
 
   return (
     <div className="bg-gray-50">
@@ -109,11 +121,13 @@ export default function PrivacyPolicyPage() {
             {pageTitle}
           </h1>
           <div className="max-w-4xl text-lg leading-relaxed text-white/80">
-            <p>
-              {introduction}
-            </p>
+            {introductionIsHtml ? (
+              <div dangerouslySetInnerHTML={{ __html: introduction }} />
+            ) : (
+              <p>{introduction || t('privacy.hero.description')}</p>
+            )}
           </div>
-          <p className="mt-6 text-sm text-white/60">{lastUpdated}</p>
+          <p className="mt-6 text-sm text-white/60">{formatLastUpdated(lastUpdatedRaw)}</p>
         </div>
       </section>
 
@@ -144,9 +158,10 @@ export default function PrivacyPolicyPage() {
                     </span>
                   </button>
                   {isOpen && (
-                    <div className="border-t border-gray-200 bg-white p-6 text-wrf-black">
-                      <p className="leading-relaxed">{article.content}</p>
-                    </div>
+                    <div
+                      className="border-t border-gray-200 bg-white p-6 text-wrf-black prose prose-p:leading-relaxed prose-ul:my-2 prose-li:my-0.5 max-w-none"
+                      dangerouslySetInnerHTML={{ __html: article.content || '' }}
+                    />
                   )}
                 </div>
               );

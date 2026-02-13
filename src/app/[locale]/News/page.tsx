@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
 
 function CategoryIcon({ name }: { name: string }) {
@@ -46,8 +47,10 @@ function CategoryIcon({ name }: { name: string }) {
 
 export default function NewsPage() {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const qFromUrl = searchParams.get('q') ?? '';
   const [activeCategory, setActiveCategory] = useState('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(qFromUrl);
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
   useEffect(() => {
@@ -56,6 +59,9 @@ export default function NewsPage() {
       .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
       .catch(() => {});
   }, []);
+  useEffect(() => {
+    setSearchQuery((prev) => (qFromUrl !== prev ? qFromUrl : prev));
+  }, [qFromUrl]);
 
   const publishedPosts = useMemo(() => {
     if (!adminData?.posts?.length) return [];
@@ -87,7 +93,7 @@ export default function NewsPage() {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Search logic can be wired later
+    // Search is applied via searchQuery state and filteredPosts
   };
 
   return (

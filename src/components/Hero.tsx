@@ -16,6 +16,7 @@ function getLocalePrefix(pathname: string): string {
 export default function Hero() {
   const pathname = usePathname();
   const localePrefix = getLocalePrefix(pathname);
+  const currentLocale = localePrefix.replace('/', '');
   const { t } = useTranslation();
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
@@ -48,10 +49,10 @@ export default function Hero() {
           <div>
             <div className={`mb-6 inline-block ${heroTitleBgClass} px-8 py-6`}>
               <h1 className="mb-4 text-4xl font-bold leading-tight text-white lg:text-6xl">
-                {adminData?.heroTitle || t('hero.title')}
+                {(currentLocale === 'en' && adminData?.heroTitle) || t('hero.title')}
               </h1>
               <p className="text-xl leading-relaxed text-white/90">
-                {adminData?.heroSubtitle || t('hero.description')}
+                {(currentLocale === 'en' && adminData?.heroSubtitle) || t('hero.description')}
               </p>
             </div>
             <div className="mt-8 flex flex-col gap-4 sm:flex-row">
@@ -59,7 +60,7 @@ export default function Hero() {
                 href={adminData?.heroButton1Link || `${localePrefix}/About`}
                 className={`flex items-center justify-center gap-2 rounded-none ${heroBtn1BgClass} px-8 py-4 font-semibold text-white shadow-lg transition-all duration-300 hover:opacity-90`}
               >
-                {adminData?.heroButton1Text || t('hero.learnStory')}
+                {(currentLocale === 'en' && adminData?.heroButton1Text) || t('hero.learnStory')}
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M5 12h14" />
                   <path d="m12 5 7 7-7 7" />
@@ -69,7 +70,7 @@ export default function Hero() {
                 href={adminData?.heroButton2Link || `${localePrefix}/Programs`}
                 className={`flex items-center justify-center gap-2 rounded-none ${heroBtn2BgClass} px-8 py-4 font-semibold text-white transition-all duration-300 hover:opacity-90`}
               >
-                {adminData?.heroButton2Text || t('hero.ourPrograms')}
+                {(currentLocale === 'en' && adminData?.heroButton2Text) || t('hero.ourPrograms')}
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m9 18 6-6-6-6" />
                 </svg>

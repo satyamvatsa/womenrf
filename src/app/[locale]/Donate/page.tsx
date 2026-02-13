@@ -10,6 +10,23 @@ const HERO_BG = '/images/GettyImages-1232002648.jpg';
 
 const AMOUNTS = [25, 50, 100, 250];
 
+const HERO_TITLE_BG_MAP: Record<string, string> = {
+  'bg-wrf-black': 'bg-wrf-black',
+  'bg-primary': 'bg-primary',
+  'bg-secondary': 'bg-secondary',
+  'bg-accent': 'bg-accent',
+  'bg-support-1': 'bg-support-1',
+};
+const HERO_TITLE_TEXT_MAP: Record<string, string> = {
+  'text-white': 'text-white',
+  'text-primary': 'text-primary',
+};
+const HERO_SUBTITLE_TEXT_MAP: Record<string, string> = {
+  'text-white/90': 'text-white/90',
+  'text-white': 'text-white',
+  'text-gray-600': 'text-gray-600',
+};
+
 type OtherWayItem = {
   id: string;
   title: string;
@@ -187,27 +204,31 @@ export default function DonatePage() {
 
   return (
     <div className="bg-white">
-      {/* Hero */}
+      {/* Hero — full-width background, dark overlay, diagonal reveal, title box left */}
       <section
-        className="relative overflow-hidden bg-cover bg-center py-20 md:py-32"
+        className="relative min-h-[420px] overflow-hidden bg-cover bg-center py-20 md:py-32"
         style={{ backgroundImage: `url(${adminDonations?.heroBackgroundImageUrl || HERO_BG})` }}
       >
         <div className="absolute inset-0 bg-black/60" aria-hidden />
-        <div className="absolute right-0 top-0 hidden h-full w-2/5 bg-cover bg-center md:block" style={{ clipPath: 'polygon(0% 100%, 100% 0%, 100% 100%)', backgroundImage: `url(${adminDonations?.heroTriangleImageUrl || adminDonations?.heroBackgroundImageUrl || HERO_BG})` }} aria-hidden />
+        <div
+          className="absolute right-0 top-0 hidden h-full w-2/5 bg-cover bg-center md:block"
+          style={{
+            clipPath: 'polygon(0% 100%, 100% 0%, 100% 100%)',
+            backgroundImage: `url(${adminDonations?.heroTriangleImageUrl || adminDonations?.heroBackgroundImageUrl || HERO_BG})`,
+          }}
+          aria-hidden
+        />
         <div className="relative mx-auto max-w-7xl px-4 text-left sm:px-6 lg:px-8">
           <div
-            className={`inline-block px-8 py-6 ${!adminDonations?.titleBackgroundColor ? 'bg-wrf-black' : ''}`}
-            style={adminDonations?.titleBackgroundColor ? { backgroundColor: adminDonations.titleBackgroundColor } : undefined}
+            className={`inline-block px-8 py-6 ${HERO_TITLE_BG_MAP[adminDonations?.titleBackgroundColor as string] || 'bg-wrf-black'}`}
           >
             <h1
-              className={`mb-4 text-4xl font-bold lg:text-6xl ${!adminDonations?.titleTextColor ? 'text-white' : ''}`}
-              style={adminDonations?.titleTextColor ? { color: adminDonations.titleTextColor } : undefined}
+              className={`mb-4 text-4xl font-bold leading-tight lg:text-6xl ${HERO_TITLE_TEXT_MAP[adminDonations?.titleTextColor as string] || 'text-white'}`}
             >
               {adminDonations?.pageTitle || t('donate.hero.title')}
             </h1>
             <p
-              className={`max-w-3xl text-xl leading-relaxed ${!adminDonations?.subtitleTextColor ? 'text-white/90' : ''}`}
-              style={adminDonations?.subtitleTextColor ? { color: adminDonations.subtitleTextColor } : undefined}
+              className={`max-w-3xl text-xl leading-relaxed ${HERO_SUBTITLE_TEXT_MAP[adminDonations?.subtitleTextColor as string] || 'text-white/90'}`}
             >
               {adminDonations?.subtitle || t('donate.hero.description')}
             </p>
@@ -531,24 +552,45 @@ export default function DonatePage() {
           <div className="grid items-start gap-12 lg:grid-cols-5">
             <div className="lg:col-span-3 text-left">
               <div className="mb-6 inline-block rounded-l-lg bg-wrf-coral px-6 py-5">
-                <h2 className="text-3xl font-bold text-white">{t('donate.otherWays.title')}</h2>
+                <h2 className="text-3xl font-bold text-white">
+                  {adminDonations?.otherWaysTitle ?? t('donate.otherWays.title')}
+                </h2>
               </div>
               <p className="max-w-lg text-lg leading-relaxed text-gray-700">
-                {t('donate.otherWays.description')}
+                {adminDonations?.otherWaysDescription ?? t('donate.otherWays.description')}
               </p>
             </div>
             <div className="lg:col-span-2 space-y-0 overflow-hidden rounded-lg shadow-md">
               {(adminOptions?.options && Array.isArray(adminOptions.options) && adminOptions.options.length > 0
                 ? adminOptions.options
                     .filter((opt: any) => opt.isActive !== false)
-                    .sort((a: any, b: any) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
-                    .map((opt: any) => ({
-                      id: opt.id || opt.title,
-                      title: opt.title,
-                      bgClass: opt.colorClass || 'bg-wrf-black',
-                      icon: opt.iconName || null,
-                      content: <p className="text-white/90">{opt.content}</p>,
-                    }))
+                    .sort((a: any, b: any) => (a.displayOrder ?? a.order ?? 0) - (b.displayOrder ?? b.order ?? 0))
+                    .map((opt: any) => {
+                      const ICON_MAP: Record<string, string> = {
+                        Mail: 'mail', mail: 'mail',
+                        Gift: 'gift', gift: 'gift',
+                        TrendingUp: 'trending-up', 'trending-up': 'trending-up',
+                        Phone: 'phone', phone: 'phone',
+                      };
+                      const DONATION_BG_MAP: Record<string, string> = {
+                        'bg-primary': 'bg-wrf-black',
+                        'bg-secondary': 'bg-wrf-purple',
+                        'bg-accent': 'bg-wrf-coral',
+                        'bg-support-1': 'bg-wrf-footer-mauve',
+                      };
+                      const icon = ICON_MAP[opt.iconName] || opt.iconName?.toLowerCase() || null;
+                      const bgClass = DONATION_BG_MAP[opt.colorClass] || opt.colorClass || 'bg-wrf-black';
+                      const contentHtml = (opt.content && String(opt.content).trim()) ? (
+                        <div className="text-white/90 prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: String(opt.content) }} />
+                      ) : null;
+                      return {
+                        id: String(opt.id ?? opt.title ?? ''),
+                        title: opt.title,
+                        bgClass,
+                        icon,
+                        content: contentHtml,
+                      };
+                    })
                 : OTHER_WAYS
               ).map((item: OtherWayItem) => {
                 const isExpanded = otherWaysExpandedId === item.id;

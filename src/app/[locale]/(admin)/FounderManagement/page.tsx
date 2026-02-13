@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AdminShell } from '@/components/AdminShell';
-import { loadAdminData, saveAdminData } from '@/lib/adminApi';
+import { loadAdminData, saveAdminData, uploadAdminImage } from '@/lib/adminApi';
 
 const SvgPlus = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -57,6 +57,7 @@ const defaultFounders: Founder[] = [
     id: '1',
     name: 'Shabnam Salehi',
     title: 'Co-Founder & President',
+    imageUrl: '/images/Shabnam_Salehi.jpeg',
     iconBg: 'bg-wrf-purple',
     bio: '',
     expertise: [],
@@ -66,6 +67,7 @@ const defaultFounders: Founder[] = [
     id: '2',
     name: 'Hanifa Girowal',
     title: 'Co-Founder & VP',
+    imageUrl: '/images/Hanifa_Girowal.jpeg',
     iconBg: 'bg-wrf-coral',
     bio: '',
     expertise: [],
@@ -99,6 +101,7 @@ export default function FounderManagementPage() {
   const [formExpertise, setFormExpertise] = useState<string[]>([]);
   const [formNewExpertise, setFormNewExpertise] = useState('');
   const [formLinks, setFormLinks] = useState<SocialLink[]>([]);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
@@ -189,7 +192,7 @@ export default function FounderManagementPage() {
       id: editingId ?? String(Date.now()),
       name: formName,
       title: formTitle,
-      imageUrl: formImageUrl || undefined,
+      imageUrl: formImageUrl.trim() || undefined,
       iconBg: formIconBg,
       bio: formBio,
       expertise: formExpertise,
@@ -254,10 +257,20 @@ export default function FounderManagementPage() {
                     }`}
                   >
                     {founder.imageUrl ? (
-                      <img src={founder.imageUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <SvgVenetianMask className="w-6 h-6 text-white" />
-                    )}
+                      <img
+                        src={founder.imageUrl}
+                        alt=""
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    <span className="w-full h-full flex items-center justify-center text-white" style={{ display: founder.imageUrl ? 'none' : 'flex' }}>
+                      <SvgVenetianMask className="w-6 h-6" />
+                    </span>
                   </div>
                   <div className="min-w-0">
                     <h3 className="font-bold">{founder.name}</h3>
@@ -339,16 +352,42 @@ export default function FounderManagementPage() {
                 />
               </div>
 
-              {/* Image URL */}
+              {/* Image URL — use type="text" so relative paths and uploads save correctly */}
               <div>
                 <label className={labelClass}>Image URL</label>
-                <input
-                  type="url"
-                  className={inputClass}
-                  placeholder="https://..."
-                  value={formImageUrl}
-                  onChange={(e) => setFormImageUrl(e.target.value)}
-                />
+                <p className="text-xs text-gray-500 mb-2">Path like /images/name.jpeg or upload a file below.</p>
+                <div className="flex gap-2 flex-wrap items-start">
+                  <input
+                    type="text"
+                    className={`${inputClass} flex-1 min-w-[200px]`}
+                    placeholder="/images/Shabnam_Salehi.jpeg"
+                    value={formImageUrl}
+                    onChange={(e) => setFormImageUrl(e.target.value)}
+                  />
+                  <label className="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium h-9 px-3 py-2 border border-input bg-background hover:bg-gray-50 cursor-pointer disabled:opacity-50">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      className="sr-only"
+                      disabled={uploadingImage}
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        setUploadingImage(true);
+                        const url = await uploadAdminImage(f);
+                        if (url) setFormImageUrl(url);
+                        setUploadingImage(false);
+                        e.target.value = '';
+                      }}
+                    />
+                    {uploadingImage ? 'Uploading…' : 'Upload image'}
+                  </label>
+                </div>
+                {formImageUrl && (
+                  <div className="mt-2 rounded border overflow-hidden bg-gray-100 inline-block w-20 h-20">
+                    <img src={formImageUrl} alt="Preview" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                  </div>
+                )}
               </div>
 
               {/* Background color */}
@@ -441,9 +480,9 @@ export default function FounderManagementPage() {
                           </select>
                         </div>
                         <input
-                          type="url"
+                          type="text"
                           className={inputClass}
-                          placeholder={link.icon === 'mail' ? 'mailto:name@example.com' : 'https://...'}
+                          placeholder={link.icon === 'mail' ? 'mailto:name@example.com' : 'https://... or # to hide'}
                           value={link.href}
                           onChange={(e) => updateSocialLink(index, 'href', e.target.value)}
                         />

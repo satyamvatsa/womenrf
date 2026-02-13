@@ -26,6 +26,43 @@ const CATEGORY_BG: Record<CategoryId, string> = {
   contact: 'bg-wrf-black',
 };
 
+const FAQ_ITEM_BG_MAP: Record<string, string> = {
+  'bg-wrf-purple': 'bg-wrf-purple',
+  'bg-wrf-purple-dark': 'bg-wrf-purple-dark',
+  'bg-wrf-footer-mauve': 'bg-wrf-footer-mauve',
+  'bg-wrf-coral': 'bg-wrf-coral',
+  'bg-wrf-rose-dark': 'bg-wrf-rose-dark',
+  'bg-wrf-footer-dark': 'bg-wrf-footer-dark',
+  'bg-wrf-black': 'bg-wrf-black',
+};
+const FAQ_ITEM_TEXT_MAP: Record<string, string> = {
+  'text-white': 'text-white',
+  'text-white/90': 'text-white/90',
+};
+
+
+/** Lighten a hex color by a given amount (0–1) */
+function lightenHex(hex: string, amount: number): string {
+  const h = hex.replace('#', '');
+  const r = Math.min(255, Math.round(parseInt(h.substring(0, 2), 16) + (255 - parseInt(h.substring(0, 2), 16)) * amount));
+  const g = Math.min(255, Math.round(parseInt(h.substring(2, 4), 16) + (255 - parseInt(h.substring(2, 4), 16)) * amount));
+  const b = Math.min(255, Math.round(parseInt(h.substring(4, 6), 16) + (255 - parseInt(h.substring(4, 6), 16)) * amount));
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+/** Resolve category colorClass from admin (WRF or legacy) to a display class for sidebar and cards */
+function resolveCategoryBg(colorClass: string | undefined): string {
+  if (!colorClass) return 'bg-wrf-purple';
+  if (FAQ_ITEM_BG_MAP[colorClass]) return colorClass;
+  const legacy: Record<string, string> = {
+    'bg-primary': 'bg-wrf-black',
+    'bg-secondary': 'bg-wrf-purple',
+    'bg-accent': 'bg-wrf-coral',
+    'bg-support-1': 'bg-wrf-footer-mauve',
+  };
+  return legacy[colorClass] || 'bg-wrf-purple';
+}
+
 function ChevronDown({ className }: { className?: string }) {
   return (
     <svg
@@ -66,7 +103,7 @@ function SearchIcon({ className }: { className?: string }) {
 }
 
 export default function FAQPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<CategoryId>('all');
 
@@ -78,12 +115,16 @@ export default function FAQPage() {
     { id: 'contact' as CategoryId, label: t('faq.categories.contact'), count: 2, bg: CATEGORY_BG['contact'] },
   ];
 
+  /** Reference image hex colors per question panel */
   const FAQ_ITEMS: Array<{
     id: string;
     question: string;
     answer: string;
     category: CategoryId;
     categoryLabel: string;
+    backgroundColor?: string;
+    textColor?: string;
+    categoryBg?: string;
   }> = [
     {
       id: '1',
@@ -91,6 +132,8 @@ export default function FAQPage() {
       answer: t('faq.a1'),
       category: 'general',
       categoryLabel: t('faq.categories.general'),
+      backgroundColor: '#6A4B92',
+      textColor: 'text-white',
     },
     {
       id: '2',
@@ -98,6 +141,8 @@ export default function FAQPage() {
       answer: t('faq.a2'),
       category: 'involved',
       categoryLabel: t('faq.categories.involved'),
+      backgroundColor: '#573E80',
+      textColor: 'text-white',
     },
     {
       id: '3',
@@ -105,6 +150,8 @@ export default function FAQPage() {
       answer: t('faq.a3'),
       category: 'contact',
       categoryLabel: t('faq.categories.contact'),
+      backgroundColor: '#B78CA3',
+      textColor: 'text-white',
     },
     {
       id: '4',
@@ -112,6 +159,8 @@ export default function FAQPage() {
       answer: t('faq.a4'),
       category: 'programs',
       categoryLabel: t('faq.categories.programs'),
+      backgroundColor: '#DA777D',
+      textColor: 'text-white',
     },
     {
       id: '5',
@@ -119,6 +168,8 @@ export default function FAQPage() {
       answer: t('faq.a5'),
       category: 'general',
       categoryLabel: t('faq.categories.general'),
+      backgroundColor: '#7C607A',
+      textColor: 'text-white',
     },
     {
       id: '6',
@@ -126,6 +177,8 @@ export default function FAQPage() {
       answer: t('faq.a6'),
       category: 'contact',
       categoryLabel: t('faq.categories.contact'),
+      backgroundColor: '#1A1A1A',
+      textColor: 'text-white',
     },
   ];
 
@@ -137,29 +190,36 @@ export default function FAQPage() {
       .catch(() => {});
   }, []);
 
-  const displayCategories = adminData && adminData.categories?.length > 0
+  const displayCategories = adminData && adminData.categories?.length > 0 && locale === 'en'
     ? [
         { id: 'all' as CategoryId, label: t('faq.categories.all'), count: 0, bg: 'bg-wrf-black' },
-        ...adminData.categories.map((c: any) => ({
-          id: c.id as CategoryId,
-          label: c.name,
-          count: 0,
-          bg: c.color || 'bg-wrf-purple',
-        })),
+        ...[...((adminData.categories) || [])]
+          .sort((a: any, b: any) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
+          .map((c: any) => ({
+            id: c.id as CategoryId,
+            label: c.name,
+            count: 0,
+            bg: resolveCategoryBg(c.colorClass || c.color),
+          })),
       ]
     : CATEGORIES;
 
-  const displayFAQs = adminData && adminData.faqs?.length > 0
-    ? adminData.faqs
+  const displayFAQs = adminData && adminData.faqs?.length > 0 && locale === 'en'
+    ? [...adminData.faqs]
         .filter((f: any) => f.isActive !== false)
+        .sort((a: any, b: any) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))
         .map((f: any) => {
           const cat = adminData.categories?.find((c: any) => c.id === f.categoryId);
+          const categoryBg = resolveCategoryBg(cat?.colorClass || cat?.color);
           return {
             id: f.id,
             question: f.question,
             answer: f.answer,
             category: f.categoryId as CategoryId,
             categoryLabel: cat?.name || f.categoryId,
+            backgroundColor: f.backgroundColor,
+            textColor: f.textColor,
+            categoryBg,
           };
         })
     : FAQ_ITEMS;
@@ -279,7 +339,10 @@ export default function FAQPage() {
                 ) : (
                   filtered.map((item: any) => {
                     const isOpen = openId === item.id;
-                    const headerBg = (CATEGORY_HEADER_BG as Record<string, string>)[item.category] || 'bg-wrf-purple';
+                    const isHexBg = typeof item.backgroundColor === 'string' && item.backgroundColor.startsWith('#');
+                    const headerBgClass = !isHexBg ? (FAQ_ITEM_BG_MAP[item.backgroundColor] || item.categoryBg || (CATEGORY_HEADER_BG as Record<string, string>)[item.category] || 'bg-wrf-purple') : '';
+                    const headerBgStyle = isHexBg ? { backgroundColor: item.backgroundColor } : undefined;
+                    const questionTextClass = FAQ_ITEM_TEXT_MAP[item.textColor] || 'text-white';
                     return (
                       <div
                         key={item.id}
@@ -288,14 +351,15 @@ export default function FAQPage() {
                         <button
                           type="button"
                           onClick={() => setOpenId(isOpen ? null : item.id)}
-                          className={`w-full p-6 text-left text-white transition-colors duration-200 ${headerBg}`}
+                          className={`w-full p-6 text-left transition-colors duration-200 ${questionTextClass} ${headerBgClass}`}
+                          style={headerBgStyle}
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex-1">
                               <h3 className="text-lg font-semibold leading-tight">
                                 {item.question}
                               </h3>
-                              <span className="mt-2 inline-block rounded-none bg-white/20 px-3 py-1 text-xs font-medium uppercase tracking-wider">
+                              <span className="mt-2 inline-block rounded px-3 py-1 text-xs font-medium uppercase tracking-wider text-white" style={{ backgroundColor: isHexBg ? lightenHex(item.backgroundColor, 0.3) : 'rgba(255,255,255,0.2)' }}>
                                 {item.categoryLabel}
                               </span>
                             </div>

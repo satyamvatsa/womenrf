@@ -40,3 +40,21 @@ export async function submitPublicForm(section: string, data: Record<string, unk
     return false;
   }
 }
+
+/** Upload an image; returns public URL or null. */
+export async function uploadAdminImage(file: File): Promise<string | null> {
+  try {
+    const form = new FormData();
+    form.append('file', file);
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${ADMIN_PASSWORD}` },
+      body: form,
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.url ?? null;
+  } catch {
+    return null;
+  }
+}
