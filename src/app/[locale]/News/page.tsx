@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
 
@@ -45,7 +45,7 @@ function CategoryIcon({ name }: { name: string }) {
   );
 }
 
-export default function NewsPage() {
+function NewsPageInner() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const qFromUrl = searchParams.get('q') ?? '';
@@ -227,5 +227,13 @@ export default function NewsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function NewsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-[40vh] bg-gray-50" />}>
+      <NewsPageInner />
+    </Suspense>
   );
 }
