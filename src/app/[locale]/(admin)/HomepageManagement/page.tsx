@@ -136,16 +136,16 @@ export default function HomepageManagementPage() {
   const [partnersTitleBg, setPartnersTitleBg] = useState('bg-primary');
   const [partnersSubtitle, setPartnersSubtitle] = useState('Working together to create lasting change');
   const [partnersList, setPartnersList] = useState<{ name: string; logoUrl: string; websiteUrl: string }[]>([
-    { name: 'Google', logoUrl: 'https://logo.clearbit.com/google.com', websiteUrl: 'https://google.com' },
-    { name: 'Microsoft', logoUrl: 'https://logo.clearbit.com/microsoft.com', websiteUrl: 'https://microsoft.com' },
-    { name: 'Salesforce', logoUrl: 'https://logo.clearbit.com/salesforce.com', websiteUrl: 'https://salesforce.com' },
-    { name: 'Amazon', logoUrl: 'https://logo.clearbit.com/amazon.com', websiteUrl: 'https://amazon.com' },
-    { name: 'Shopify', logoUrl: 'https://logo.clearbit.com/shopify.com', websiteUrl: 'https://shopify.com' },
-    { name: 'Netflix', logoUrl: 'https://logo.clearbit.com/netflix.com', websiteUrl: 'https://netflix.com' },
-    { name: 'Meta', logoUrl: 'https://logo.clearbit.com/meta.com', websiteUrl: 'https://meta.com' },
-    { name: 'Slack', logoUrl: 'https://logo.clearbit.com/slack.com', websiteUrl: 'https://slack.com' },
-    { name: 'Asana', logoUrl: 'https://logo.clearbit.com/asana.com', websiteUrl: 'https://asana.com' },
-    { name: 'Trello', logoUrl: 'https://logo.clearbit.com/trello.com', websiteUrl: 'https://trello.com' },
+    { name: 'Google', logoUrl: '/images/partners/google.svg', websiteUrl: 'https://google.com' },
+    { name: 'Microsoft', logoUrl: '/images/partners/microsoft.svg', websiteUrl: 'https://microsoft.com' },
+    { name: 'Salesforce', logoUrl: '/images/partners/salesforce.svg', websiteUrl: 'https://salesforce.com' },
+    { name: 'Amazon', logoUrl: '/images/partners/amazon.svg', websiteUrl: 'https://amazon.com' },
+    { name: 'Shopify', logoUrl: '/images/partners/shopify.svg', websiteUrl: 'https://shopify.com' },
+    { name: 'Netflix', logoUrl: '/images/partners/netflix.svg', websiteUrl: 'https://netflix.com' },
+    { name: 'Meta', logoUrl: '/images/partners/meta.svg', websiteUrl: 'https://meta.com' },
+    { name: 'Slack', logoUrl: '/images/partners/slack.svg', websiteUrl: 'https://slack.com' },
+    { name: 'Asana', logoUrl: '/images/partners/asana.svg', websiteUrl: 'https://asana.com' },
+    { name: 'Trello', logoUrl: '/images/partners/trello.svg', websiteUrl: 'https://trello.com' },
   ]);
 
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');

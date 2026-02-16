@@ -4,16 +4,16 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
 
 const PARTNERS = [
-  { name: 'Google', url: 'https://google.com', logo: 'https://logo.clearbit.com/google.com' },
-  { name: 'Microsoft', url: 'https://microsoft.com', logo: 'https://logo.clearbit.com/microsoft.com' },
-  { name: 'Salesforce', url: 'https://salesforce.com', logo: 'https://logo.clearbit.com/salesforce.com' },
-  { name: 'Amazon', url: 'https://amazon.com', logo: 'https://logo.clearbit.com/amazon.com' },
-  { name: 'Shopify', url: 'https://shopify.com', logo: 'https://logo.clearbit.com/shopify.com' },
-  { name: 'Netflix', url: 'https://netflix.com', logo: 'https://logo.clearbit.com/netflix.com' },
-  { name: 'Meta', url: 'https://meta.com', logo: 'https://logo.clearbit.com/meta.com' },
-  { name: 'Slack', url: 'https://slack.com', logo: 'https://logo.clearbit.com/slack.com' },
-  { name: 'Asana', url: 'https://asana.com', logo: 'https://logo.clearbit.com/asana.com' },
-  { name: 'Trello', url: 'https://trello.com', logo: 'https://logo.clearbit.com/trello.com' },
+  { name: 'Google', url: 'https://google.com', logo: '/images/partners/google.svg' },
+  { name: 'Microsoft', url: 'https://microsoft.com', logo: '/images/partners/microsoft.svg' },
+  { name: 'Salesforce', url: 'https://salesforce.com', logo: '/images/partners/salesforce.svg' },
+  { name: 'Amazon', url: 'https://amazon.com', logo: '/images/partners/amazon.svg' },
+  { name: 'Shopify', url: 'https://shopify.com', logo: '/images/partners/shopify.svg' },
+  { name: 'Netflix', url: 'https://netflix.com', logo: '/images/partners/netflix.svg' },
+  { name: 'Meta', url: 'https://meta.com', logo: '/images/partners/meta.svg' },
+  { name: 'Slack', url: 'https://slack.com', logo: '/images/partners/slack.svg' },
+  { name: 'Asana', url: 'https://asana.com', logo: '/images/partners/asana.svg' },
+  { name: 'Trello', url: 'https://trello.com', logo: '/images/partners/trello.svg' },
 ];
 
 export default function Partners() {
