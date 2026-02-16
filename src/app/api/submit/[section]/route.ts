@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readData, writeData } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const VALID_SECTIONS = [
   'contact-submissions',
@@ -14,9 +15,9 @@ const VALID_SECTIONS = [
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { section: string } }
+  context: { params: { section: string } }
 ) {
-  const { section } = params;
+  const section = context.params.section;
   if (!VALID_SECTIONS.includes(section)) {
     return NextResponse.json({ error: 'Invalid section' }, { status: 400 });
   }

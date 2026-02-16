@@ -3,6 +3,7 @@ import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import path from 'path';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'NothingIsPermanent';
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB

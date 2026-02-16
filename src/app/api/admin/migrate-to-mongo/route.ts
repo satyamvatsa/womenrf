@@ -4,6 +4,7 @@ import { writeDataMongo } from '@/lib/db-mongo';
 import { isMongoConfigured, getDb } from '@/lib/mongodb';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 export const maxDuration = 120; // allow up to 2 minutes for migration
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'NothingIsPermanent';
