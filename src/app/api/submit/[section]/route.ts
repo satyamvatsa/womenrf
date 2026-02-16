@@ -22,14 +22,15 @@ export async function POST(
   }
   try {
     const body = await request.json();
-    const existing = (readData<unknown[]>(section) as unknown[] | null) || [];
-    existing.push({
+    const existing = (await readData<unknown[]>(section)) || [];
+    const list = Array.isArray(existing) ? existing : [];
+    list.push({
       ...body,
       id: Date.now().toString(),
       submittedAt: new Date().toISOString(),
       status: 'new',
     });
-    writeData(section, existing);
+    await writeData(section, list);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
