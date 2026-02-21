@@ -141,7 +141,7 @@ const icons: Record<string, React.ReactNode> = {
   ),
 };
 
-const TABS = ['mission', 'values', 'quote', 'history', 'impact', 'team', 'links'] as const;
+const TABS = ['vision', 'mission', 'values', 'operations', 'quote', 'history', 'impact', 'team', 'links'] as const;
 const COLOR_OPTIONS = [
   { value: 'wrf-black', label: 'WRF Dark (#1a1a1a)' },
   { value: 'wrf-purple', label: 'WRF Purple (#6B5B95)' },
@@ -191,11 +191,33 @@ export default function AboutManagementPage() {
   const [button2Text, setButton2Text] = useState('Explore Programs');
   const [button2Url, setButton2Url] = useState('Programs');
   const [button2Color, setButton2Color] = useState('wrf-coral');
-  // Core values description state
-  const [valuesEqualityDesc, setValuesEqualityDesc] = useState('');
-  const [valuesEmpowermentDesc, setValuesEmpowermentDesc] = useState('');
-  const [valuesCommunityDesc, setValuesCommunityDesc] = useState('');
-  const [valuesInnovationDesc, setValuesInnovationDesc] = useState('');
+  // Vision section state
+  const [visionTitle, setVisionTitle] = useState('Our Vision');
+  const [visionTitleBgColor, setVisionTitleBgColor] = useState('wrf-purple');
+  const [visionContent, setVisionContent] = useState(
+    'A just and peaceful Afghanistan where women can exercise agency with pride, dignity and freedom.'
+  );
+  const [visionImageUrl, setVisionImageUrl] = useState('/images/teams.jpeg');
+
+  // Core values state (dynamic array)
+  const [coreValues, setCoreValues] = useState([
+    { id: '1', title: 'Equality & Justice', description: '', color: 'wrf-black' },
+    { id: '2', title: 'Empowerment & Leadership', description: '', color: 'wrf-purple' },
+    { id: '3', title: 'Community & Solidarity', description: '', color: 'wrf-coral' },
+    { id: '4', title: 'Innovation & Sustainability', description: '', color: 'wrf-footer-mauve' },
+  ]);
+
+  // Areas of Operations state
+  const [operationsTitle, setOperationsTitle] = useState('Areas of Operations');
+  const [operationsTitleBgColor, setOperationsTitleBgColor] = useState('wrf-coral');
+  const [opsArea1Title, setOpsArea1Title] = useState('Peace Building and Social Cohesion');
+  const [opsArea1Desc, setOpsArea1Desc] = useState('');
+  const [opsArea2Title, setOpsArea2Title] = useState('Legal Empowerment and International Accountability');
+  const [opsArea2Desc, setOpsArea2Desc] = useState('');
+  const [opsArea3Title, setOpsArea3Title] = useState('Digital Transformation and Open Gender Data');
+  const [opsArea3Desc, setOpsArea3Desc] = useState('');
+  const [opsArea4Title, setOpsArea4Title] = useState('Representation and Advocacy');
+  const [opsArea4Desc, setOpsArea4Desc] = useState('');
 
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
 
@@ -234,11 +256,34 @@ export default function AboutManagementPage() {
       if (data.button2Text !== undefined) setButton2Text(data.button2Text);
       if (data.button2Url !== undefined) setButton2Url(data.button2Url);
       if (data.button2Color !== undefined) setButton2Color(data.button2Color);
-      // Core values descriptions
-      if (data.valuesEqualityDesc !== undefined) setValuesEqualityDesc(data.valuesEqualityDesc);
-      if (data.valuesEmpowermentDesc !== undefined) setValuesEmpowermentDesc(data.valuesEmpowermentDesc);
-      if (data.valuesCommunityDesc !== undefined) setValuesCommunityDesc(data.valuesCommunityDesc);
-      if (data.valuesInnovationDesc !== undefined) setValuesInnovationDesc(data.valuesInnovationDesc);
+      // Vision section
+      if (data.visionTitle !== undefined) setVisionTitle(data.visionTitle);
+      if (data.visionTitleBgColor !== undefined) setVisionTitleBgColor(data.visionTitleBgColor);
+      if (data.visionContent !== undefined) setVisionContent(data.visionContent);
+      if (data.visionImageUrl !== undefined) setVisionImageUrl(data.visionImageUrl);
+      // Core values (dynamic array, with backward compatibility for old individual fields)
+      if (Array.isArray(data.coreValues) && data.coreValues.length > 0) {
+        setCoreValues(data.coreValues);
+      } else if (data.valuesEqualityTitle !== undefined) {
+        const migrated = [
+          { id: '1', title: data.valuesEqualityTitle || 'Equality & Justice', description: data.valuesEqualityDesc || '', color: 'wrf-black' },
+          { id: '2', title: data.valuesEmpowermentTitle || 'Empowerment & Leadership', description: data.valuesEmpowermentDesc || '', color: 'wrf-purple' },
+          { id: '3', title: data.valuesCommunityTitle || 'Community & Solidarity', description: data.valuesCommunityDesc || '', color: 'wrf-coral' },
+          { id: '4', title: data.valuesInnovationTitle || 'Innovation & Sustainability', description: data.valuesInnovationDesc || '', color: 'wrf-footer-mauve' },
+        ];
+        setCoreValues(migrated);
+      }
+      // Areas of Operations
+      if (data.operationsTitle !== undefined) setOperationsTitle(data.operationsTitle);
+      if (data.operationsTitleBgColor !== undefined) setOperationsTitleBgColor(data.operationsTitleBgColor);
+      if (data.opsArea1Title !== undefined) setOpsArea1Title(data.opsArea1Title);
+      if (data.opsArea1Desc !== undefined) setOpsArea1Desc(data.opsArea1Desc);
+      if (data.opsArea2Title !== undefined) setOpsArea2Title(data.opsArea2Title);
+      if (data.opsArea2Desc !== undefined) setOpsArea2Desc(data.opsArea2Desc);
+      if (data.opsArea3Title !== undefined) setOpsArea3Title(data.opsArea3Title);
+      if (data.opsArea3Desc !== undefined) setOpsArea3Desc(data.opsArea3Desc);
+      if (data.opsArea4Title !== undefined) setOpsArea4Title(data.opsArea4Title);
+      if (data.opsArea4Desc !== undefined) setOpsArea4Desc(data.opsArea4Desc);
     });
   }, []);
 
@@ -254,8 +299,13 @@ export default function AboutManagementPage() {
       sectionTitle, titleBgColor, titleTextColor, content, imageUrl,
       button1Text, button1Url, button1Color,
       button2Text, button2Url, button2Color,
-      valuesEqualityDesc, valuesEmpowermentDesc,
-      valuesCommunityDesc, valuesInnovationDesc,
+      visionTitle, visionTitleBgColor, visionContent, visionImageUrl,
+      coreValues,
+      operationsTitle, operationsTitleBgColor,
+      opsArea1Title, opsArea1Desc,
+      opsArea2Title, opsArea2Desc,
+      opsArea3Title, opsArea3Desc,
+      opsArea4Title, opsArea4Desc,
     };
     const ok = await saveAdminData('about', data);
     setSaveStatus(ok ? 'saved' : 'error');
@@ -349,7 +399,7 @@ export default function AboutManagementPage() {
             <div
               role="tablist"
               aria-orientation="horizontal"
-              className="h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-600 grid w-full grid-cols-7"
+              className="h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-600 grid w-full grid-cols-9"
             >
               {TABS.map((tab) => (
                 <button
@@ -567,6 +617,94 @@ export default function AboutManagementPage() {
                 </div>
               )}
 
+              {activeTab === 'vision' && (
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                  <div className="flex flex-col space-y-1.5 p-6">
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                        <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                      Our Vision Section
+                    </h3>
+                  </div>
+                  <div className="p-6 pt-0 space-y-4">
+                    <div>
+                      <label className="text-sm font-medium leading-none">Section Title</label>
+                      <input
+                        type="text"
+                        value={visionTitle}
+                        onChange={(e) => setVisionTitle(e.target.value)}
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium leading-none">Title BG Color</label>
+                      <select
+                        value={visionTitleBgColor}
+                        onChange={(e) => setVisionTitleBgColor(e.target.value)}
+                        className="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-primary"
+                      >
+                        {COLOR_OPTIONS.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium leading-none">Content (HTML enabled)</label>
+                      <textarea
+                        value={visionContent}
+                        onChange={(e) => setVisionContent(e.target.value)}
+                        rows={4}
+                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium leading-none">Image URL</label>
+                      <input
+                        type="url"
+                        value={visionImageUrl}
+                        onChange={(e) => setVisionImageUrl(e.target.value)}
+                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:text-sm"
+                      />
+                    </div>
+
+                    {/* Live Preview */}
+                    <div className="pt-6 border-t border-gray-200">
+                      <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wider mb-4">Live Preview</h3>
+                      <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 overflow-hidden">
+                        <div className="grid items-center gap-8 lg:grid-cols-2">
+                          <div className="text-left">
+                            <div
+                              className="inline-block p-4"
+                              style={{ backgroundColor: resolveColor(visionTitleBgColor, '#6B5B95') }}
+                            >
+                              <h2 className="text-2xl font-bold text-white">
+                                {visionTitle || 'Our Vision'}
+                              </h2>
+                            </div>
+                            <p className="mb-6 mt-4 text-sm leading-relaxed text-gray-700 max-w-md">
+                              {visionContent ? visionContent.slice(0, 200) + (visionContent.length > 200 ? '...' : '') : 'Content will appear here...'}
+                            </p>
+                          </div>
+                          <div>
+                            {visionImageUrl ? (
+                              <img src={visionImageUrl} alt="Vision Preview" className="h-48 w-full rounded object-cover shadow" />
+                            ) : (
+                              <div className="flex h-48 w-full items-center justify-center rounded bg-gray-100 text-gray-400 text-sm">
+                                Image preview
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {activeTab === 'values' && (
                 <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
                   <div className="flex flex-col space-y-1.5 p-6">
@@ -574,67 +712,225 @@ export default function AboutManagementPage() {
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                       </svg>
-                      Core Values Descriptions
+                      Core Values
                     </h3>
-                    <p className="text-sm text-gray-500">Edit the short descriptions that appear when users click on each core value. Leave empty to use the default translated text.</p>
+                    <p className="text-sm text-gray-500">Add, edit, or remove core values. These appear as expandable cards on the About page.</p>
                   </div>
                   <div className="p-6 pt-0 space-y-6">
-                    <div className="rounded-md border border-gray-200 p-4 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block w-3 h-3 rounded-full bg-wrf-black" />
-                        <label className="text-sm font-semibold leading-none">Equality &amp; Justice</label>
+                    {coreValues.map((val, idx) => (
+                      <div key={val.id} className="rounded-md border border-gray-200 p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className="inline-block w-3 h-3 rounded-full"
+                              style={{ backgroundColor: resolveColor(val.color, '#1a1a1a') }}
+                            />
+                            <label className="text-sm font-semibold leading-none">Value {idx + 1}</label>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {idx > 0 && (
+                              <button
+                                type="button"
+                                title="Move up"
+                                onClick={() => {
+                                  const updated = [...coreValues];
+                                  [updated[idx - 1], updated[idx]] = [updated[idx], updated[idx - 1]];
+                                  setCoreValues(updated);
+                                }}
+                                className="p-1 text-gray-400 hover:text-gray-700 rounded"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m18 15-6-6-6 6"/></svg>
+                              </button>
+                            )}
+                            {idx < coreValues.length - 1 && (
+                              <button
+                                type="button"
+                                title="Move down"
+                                onClick={() => {
+                                  const updated = [...coreValues];
+                                  [updated[idx], updated[idx + 1]] = [updated[idx + 1], updated[idx]];
+                                  setCoreValues(updated);
+                                }}
+                                className="p-1 text-gray-400 hover:text-gray-700 rounded"
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 9 6 6 6-6"/></svg>
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              title="Remove value"
+                              onClick={() => setCoreValues(coreValues.filter((_, i) => i !== idx))}
+                              className="p-1 text-gray-400 hover:text-red-600 rounded ml-1"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                            </button>
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Title</label>
+                            <input
+                              type="text"
+                              value={val.title}
+                              onChange={(e) => {
+                                const updated = [...coreValues];
+                                updated[idx] = { ...updated[idx], title: e.target.value };
+                                setCoreValues(updated);
+                              }}
+                              className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Card Color</label>
+                            <select
+                              value={val.color}
+                              onChange={(e) => {
+                                const updated = [...coreValues];
+                                updated[idx] = { ...updated[idx], color: e.target.value };
+                                setCoreValues(updated);
+                              }}
+                              className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-primary"
+                            >
+                              {COLOR_OPTIONS.map((opt) => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500">Description</label>
+                          <textarea
+                            value={val.description}
+                            onChange={(e) => {
+                              const updated = [...coreValues];
+                              updated[idx] = { ...updated[idx], description: e.target.value };
+                              setCoreValues(updated);
+                            }}
+                            rows={3}
+                            placeholder="Describe this core value..."
+                            className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                          />
+                        </div>
                       </div>
-                      <textarea
-                        value={valuesEqualityDesc}
-                        onChange={(e) => setValuesEqualityDesc(e.target.value)}
-                        rows={3}
-                        placeholder="We believe every woman deserves equal rights, opportunities, and access to justice..."
-                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                      />
-                    </div>
-                    <div className="rounded-md border border-gray-200 p-4 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block w-3 h-3 rounded-full bg-wrf-purple" />
-                        <label className="text-sm font-semibold leading-none">Empowerment &amp; Leadership</label>
-                      </div>
-                      <textarea
-                        value={valuesEmpowermentDesc}
-                        onChange={(e) => setValuesEmpowermentDesc(e.target.value)}
-                        rows={3}
-                        placeholder="We invest in women's potential by providing education, mentorship, and resources..."
-                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                      />
-                    </div>
-                    <div className="rounded-md border border-gray-200 p-4 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block w-3 h-3 rounded-full bg-wrf-coral" />
-                        <label className="text-sm font-semibold leading-none">Community &amp; Solidarity</label>
-                      </div>
-                      <textarea
-                        value={valuesCommunityDesc}
-                        onChange={(e) => setValuesCommunityDesc(e.target.value)}
-                        rows={3}
-                        placeholder="We stand united with women across borders, cultures, and backgrounds..."
-                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                      />
-                    </div>
-                    <div className="rounded-md border border-gray-200 p-4 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-block w-3 h-3 rounded-full bg-wrf-footer-mauve" />
-                        <label className="text-sm font-semibold leading-none">Innovation &amp; Sustainability</label>
-                      </div>
-                      <textarea
-                        value={valuesInnovationDesc}
-                        onChange={(e) => setValuesInnovationDesc(e.target.value)}
-                        rows={3}
-                        placeholder="We embrace creative solutions and modern approaches to create lasting change..."
-                        className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                      />
-                    </div>
-                    <p className="text-xs text-gray-400">Tip: These descriptions expand when a visitor clicks on the value card on the About page. If left empty, the default translated text is used.</p>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const newId = String(Date.now());
+                        setCoreValues([...coreValues, { id: newId, title: '', description: '', color: 'wrf-black' }]);
+                      }}
+                      className="inline-flex items-center gap-2 rounded-md border-2 border-dashed border-gray-300 px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors w-full justify-center"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                      Add Value
+                    </button>
+
+                    <p className="text-xs text-gray-400">Tip: These values appear as expandable cards on the About page. Click &quot;Add Value&quot; to add more. Use the arrows to reorder and the trash icon to remove.</p>
                   </div>
                 </div>
               )}
+              {activeTab === 'operations' && (
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                  <div className="flex flex-col space-y-1.5 p-6">
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                        <path d="M2 12h20" />
+                      </svg>
+                      Areas of Operations
+                    </h3>
+                    <p className="text-sm text-gray-500">Edit the section title and the four operational areas displayed on the About page.</p>
+                  </div>
+                  <div className="p-6 pt-0 space-y-6">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm font-medium leading-none">Section Title</label>
+                        <input
+                          type="text"
+                          value={operationsTitle}
+                          onChange={(e) => setOperationsTitle(e.target.value)}
+                          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium leading-none">Title BG Color</label>
+                        <select
+                          value={operationsTitleBgColor}
+                          onChange={(e) => setOperationsTitleBgColor(e.target.value)}
+                          className="flex h-10 w-full items-center justify-between rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-primary"
+                        >
+                          {COLOR_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {[
+                      { num: 1, title: opsArea1Title, setTitle: setOpsArea1Title, desc: opsArea1Desc, setDesc: setOpsArea1Desc, color: 'bg-wrf-black' },
+                      { num: 2, title: opsArea2Title, setTitle: setOpsArea2Title, desc: opsArea2Desc, setDesc: setOpsArea2Desc, color: 'bg-wrf-purple' },
+                      { num: 3, title: opsArea3Title, setTitle: setOpsArea3Title, desc: opsArea3Desc, setDesc: setOpsArea3Desc, color: 'bg-wrf-coral' },
+                      { num: 4, title: opsArea4Title, setTitle: setOpsArea4Title, desc: opsArea4Desc, setDesc: setOpsArea4Desc, color: 'bg-wrf-footer-mauve' },
+                    ].map((area) => (
+                      <div key={area.num} className="rounded-md border border-gray-200 p-4 space-y-3">
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-block w-3 h-3 rounded-full ${area.color}`} />
+                          <label className="text-sm font-semibold leading-none">Area {area.num}</label>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500">Title</label>
+                          <input
+                            type="text"
+                            value={area.title}
+                            onChange={(e) => area.setTitle(e.target.value)}
+                            className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500">Description</label>
+                          <textarea
+                            value={area.desc}
+                            onChange={(e) => area.setDesc(e.target.value)}
+                            rows={3}
+                            placeholder="Describe this area of operations..."
+                            className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                          />
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Live Preview */}
+                    <div className="pt-6 border-t border-gray-200">
+                      <h3 className="font-semibold text-sm text-gray-500 uppercase tracking-wider mb-4">Live Preview</h3>
+                      <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 overflow-hidden">
+                        <div
+                          className="inline-block p-3 mb-4"
+                          style={{ backgroundColor: resolveColor(operationsTitleBgColor, '#E07A7A') }}
+                        >
+                          <h2 className="text-xl font-bold text-white">{operationsTitle || 'Areas of Operations'}</h2>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          {[
+                            { title: opsArea1Title, bg: '#1a1a1a' },
+                            { title: opsArea2Title, bg: '#6B5B95' },
+                            { title: opsArea3Title, bg: '#E07A7A' },
+                            { title: opsArea4Title, bg: '#b88a9e' },
+                          ].map((a) => (
+                            <div key={a.title} className="p-4 text-white rounded" style={{ backgroundColor: a.bg }}>
+                              <h3 className="text-sm font-bold">{a.title}</h3>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {activeTab === 'quote' && (
                 <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
                   <h3 className="text-lg font-semibold">Quote Section</h3>

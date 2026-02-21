@@ -47,7 +47,7 @@ export default function AdminDashboard() {
           </div>
           <div className="p-6 pt-0">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Link href={`${base}/ContentManagement`} className="p-4 rounded-lg border border-gray-200 hover:border-secondary hover:shadow-md transition-all duration-200 group">
+              <Link href={`${base}/PageSettingManagement`} className="p-4 rounded-lg border border-gray-200 hover:border-secondary hover:shadow-md transition-all duration-200 group">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-blue-500 text-white group-hover:scale-110 transition-transform duration-200">{icons['file-text']}</div>
                   <div>
@@ -65,7 +65,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </Link>
-              <Link href={`${base}/NewsManagement`} className="p-4 rounded-lg border border-gray-200 hover:border-secondary hover:shadow-md transition-all duration-200 group">
+              <Link href={`${base}/BlogPostManagement`} className="p-4 rounded-lg border border-gray-200 hover:border-secondary hover:shadow-md transition-all duration-200 group">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-purple-500 text-white group-hover:scale-110 transition-transform duration-200">{icons.mail}</div>
                   <div>
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div className="space-y-1.5 p-6 flex flex-row items-center justify-between">
               <h3 className="text-2xl font-semibold leading-none tracking-tight font-heading">Recent Content</h3>
-              <Link href={`${base}/ContentManagement`}>
+              <Link href={`${base}/BlogPostManagement`}>
                 <button type="button" className="inline-flex items-center justify-center gap-1 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
                   View All
                 </button>
@@ -104,7 +104,7 @@ export default function AdminDashboard() {
           <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
             <div className="space-y-1.5 p-6 flex flex-row items-center justify-between">
               <h3 className="text-2xl font-semibold leading-none tracking-tight font-heading">Recent News</h3>
-              <Link href={`${base}/NewsManagement`}>
+              <Link href={`${base}/BlogPostManagement`}>
                 <button type="button" className="inline-flex items-center justify-center gap-1 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3">
                   View All
                 </button>

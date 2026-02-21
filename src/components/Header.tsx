@@ -235,7 +235,7 @@ export default function Header() {
               <button
                 id="desktopLangToggleBtn"
                 type="button"
-                className="flex h-12 flex-row items-center justify-center gap-2 rounded-full bg-primary px-4 pe-4 text-base font-bold text-white lg:px-5 lg:text-lg"
+                className="flex h-12 flex-row items-center justify-center gap-2 rounded-full bg-wrf-purple px-4 pe-4 text-base font-bold text-white lg:px-5 lg:text-lg"
                 aria-expanded={langDropdownOpen}
                 aria-haspopup="true"
                 onClick={(e) => {
@@ -301,7 +301,7 @@ export default function Header() {
             <div className="relative" ref={langDropdownMobileRef}>
               <button
                 type="button"
-                className="flex h-9 flex-row items-center justify-center gap-1 rounded-full bg-primary px-2.5 text-xs font-bold text-white sm:h-10 sm:px-4 sm:text-sm"
+                className="flex h-9 flex-row items-center justify-center gap-1 rounded-full bg-wrf-purple px-2.5 text-xs font-bold text-white sm:h-10 sm:px-4 sm:text-sm"
                 aria-expanded={langDropdownOpen}
                 onClick={(e) => {
                   e.preventDefault();

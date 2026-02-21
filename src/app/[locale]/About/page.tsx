@@ -6,8 +6,6 @@ import ScrollReveal from './ScrollReveal';
 
 const HERO_BG =
   '/images/00D0CA02-1516-4042-B101-FC127C88E162.jpg';
-const HERO_RIGHT_IMAGE =
-  '/images/Element-2-03-scaled.png';
 
 import AboutSectionNav from './AboutSectionNav';
 import { useTranslation } from '@/lib/TranslationContext';
@@ -28,6 +26,13 @@ function resolveColor(colorName: string | undefined, fallback: string): string {
   if (!colorName) return fallback;
   return COLOR_MAP[colorName] || colorName;
 }
+
+const DEFAULT_CORE_VALUES = [
+  { id: '1', title: 'Equality & Justice', description: '', color: 'wrf-black' },
+  { id: '2', title: 'Empowerment & Leadership', description: '', color: 'wrf-purple' },
+  { id: '3', title: 'Community & Solidarity', description: '', color: 'wrf-coral' },
+  { id: '4', title: 'Innovation & Sustainability', description: '', color: 'wrf-footer-mauve' },
+];
 
 const TEAM = [
   { name: 'Hanifa Girowal', role: 'Co-Founder & VP', img: '/images/Hanifa_Girowal.jpeg', bg: 'bg-wrf-coral' },
@@ -101,14 +106,6 @@ export default function AboutPage() {
         style={{ backgroundImage: `url(${HERO_BG})` }}
       >
         <div className="absolute inset-0 bg-black/50" aria-hidden />
-        <div
-          className="absolute right-0 top-0 hidden h-full w-2/5 bg-cover bg-center md:block"
-          style={{
-            backgroundImage: `url(${HERO_RIGHT_IMAGE})`,
-            clipPath: 'polygon(0% 100%, 100% 0%, 100% 100%)',
-          }}
-          aria-hidden
-        />
         <div className="relative mx-auto max-w-7xl px-4 text-left sm:px-6 lg:px-8">
           <ScrollReveal variant="fade">
             <div className="inline-block bg-wrf-black px-8 py-6">
@@ -126,8 +123,36 @@ export default function AboutPage() {
       {/* Section nav - normal section, with border and font per attachment */}
       <AboutSectionNav />
 
+      {/* Our Vision */}
+      <section id="vision" className="bg-white py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <ScrollReveal variant="slideLeft" className="text-left">
+              <div
+                className="inline-block p-4"
+                style={{ backgroundColor: resolveColor(adminData?.visionTitleBgColor, '#6B5B95') }}
+              >
+                <h2 className="text-3xl font-bold text-white">
+                  {(locale === 'en' && adminData?.visionTitle) || 'Our Vision'}
+                </h2>
+              </div>
+              <p className="mb-8 mt-6 max-w-3xl text-lg leading-relaxed text-gray-700">
+                {(locale === 'en' && adminData?.visionContent) || 'A just and peaceful Afghanistan where women can exercise agency with pride, dignity and freedom.'}
+              </p>
+            </ScrollReveal>
+            <ScrollReveal variant="slideRight">
+              <img
+                src={adminData?.visionImageUrl || '/images/teams.jpeg'}
+                alt="Our Vision"
+                className="h-96 w-full object-cover shadow-2xl"
+              />
+            </ScrollReveal>
+          </div>
+        </div>
+      </section>
+
       {/* Mission & History */}
-      <section id="mission" className="bg-white py-20">
+      <section id="mission" className="bg-gray-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <ScrollReveal variant="slideLeft" className="text-left">
@@ -183,7 +208,7 @@ export default function AboutPage() {
       </section>
 
       {/* Core Values */}
-      <section id="values" className="bg-gray-50 py-20 text-left">
+      <section id="values" className="bg-white py-20 text-left">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <ScrollReveal variant="slideUp" className="mb-12">
             <div className="inline-block bg-wrf-purple p-4">
@@ -194,11 +219,75 @@ export default function AboutPage() {
             </p>
           </ScrollReveal>
           <div className="grid gap-1 md:grid-cols-2">
+            {(Array.isArray(adminData?.coreValues) && adminData.coreValues.length > 0
+              ? adminData.coreValues
+              : DEFAULT_CORE_VALUES
+            ).map((val: { id: string; title: string; description: string; color: string }) => (
+              <ScrollReveal key={val.id} variant="slideUpSm">
+                <div
+                  className="overflow-hidden shadow-inner"
+                  style={{ backgroundColor: resolveColor(val.color, '#1a1a1a') }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleValue(val.id)}
+                    className="w-full p-6 text-left text-white transition-none"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-bold">{val.title}</h3>
+                      {val.description && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className={`h-6 w-6 transition-transform duration-300 ${openValue === val.id ? 'rotate-180' : ''}`}
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      )}
+                    </div>
+                  </button>
+                  {val.description && (
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        openValue === val.id ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+                      }`}
+                    >
+                      <p className="px-6 pb-6 text-white/90 leading-relaxed">
+                        {val.description}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Areas of Operations */}
+      <section id="operations" className="bg-gray-50 py-20 text-left">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <ScrollReveal variant="slideUp" className="mb-12">
+            <div
+              className="inline-block p-4"
+              style={{ backgroundColor: resolveColor(adminData?.operationsTitleBgColor, '#E07A7A') }}
+            >
+              <h2 className="text-3xl font-bold text-white">
+                {(locale === 'en' && adminData?.operationsTitle) || 'Areas of Operations'}
+              </h2>
+            </div>
+          </ScrollReveal>
+          <div className="grid gap-1 md:grid-cols-2">
             {[
-              { key: 'equality', title: t('about.values.equality'), desc: (locale === 'en' && adminData?.valuesEqualityDesc) || t('about.values.equality.desc'), bg: 'bg-wrf-black' },
-              { key: 'empowerment', title: t('about.values.empowerment'), desc: (locale === 'en' && adminData?.valuesEmpowermentDesc) || t('about.values.empowerment.desc'), bg: 'bg-wrf-purple' },
-              { key: 'community', title: t('about.values.community'), desc: (locale === 'en' && adminData?.valuesCommunityDesc) || t('about.values.community.desc'), bg: 'bg-wrf-coral' },
-              { key: 'innovation', title: t('about.values.innovation'), desc: (locale === 'en' && adminData?.valuesInnovationDesc) || t('about.values.innovation.desc'), bg: 'bg-wrf-footer-mauve' },
+              { key: 'ops1', title: (locale === 'en' && adminData?.opsArea1Title) || 'Peace Building and Social Cohesion', desc: (locale === 'en' && adminData?.opsArea1Desc) || '', bg: 'bg-wrf-black' },
+              { key: 'ops2', title: (locale === 'en' && adminData?.opsArea2Title) || 'Legal Empowerment and International Accountability', desc: (locale === 'en' && adminData?.opsArea2Desc) || '', bg: 'bg-wrf-purple' },
+              { key: 'ops3', title: (locale === 'en' && adminData?.opsArea3Title) || 'Digital Transformation and Open Gender Data', desc: (locale === 'en' && adminData?.opsArea3Desc) || '', bg: 'bg-wrf-coral' },
+              { key: 'ops4', title: (locale === 'en' && adminData?.opsArea4Title) || 'Representation and Advocacy', desc: (locale === 'en' && adminData?.opsArea4Desc) || '', bg: 'bg-wrf-footer-mauve' },
             ].map((item) => (
               <ScrollReveal key={item.key} variant="slideUpSm">
                 <div className={`overflow-hidden shadow-inner ${item.bg}`}>
@@ -209,29 +298,33 @@ export default function AboutPage() {
                   >
                     <div className="flex items-center justify-between">
                       <h3 className="text-xl font-bold">{item.title}</h3>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        className={`h-6 w-6 transition-transform duration-300 ${openValue === item.key ? 'rotate-180' : ''}`}
-                      >
-                        <path d="m6 9 6 6 6-6" />
-                      </svg>
+                      {item.desc && (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          className={`h-6 w-6 transition-transform duration-300 ${openValue === item.key ? 'rotate-180' : ''}`}
+                        >
+                          <path d="m6 9 6 6 6-6" />
+                        </svg>
+                      )}
                     </div>
                   </button>
-                  <div
-                    className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      openValue === item.key ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
-                    }`}
-                  >
-                    <p className="px-6 pb-6 text-white/90 leading-relaxed">
-                      {item.desc}
-                    </p>
-                  </div>
+                  {item.desc && (
+                    <div
+                      className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                        openValue === item.key ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'
+                      }`}
+                    >
+                      <p className="px-6 pb-6 text-white/90 leading-relaxed">
+                        {item.desc}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </ScrollReveal>
             ))}
