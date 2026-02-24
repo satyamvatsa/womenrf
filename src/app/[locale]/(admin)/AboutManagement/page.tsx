@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, usePathname, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { loadAdminData, saveAdminData } from '@/lib/adminApi';
+import { loadAdminData, saveAdminData, uploadAdminImage } from '@/lib/adminApi';
 
 const sidebarItems = [
   { label: 'Dashboard', href: '/AdminDashboard', icon: 'house' },
@@ -219,7 +219,52 @@ export default function AboutManagementPage() {
   const [opsArea4Title, setOpsArea4Title] = useState('Representation and Advocacy');
   const [opsArea4Desc, setOpsArea4Desc] = useState('');
 
+  // Timeline / History state (dynamic array)
+  const [timeline, setTimeline] = useState([
+    { id: '1', year: '2019', title: 'Founded in Response to Crisis', description: '' },
+    { id: '2', year: '2020', title: 'Digital Expansion', description: '' },
+    { id: '3', year: '2021', title: 'Growing Impact', description: '' },
+    { id: '4', year: '2022', title: 'International Recognition', description: '' },
+    { id: '5', year: '2023', title: 'Scaling Programs', description: '' },
+    { id: '6', year: '2024', title: 'Continuing the Mission', description: '' },
+  ]);
+
+  // Impact stats state (dynamic array)
+  const [impactStats, setImpactStats] = useState([
+    { id: '1', value: '12,000+', label: 'Women Empowered', color: 'wrf-black', textColor: 'wrf-coral' },
+    { id: '2', value: '45', label: 'Countries Reached', color: 'wrf-purple', textColor: 'wrf-coral' },
+    { id: '3', value: '150+', label: 'Partner Organizations', color: 'wrf-coral', textColor: 'white' },
+    { id: '4', value: '$2.1M', label: 'Funds Raised', color: 'wrf-footer-mauve', textColor: 'wrf-coral' },
+  ]);
+
+  // Team preview state (dynamic array)
+  const [teamMembers, setTeamMembers] = useState([
+    { id: '1', name: 'Hanifa Girowal', role: 'Co-Founder & VP', img: '/images/Hanifa_Girowal.jpeg' },
+    { id: '2', name: 'Shabnam Salehi', role: 'Co-Founder & President', img: '/images/Shabnam_Salehi.jpeg' },
+    { id: '3', name: 'Morten Kjaerum', role: 'Board Member', img: '/images/1-Panelist-Morten-Kjaerum-Picture-1.jpg' },
+  ]);
+  const [teamDescription, setTeamDescription] = useState('');
+
+  // Get Involved links state (dynamic array)
+  const [getInvolvedLinks, setGetInvolvedLinks] = useState([
+    { id: '1', label: 'Volunteer', href: '/Volunteer', color: 'wrf-black' },
+    { id: '2', label: 'Careers', href: '/Vacancies', color: 'wrf-purple' },
+    { id: '3', label: 'Partner With Us', href: '/Partnership', color: 'wrf-coral' },
+    { id: '4', label: 'News & Updates', href: '/News', color: 'wrf-footer-mauve' },
+    { id: '5', label: 'Contact Us', href: '/Contact', color: 'wrf-black' },
+  ]);
+
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
+
+  const [uploadingField, setUploadingField] = useState<string | null>(null);
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  const handleImageUpload = async (file: File, folder: string, onSuccess: (url: string) => void, fieldKey: string) => {
+    setUploadingField(fieldKey);
+    const url = await uploadAdminImage(file, folder);
+    if (url) onSuccess(url);
+    setUploadingField(null);
+  };
 
   const base = `/${locale}`;
   const isActive = (href: string) => pathname === `${base}${href}`;
@@ -284,6 +329,15 @@ export default function AboutManagementPage() {
       if (data.opsArea3Desc !== undefined) setOpsArea3Desc(data.opsArea3Desc);
       if (data.opsArea4Title !== undefined) setOpsArea4Title(data.opsArea4Title);
       if (data.opsArea4Desc !== undefined) setOpsArea4Desc(data.opsArea4Desc);
+      // Timeline
+      if (Array.isArray(data.timeline) && data.timeline.length > 0) setTimeline(data.timeline);
+      // Impact stats
+      if (Array.isArray(data.impactStats) && data.impactStats.length > 0) setImpactStats(data.impactStats);
+      // Team preview
+      if (Array.isArray(data.teamMembers) && data.teamMembers.length > 0) setTeamMembers(data.teamMembers);
+      if (data.teamDescription !== undefined) setTeamDescription(data.teamDescription);
+      // Get Involved links
+      if (Array.isArray(data.getInvolvedLinks) && data.getInvolvedLinks.length > 0) setGetInvolvedLinks(data.getInvolvedLinks);
     });
   }, []);
 
@@ -306,6 +360,10 @@ export default function AboutManagementPage() {
       opsArea2Title, opsArea2Desc,
       opsArea3Title, opsArea3Desc,
       opsArea4Title, opsArea4Desc,
+      timeline,
+      impactStats,
+      teamMembers, teamDescription,
+      getInvolvedLinks,
     };
     const ok = await saveAdminData('about', data);
     setSaveStatus(ok ? 'saved' : 'error');
@@ -478,13 +536,21 @@ export default function AboutManagementPage() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium leading-none">Image URL</label>
-                      <input
-                        type="url"
-                        value={imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:text-sm"
-                      />
+                      <label className="text-sm font-medium leading-none">Image</label>
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          type="url"
+                          value={imageUrl}
+                          onChange={(e) => setImageUrl(e.target.value)}
+                          placeholder="/images/about/mission.jpg"
+                          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:text-sm"
+                        />
+                        <input type="file" accept="image/*" className="hidden" ref={(el) => { fileInputRefs.current['mission-img'] = el; }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'about', setImageUrl, 'mission-img'); e.target.value = ''; }} />
+                        <button type="button" onClick={() => fileInputRefs.current['mission-img']?.click()} disabled={uploadingField === 'mission-img'} className="inline-flex items-center gap-1 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 rounded-md px-3 whitespace-nowrap disabled:opacity-50" title="Upload image">
+                          {uploadingField === 'mission-img' ? <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> : <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>}
+                          Upload
+                        </button>
+                      </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-gray-200">
                       <div className="space-y-4">
@@ -662,13 +728,21 @@ export default function AboutManagementPage() {
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium leading-none">Image URL</label>
-                      <input
-                        type="url"
-                        value={visionImageUrl}
-                        onChange={(e) => setVisionImageUrl(e.target.value)}
-                        className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:text-sm"
-                      />
+                      <label className="text-sm font-medium leading-none">Image</label>
+                      <div className="flex gap-2 mt-1">
+                        <input
+                          type="url"
+                          value={visionImageUrl}
+                          onChange={(e) => setVisionImageUrl(e.target.value)}
+                          placeholder="/images/about/vision.jpg"
+                          className="flex h-10 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 md:text-sm"
+                        />
+                        <input type="file" accept="image/*" className="hidden" ref={(el) => { fileInputRefs.current['vision-img'] = el; }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'about', setVisionImageUrl, 'vision-img'); e.target.value = ''; }} />
+                        <button type="button" onClick={() => fileInputRefs.current['vision-img']?.click()} disabled={uploadingField === 'vision-img'} className="inline-flex items-center gap-1 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 rounded-md px-3 whitespace-nowrap disabled:opacity-50" title="Upload image">
+                          {uploadingField === 'vision-img' ? <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> : <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>}
+                          Upload
+                        </button>
+                      </div>
                     </div>
 
                     {/* Live Preview */}
@@ -939,31 +1013,213 @@ export default function AboutManagementPage() {
                 </div>
               )}
               {activeTab === 'history' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
-                  <h3 className="text-lg font-semibold">History / Timeline Section</h3>
-                  <p className="text-gray-600 font-body">This section shows the organization&apos;s journey timeline (2019–2025). Content is managed through the translation files.</p>
-                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                  <div className="flex flex-col space-y-1.5 p-6">
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></svg>
+                      Our Journey / Timeline
+                    </h3>
+                    <p className="text-sm text-gray-500">Add, edit, or remove timeline milestones. Each entry has a year, title, and description.</p>
+                  </div>
+                  <div className="p-6 pt-0 space-y-4">
+                    {timeline.map((item, idx) => (
+                      <div key={item.id} className="rounded-md border border-gray-200 p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-semibold">Milestone {idx + 1}</label>
+                          <div className="flex items-center gap-1">
+                            {idx > 0 && (
+                              <button type="button" title="Move up" onClick={() => { const u = [...timeline]; [u[idx-1],u[idx]] = [u[idx],u[idx-1]]; setTimeline(u); }} className="p-1 text-gray-400 hover:text-gray-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m18 15-6-6-6 6"/></svg></button>
+                            )}
+                            {idx < timeline.length - 1 && (
+                              <button type="button" title="Move down" onClick={() => { const u = [...timeline]; [u[idx],u[idx+1]] = [u[idx+1],u[idx]]; setTimeline(u); }} className="p-1 text-gray-400 hover:text-gray-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                            )}
+                            <button type="button" title="Remove" onClick={() => setTimeline(timeline.filter((_,i) => i !== idx))} className="p-1 text-gray-400 hover:text-red-600 ml-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-4 gap-3">
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Year</label>
+                            <input type="text" value={item.year} onChange={(e) => { const u = [...timeline]; u[idx] = {...u[idx], year: e.target.value}; setTimeline(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                          </div>
+                          <div className="md:col-span-3">
+                            <label className="text-xs font-medium text-gray-500">Title</label>
+                            <input type="text" value={item.title} onChange={(e) => { const u = [...timeline]; u[idx] = {...u[idx], title: e.target.value}; setTimeline(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="text-xs font-medium text-gray-500">Description</label>
+                          <textarea value={item.description} onChange={(e) => { const u = [...timeline]; u[idx] = {...u[idx], description: e.target.value}; setTimeline(u); }} rows={2} placeholder="Describe this milestone..." className="flex min-h-[60px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => setTimeline([...timeline, { id: String(Date.now()), year: '', title: '', description: '' }])} className="inline-flex items-center gap-2 rounded-md border-2 border-dashed border-gray-300 px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors w-full justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                      Add Milestone
+                    </button>
+                  </div>
                 </div>
               )}
+
               {activeTab === 'impact' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
-                  <h3 className="text-lg font-semibold">Impact Statistics Section</h3>
-                  <p className="text-gray-600 font-body">This section shows impact metrics (programs, countries, etc.). Content is managed through the translation files.</p>
-                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                  <div className="flex flex-col space-y-1.5 p-6">
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                      Impact in Numbers
+                    </h3>
+                    <p className="text-sm text-gray-500">Edit the statistics displayed in the impact section. Each stat has a number/value, label, and card color.</p>
+                  </div>
+                  <div className="p-6 pt-0 space-y-4">
+                    {impactStats.map((stat, idx) => (
+                      <div key={stat.id} className="rounded-md border border-gray-200 p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: resolveColor(stat.color, '#1a1a1a') }} />
+                            <label className="text-sm font-semibold">Stat {idx + 1}</label>
+                          </div>
+                          <button type="button" title="Remove" onClick={() => setImpactStats(impactStats.filter((_,i) => i !== idx))} className="p-1 text-gray-400 hover:text-red-600"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Value (e.g. &quot;12,000+&quot;)</label>
+                            <input type="text" value={stat.value} onChange={(e) => { const u = [...impactStats]; u[idx] = {...u[idx], value: e.target.value}; setImpactStats(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Label</label>
+                            <input type="text" value={stat.label} onChange={(e) => { const u = [...impactStats]; u[idx] = {...u[idx], label: e.target.value}; setImpactStats(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Card BG Color</label>
+                            <select value={stat.color} onChange={(e) => { const u = [...impactStats]; u[idx] = {...u[idx], color: e.target.value}; setImpactStats(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-primary">
+                              {COLOR_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Value Text Color</label>
+                            <select value={stat.textColor || 'wrf-coral'} onChange={(e) => { const u = [...impactStats]; u[idx] = {...u[idx], textColor: e.target.value}; setImpactStats(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-primary">
+                              {COLOR_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => setImpactStats([...impactStats, { id: String(Date.now()), value: '', label: '', color: 'wrf-black', textColor: 'wrf-coral' }])} className="inline-flex items-center gap-2 rounded-md border-2 border-dashed border-gray-300 px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors w-full justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                      Add Stat
+                    </button>
+                  </div>
                 </div>
               )}
+
               {activeTab === 'team' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
-                  <h3 className="text-lg font-semibold">Team Preview Section</h3>
-                  <p className="text-gray-600 font-body">This section shows a brief team preview on the About page. To manage full team profiles, use the <strong>Team Management</strong> page in the sidebar.</p>
-                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — team data is managed separately.</p>
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                  <div className="flex flex-col space-y-1.5 p-6">
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                      Meet Our People
+                    </h3>
+                    <p className="text-sm text-gray-500">Edit the team description and manage the team member cards shown on the About page.</p>
+                  </div>
+                  <div className="p-6 pt-0 space-y-6">
+                    <div>
+                      <label className="text-sm font-medium leading-none">Team Description</label>
+                      <textarea value={teamDescription} onChange={(e) => setTeamDescription(e.target.value)} rows={3} placeholder="Our team of dedicated professionals..." className="flex min-h-[80px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                    </div>
+
+                    <h4 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Team Members</h4>
+                    {teamMembers.map((member, idx) => (
+                      <div key={member.id} className="rounded-md border border-gray-200 p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-semibold">Member {idx + 1}</label>
+                          <button type="button" title="Remove" onClick={() => setTeamMembers(teamMembers.filter((_,i) => i !== idx))} className="p-1 text-gray-400 hover:text-red-600"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-3">
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Name</label>
+                            <input type="text" value={member.name} onChange={(e) => { const u = [...teamMembers]; u[idx] = {...u[idx], name: e.target.value}; setTeamMembers(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Role</label>
+                            <input type="text" value={member.role} onChange={(e) => { const u = [...teamMembers]; u[idx] = {...u[idx], role: e.target.value}; setTeamMembers(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Image</label>
+                            <div className="flex gap-2 mt-1">
+                              <input type="text" value={member.img} onChange={(e) => { const u = [...teamMembers]; u[idx] = {...u[idx], img: e.target.value}; setTeamMembers(u); }} placeholder="/images/team/photo.jpg" className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                              <input type="file" accept="image/*" className="hidden" ref={(el) => { fileInputRefs.current[`team-${idx}`] = el; }} onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImageUpload(f, 'team', (url) => { const u = [...teamMembers]; u[idx] = {...u[idx], img: url}; setTeamMembers(u); }, `team-${idx}`); e.target.value = ''; }} />
+                              <button type="button" onClick={() => fileInputRefs.current[`team-${idx}`]?.click()} disabled={uploadingField === `team-${idx}`} className="inline-flex items-center gap-1 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-2 whitespace-nowrap disabled:opacity-50" title="Upload photo">
+                                {uploadingField === `team-${idx}` ? <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> : <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>}
+                              </button>
+                            </div>
+                            {member.img && (
+                              <div className="mt-1.5 inline-block">
+                                <img src={member.img} alt={member.name || 'Preview'} className="h-10 w-10 rounded-full object-cover border" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => setTeamMembers([...teamMembers, { id: String(Date.now()), name: '', role: '', img: '' }])} className="inline-flex items-center gap-2 rounded-md border-2 border-dashed border-gray-300 px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors w-full justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                      Add Team Member
+                    </button>
+                  </div>
                 </div>
               )}
+
               {activeTab === 'links' && (
-                <div className="rounded-lg border bg-card p-6 shadow-sm space-y-2">
-                  <h3 className="text-lg font-semibold">Get Involved Links Section</h3>
-                  <p className="text-gray-600 font-body">This section shows &quot;Get Involved&quot; action cards (Donate, Partner, Volunteer, Contact). Content is managed through the translation files.</p>
-                  <p className="text-sm text-amber-600 font-medium">No admin changes needed — the frontend uses translated default content.</p>
+                <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+                  <div className="flex flex-col space-y-1.5 p-6">
+                    <h3 className="text-2xl font-semibold leading-none tracking-tight flex items-center gap-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                      Get Involved Links
+                    </h3>
+                    <p className="text-sm text-gray-500">Manage the action cards at the bottom of the About page. Each card has a label, link URL, and color.</p>
+                  </div>
+                  <div className="p-6 pt-0 space-y-4">
+                    {getInvolvedLinks.map((link, idx) => (
+                      <div key={link.id} className="rounded-md border border-gray-200 p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="inline-block w-3 h-3 rounded-full" style={{ backgroundColor: resolveColor(link.color, '#1a1a1a') }} />
+                            <label className="text-sm font-semibold">Link {idx + 1}</label>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            {idx > 0 && (
+                              <button type="button" title="Move up" onClick={() => { const u = [...getInvolvedLinks]; [u[idx-1],u[idx]] = [u[idx],u[idx-1]]; setGetInvolvedLinks(u); }} className="p-1 text-gray-400 hover:text-gray-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m18 15-6-6-6 6"/></svg></button>
+                            )}
+                            {idx < getInvolvedLinks.length - 1 && (
+                              <button type="button" title="Move down" onClick={() => { const u = [...getInvolvedLinks]; [u[idx],u[idx+1]] = [u[idx+1],u[idx]]; setGetInvolvedLinks(u); }} className="p-1 text-gray-400 hover:text-gray-700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                            )}
+                            <button type="button" title="Remove" onClick={() => setGetInvolvedLinks(getInvolvedLinks.filter((_,i) => i !== idx))} className="p-1 text-gray-400 hover:text-red-600 ml-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-3 gap-3">
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Label</label>
+                            <input type="text" value={link.label} onChange={(e) => { const u = [...getInvolvedLinks]; u[idx] = {...u[idx], label: e.target.value}; setGetInvolvedLinks(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">URL (e.g. &quot;/Volunteer&quot;)</label>
+                            <input type="text" value={link.href} onChange={(e) => { const u = [...getInvolvedLinks]; u[idx] = {...u[idx], href: e.target.value}; setGetInvolvedLinks(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2" />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500">Card Color</label>
+                            <select value={link.color} onChange={(e) => { const u = [...getInvolvedLinks]; u[idx] = {...u[idx], color: e.target.value}; setGetInvolvedLinks(u); }} className="flex h-9 w-full rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm mt-1 focus:outline-none focus:ring-1 focus:ring-primary">
+                              {COLOR_OPTIONS.map((opt) => (<option key={opt.value} value={opt.value}>{opt.label}</option>))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" onClick={() => setGetInvolvedLinks([...getInvolvedLinks, { id: String(Date.now()), label: '', href: '/', color: 'wrf-black' }])} className="inline-flex items-center gap-2 rounded-md border-2 border-dashed border-gray-300 px-4 py-3 text-sm font-medium text-gray-600 hover:border-gray-400 hover:text-gray-800 transition-colors w-full justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                      Add Link
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

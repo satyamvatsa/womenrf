@@ -7,7 +7,8 @@ export const runtime = 'nodejs';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'NothingIsPermanent';
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+const ALLOWED_FOLDERS = ['partners', 'team', 'about', 'programs', 'news', 'blog'];
 
 function isAuthorized(request: NextRequest): boolean {
   const auth = request.headers.get('Authorization');
@@ -35,15 +36,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
     }
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Use JPEG, PNG, GIF, or WebP.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid file type. Use JPEG, PNG, GIF, WebP, or SVG.' }, { status: 400 });
     }
-    const dir = path.join(process.cwd(), 'public', 'images');
+
+    const folder = formData.get('folder');
+    let subDir = '';
+    if (typeof folder === 'string' && ALLOWED_FOLDERS.includes(folder)) {
+      subDir = folder;
+    }
+
+    const dir = path.join(process.cwd(), 'public', 'images', subDir);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
     const filename = safeName(file.name);
     const filePath = path.join(dir, filename);
     const bytes = await file.arrayBuffer();
     writeFileSync(filePath, Buffer.from(bytes));
-    const url = `/images/${filename}`;
+    const url = subDir ? `/images/${subDir}/${filename}` : `/images/${filename}`;
     return NextResponse.json({ url });
   } catch (e) {
     console.error('Upload error:', e);

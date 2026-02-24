@@ -34,10 +34,25 @@ const DEFAULT_CORE_VALUES = [
   { id: '4', title: 'Innovation & Sustainability', description: '', color: 'wrf-footer-mauve' },
 ];
 
-const TEAM = [
-  { name: 'Hanifa Girowal', role: 'Co-Founder & VP', img: '/images/Hanifa_Girowal.jpeg', bg: 'bg-wrf-coral' },
-  { name: 'Shabnam Salehi', role: 'Co-Founder & President', img: '/images/Shabnam_Salehi.jpeg', bg: 'bg-wrf-purple' },
-  { name: 'Morten Kjaerum', role: 'Board Member', img: '/images/1-Panelist-Morten-Kjaerum-Picture-1.jpg', bg: 'bg-wrf-purple' },
+const DEFAULT_TEAM = [
+  { id: '1', name: 'Hanifa Girowal', role: 'Co-Founder & VP', img: '/images/Hanifa_Girowal.jpeg' },
+  { id: '2', name: 'Shabnam Salehi', role: 'Co-Founder & President', img: '/images/Shabnam_Salehi.jpeg' },
+  { id: '3', name: 'Morten Kjaerum', role: 'Board Member', img: '/images/1-Panelist-Morten-Kjaerum-Picture-1.jpg' },
+];
+
+const DEFAULT_IMPACT_STATS = [
+  { id: '1', value: '12,000+', label: 'Women Empowered', color: 'wrf-black', textColor: 'wrf-coral' },
+  { id: '2', value: '45', label: 'Countries Reached', color: 'wrf-purple', textColor: 'wrf-coral' },
+  { id: '3', value: '150+', label: 'Partner Organizations', color: 'wrf-coral', textColor: 'white' },
+  { id: '4', value: '$2.1M', label: 'Funds Raised', color: 'wrf-footer-mauve', textColor: 'wrf-coral' },
+];
+
+const DEFAULT_GET_INVOLVED = [
+  { id: '1', label: 'Volunteer', href: '/Volunteer', color: 'wrf-black' },
+  { id: '2', label: 'Careers', href: '/Vacancies', color: 'wrf-purple' },
+  { id: '3', label: 'Partner With Us', href: '/Partnership', color: 'wrf-coral' },
+  { id: '4', label: 'News & Updates', href: '/News', color: 'wrf-footer-mauve' },
+  { id: '5', label: 'Contact Us', href: '/Contact', color: 'wrf-black' },
 ];
 
 export default function AboutPage() {
@@ -56,46 +71,28 @@ export default function AboutPage() {
       .catch(() => {});
   }, []);
 
-  const TIMELINE = [
-    {
-      year: '2019',
-      title: t('about.journey.2019.title'),
-      description: t('about.journey.2019.description'),
-    },
-    {
-      year: '2020',
-      title: t('about.journey.2020.title'),
-      description: t('about.journey.2020.description'),
-    },
-    {
-      year: '2021',
-      title: t('about.journey.2021.title'),
-      description: t('about.journey.2021.description'),
-    },
-    {
-      year: '2022',
-      title: t('about.journey.2022.title'),
-      description: t('about.journey.2022.description'),
-    },
-    {
-      year: '2023',
-      title: t('about.journey.2023.title'),
-      description: t('about.journey.2023.description'),
-    },
-    {
-      year: '2024',
-      title: t('about.journey.2024.title'),
-      description: t('about.journey.2024.description'),
-    },
-  ];
+  const timelineData = (Array.isArray(adminData?.timeline) && adminData.timeline.length > 0)
+    ? adminData.timeline
+    : [
+        { id: '1', year: '2019', title: t('about.journey.2019.title'), description: t('about.journey.2019.description') },
+        { id: '2', year: '2020', title: t('about.journey.2020.title'), description: t('about.journey.2020.description') },
+        { id: '3', year: '2021', title: t('about.journey.2021.title'), description: t('about.journey.2021.description') },
+        { id: '4', year: '2022', title: t('about.journey.2022.title'), description: t('about.journey.2022.description') },
+        { id: '5', year: '2023', title: t('about.journey.2023.title'), description: t('about.journey.2023.description') },
+        { id: '6', year: '2024', title: t('about.journey.2024.title'), description: t('about.journey.2024.description') },
+      ];
 
-  const GET_INVOLVED_LINKS = [
-    { href: '/Volunteer', label: t('about.getInvolved.volunteer'), bgClass: 'bg-wrf-black' },
-    { href: '/Vacancies', label: t('about.getInvolved.careers'), bgClass: 'bg-wrf-purple' },
-    { href: '/Partnership', label: t('about.getInvolved.partner'), bgClass: 'bg-wrf-coral' },
-    { href: '/News', label: t('about.getInvolved.news'), bgClass: 'bg-wrf-footer-mauve' },
-    { href: '/Contact', label: t('about.getInvolved.contact'), bgClass: 'bg-wrf-black' },
-  ];
+  const impactData = (Array.isArray(adminData?.impactStats) && adminData.impactStats.length > 0)
+    ? adminData.impactStats
+    : DEFAULT_IMPACT_STATS;
+
+  const teamData = (Array.isArray(adminData?.teamMembers) && adminData.teamMembers.length > 0)
+    ? adminData.teamMembers
+    : DEFAULT_TEAM;
+
+  const linksData = (Array.isArray(adminData?.getInvolvedLinks) && adminData.getInvolvedLinks.length > 0)
+    ? adminData.getInvolvedLinks
+    : DEFAULT_GET_INVOLVED;
 
   return (
     <div className="bg-white">
@@ -352,14 +349,11 @@ export default function AboutPage() {
           <div className="mb-12 inline-block bg-wrf-footer-mauve p-4">
             <h2 className="text-3xl font-bold text-white">{t('about.journey.title')}</h2>
           </div>
-          <p className="mt-4 max-w-4xl text-lg leading-relaxed text-gray-700">
-            {t('about.journey.description')}
-          </p>
           <div className="relative mt-12">
             <div className="absolute left-4 top-0 hidden h-full w-0.5 bg-gray-200 md:block" aria-hidden />
             <div className="space-y-12">
-              {TIMELINE.map((item) => (
-                <ScrollReveal key={item.year} variant="slideUpLg" className="relative md:pl-16">
+              {timelineData.map((item: { id: string; year: string; title: string; description: string }) => (
+                <ScrollReveal key={item.id} variant="slideUpLg" className="relative md:pl-16">
                   <div className="absolute left-4 top-1 hidden h-8 w-8 -translate-x-1/2 items-center justify-center rounded-full border-4 border-white bg-wrf-coral md:flex">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-white">
                       <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
@@ -384,19 +378,14 @@ export default function AboutPage() {
           <div className="mb-12 inline-block bg-wrf-coral p-4">
             <h2 className="text-3xl font-bold text-white">{t('about.impact.title')}</h2>
           </div>
-          <p className="mt-4 max-w-4xl text-lg leading-relaxed text-gray-700">
-            {t('about.impact.description')}
-          </p>
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              { value: '12,000+', label: t('about.impact.women'), bg: 'bg-wrf-black' },
-              { value: '45', label: t('about.impact.countries'), bg: 'bg-wrf-purple' },
-              { value: '150+', label: t('about.impact.partners'), bg: 'bg-wrf-coral' },
-              { value: '$2.1M', label: t('about.impact.funds'), bg: 'bg-wrf-footer-mauve' },
-            ].map((stat) => (
-              <ScrollReveal key={stat.label} variant="slideUpLg">
-                <div className={`p-8 text-center text-white shadow-lg ${stat.bg}`}>
-                  <p className="text-5xl font-bold text-wrf-coral">{stat.value}</p>
+            {impactData.map((stat: { id: string; value: string; label: string; color: string; textColor?: string }) => (
+              <ScrollReveal key={stat.id} variant="slideUpLg">
+                <div
+                  className="p-8 text-center text-white shadow-lg"
+                  style={{ backgroundColor: resolveColor(stat.color, '#1a1a1a') }}
+                >
+                  <p className="text-5xl font-bold" style={{ color: resolveColor(stat.textColor || 'wrf-coral', '#E07A7A') }}>{stat.value}</p>
                   <p className="mt-2">{stat.label}</p>
                 </div>
               </ScrollReveal>
@@ -414,7 +403,7 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold text-white">{t('about.people.title')}</h2>
               </div>
               <p className="text-lg leading-relaxed text-gray-700">
-                {t('about.people.description')}
+                {adminData?.teamDescription || t('about.people.description')}
               </p>
               <p className="mt-4 text-lg leading-relaxed text-gray-700">
                 {t('about.people.together')}
@@ -422,9 +411,9 @@ export default function AboutPage() {
             </ScrollReveal>
             <ScrollReveal variant="slideRight" className="space-y-8">
               <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-                {TEAM.map((person) => (
-                  <div key={person.name} className={`relative h-48 overflow-hidden ${person.bg}`}>
-                    <img src={person.img} alt={person.name} className="h-full w-full object-cover" />
+                {teamData.map((person: { id: string; name: string; role: string; img: string }) => (
+                  <div key={person.id} className="relative h-48 overflow-hidden bg-wrf-purple">
+                    {person.img && <img src={person.img} alt={person.name} className="h-full w-full object-cover" />}
                     <div className="absolute inset-0 bg-black/50" aria-hidden />
                     <div className="absolute bottom-0 left-0 w-full p-3 text-white">
                       <h3 className="inline-block text-sm font-bold">
@@ -474,11 +463,12 @@ export default function AboutPage() {
             </div>
           </ScrollReveal>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {GET_INVOLVED_LINKS.map((link) => (
-              <ScrollReveal key={link.href} variant="slideUpSm">
+            {linksData.map((link: { id: string; label: string; href: string; color: string }) => (
+              <ScrollReveal key={link.id} variant="slideUpSm">
                 <Link
                   href={link.href}
-                  className={`flex h-full flex-col justify-between p-8 text-white shadow-inner transition-none ${link.bgClass}`}
+                  className="flex h-full flex-col justify-between p-8 text-white shadow-inner transition-none"
+                  style={{ backgroundColor: resolveColor(link.color, '#1a1a1a') }}
                 >
                   <h3 className="mb-2 text-lg font-bold">{link.label}</h3>
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mt-4 h-6 w-6 self-end">

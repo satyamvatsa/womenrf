@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { AdminShell } from '@/components/AdminShell';
-import { loadAdminData, saveAdminData } from '@/lib/adminApi';
+import { loadAdminData, saveAdminData, uploadAdminImage } from '@/lib/adminApi';
 
 const COLOR_OPTIONS = [
   { value: 'bg-primary', label: 'Primary (Dark)' },
@@ -210,6 +210,18 @@ export default function HomepageManagementPage() {
   };
   const updatePartner = (i: number, field: 'name' | 'logoUrl' | 'websiteUrl', value: string) => {
     setPartnersList((p) => p.map((item, idx) => (idx === i ? { ...item, [field]: value } : item)));
+  };
+
+  const partnerFileRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const [uploadingPartner, setUploadingPartner] = useState<number | null>(null);
+
+  const handlePartnerLogoUpload = async (index: number, file: File) => {
+    setUploadingPartner(index);
+    const url = await uploadAdminImage(file, 'partners');
+    if (url) {
+      updatePartner(index, 'logoUrl', url);
+    }
+    setUploadingPartner(null);
   };
 
   const addShowcaseCard = () => {
@@ -666,8 +678,40 @@ export default function HomepageManagementPage() {
                         <input className={inputClass + ' mt-2'} placeholder="Organization Name" value={partner.name} onChange={(e) => updatePartner(i, 'name', e.target.value)} />
                       </div>
                       <div>
-                        <label className={labelClass}>Logo URL</label>
-                        <input className={inputClass + ' mt-2'} placeholder="https://example.com/logo.png" value={partner.logoUrl} onChange={(e) => updatePartner(i, 'logoUrl', e.target.value)} />
+                        <label className={labelClass}>Logo</label>
+                        <div className="flex gap-2 mt-2">
+                          <input className={inputClass + ' flex-1'} placeholder="/images/partners/logo.svg" value={partner.logoUrl} onChange={(e) => updatePartner(i, 'logoUrl', e.target.value)} />
+                          <input
+                            type="file"
+                            accept="image/*,.svg"
+                            className="hidden"
+                            ref={(el) => { partnerFileRefs.current[i] = el; }}
+                            onChange={(e) => {
+                              const f = e.target.files?.[0];
+                              if (f) handlePartnerLogoUpload(i, f);
+                              e.target.value = '';
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => partnerFileRefs.current[i]?.click()}
+                            disabled={uploadingPartner === i}
+                            className="inline-flex items-center justify-center gap-1 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3 whitespace-nowrap disabled:opacity-50"
+                            title="Upload logo from your computer"
+                          >
+                            {uploadingPartner === i ? (
+                              <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            ) : (
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                            )}
+                            Upload
+                          </button>
+                        </div>
+                        {partner.logoUrl && (
+                          <div className="mt-2 p-2 bg-gray-50 border rounded inline-block">
+                            <img src={partner.logoUrl} alt={partner.name || 'Logo preview'} className="h-8 max-w-[120px] object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          </div>
+                        )}
                       </div>
                       <div>
                         <label className={labelClass}>Website URL (Optional)</label>

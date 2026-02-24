@@ -41,11 +41,12 @@ export async function submitPublicForm(section: string, data: Record<string, unk
   }
 }
 
-/** Upload an image; returns public URL or null. */
-export async function uploadAdminImage(file: File): Promise<string | null> {
+/** Upload an image; returns public URL or null. Optional folder for subdirectory (e.g. 'partners', 'team'). */
+export async function uploadAdminImage(file: File, folder?: string): Promise<string | null> {
   try {
     const form = new FormData();
     form.append('file', file);
+    if (folder) form.append('folder', folder);
     const res = await fetch('/api/upload', {
       method: 'POST',
       headers: { Authorization: `Bearer ${ADMIN_PASSWORD}` },
