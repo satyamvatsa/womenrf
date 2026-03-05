@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import path from 'path';
+import { isS3Configured, uploadToS3 } from '@/lib/s3';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -45,14 +46,24 @@ export async function POST(request: NextRequest) {
       subDir = folder;
     }
 
+    const filename = safeName(file.name);
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Use S3 in production when configured, otherwise fall back to local filesystem
+    if (isS3Configured()) {
+      const s3Key = subDir ? `uploads/${subDir}/${filename}` : `uploads/${filename}`;
+      const url = await uploadToS3(s3Key, buffer, file.name);
+      return NextResponse.json({ url, storage: 's3' });
+    }
+
+    // Local filesystem fallback (development)
     const dir = path.join(process.cwd(), 'public', 'images', subDir);
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-    const filename = safeName(file.name);
     const filePath = path.join(dir, filename);
-    const bytes = await file.arrayBuffer();
-    writeFileSync(filePath, Buffer.from(bytes));
+    writeFileSync(filePath, buffer);
     const url = subDir ? `/images/${subDir}/${filename}` : `/images/${filename}`;
-    return NextResponse.json({ url });
+    return NextResponse.json({ url, storage: 'local' });
   } catch (e) {
     console.error('Upload error:', e);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });

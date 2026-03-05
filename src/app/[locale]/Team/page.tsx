@@ -50,6 +50,26 @@ export default function TeamPage() {
         { label: 'Email', href: 'mailto:', icon: 'mail' },
       ],
     },
+    {
+      name: t('team.alex.name'),
+      role: t('team.alex.role'),
+      image: '/images/Alex_Neve.jpeg',
+      alt: 'Alex Neve',
+      bio: t('team.alex.bio'),
+      links: [
+        { label: 'Email', href: 'mailto:', icon: 'mail' },
+      ],
+    },
+    {
+      name: t('team.saba.name'),
+      role: t('team.saba.role'),
+      image: '/images/Saba_Ghori.jpeg',
+      alt: 'Saba Ghori',
+      bio: t('team.saba.bio'),
+      links: [
+        { label: 'Email', href: 'mailto:', icon: 'mail' },
+      ],
+    },
   ];
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);

@@ -72,6 +72,26 @@ const defaultMembers: TeamMember[] = [
     linkedinUrl: 'https://www.linkedin.com/in/morten-kjaerum-434b6a2',
     email: '',
   },
+  {
+    id: 'm-2',
+    name: 'Alex Neve',
+    role: 'Board Member',
+    categoryId: 'cat-1',
+    imageUrl: '/images/Alex_Neve.jpeg',
+    bio: 'Alex Neve is a visiting and adjunct professor in international human rights law at the University of Ottawa and Dalhousie University, and a Senior Fellow with the University of Ottawa\u2019s Graduate School of Public and International Affairs. He presently serves as a Member of the UN Human Rights Council\u2019s Independent International Fact-Finding Mission on Venezuela. He was Secretary General of Amnesty International Canada\u2019s English Branch from 2000 \u2013 2020. He is a lawyer, with a Master\u2019s Degree in International Human Rights Law from the University of Essex. Alex was the 2025 CBC Massey Lecturer, addressing the theme of Universal: Renewing Human Rights in a Fractured World. Alex Neve is an Officer of the Order of Canada.',
+    linkedinUrl: '',
+    email: '',
+  },
+  {
+    id: 'm-3',
+    name: 'Saba Ghori',
+    role: 'Board Member',
+    categoryId: 'cat-1',
+    imageUrl: '/images/Saba_Ghori.jpeg',
+    bio: '',
+    linkedinUrl: '',
+    email: '',
+  },
 ];
 
 export default function TeamManagementPage() {

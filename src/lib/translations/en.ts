@@ -287,6 +287,12 @@ const en: Record<string, string> = {
   'team.morten.name': 'Morten Kjaerum',
   'team.morten.role': 'Board Member',
   'team.morten.bio': 'Morten Kjaerum is an Adjunct professor at the University of Aalborg, Denmark and an affiliated scholar at The Raoul Wallenberg Institute (RWI), Sweden. 2015 -2024 Director the RWI, 2008-15: director the EU Agency for Fundamental Rights; 1991-2008: Director, the Danish Institute for Human Rights; Member of the UN Committee on the Elimination of Racial Discrimination 2002-08. 2018-2020 Chair the Board of Trustees for the United Nations Voluntary Fund for Technical Cooperation in the Field of Human Rights (VFTC) and of the UPR Trust Fund for Financial and Technical Assistance. From 2015-23 he was chair of the European Council for Refugees and Exiles (ECRE). He has written extensively on human rights issues and lectured at universities across continents.',
+  'team.alex.name': 'Alex Neve',
+  'team.alex.role': 'Board Member',
+  'team.alex.bio': 'Alex Neve is a visiting and adjunct professor in international human rights law at the University of Ottawa and Dalhousie University, and a Senior Fellow with the University of Ottawa\u2019s Graduate School of Public and International Affairs. He presently serves as a Member of the UN Human Rights Council\u2019s Independent International Fact-Finding Mission on Venezuela. He was Secretary General of Amnesty International Canada\u2019s English Branch from 2000 \u2013 2020. He is a lawyer, with a Master\u2019s Degree in International Human Rights Law from the University of Essex. Alex was the 2025 CBC Massey Lecturer, addressing the theme of Universal: Renewing Human Rights in a Fractured World. Alex Neve is an Officer of the Order of Canada.',
+  'team.saba.name': 'Saba Ghori',
+  'team.saba.role': 'Board Member',
+  'team.saba.bio': '',
 
   // ─── Vacancies Page ───
   'vacancies.hero.title': 'Join Our Team now',
