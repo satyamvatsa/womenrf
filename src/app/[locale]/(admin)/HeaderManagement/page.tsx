@@ -91,8 +91,8 @@ const defaultMegaColumns: MegaMenuColumn[] = [
     title: "Women's Rights First",
     color: 'secondary',
     links: [
-      { name: 'Founders', path: 'Founders' },
-      { name: 'Team', path: 'Team' },
+      { name: 'Team', path: 'Founders' },
+      { name: 'Board of Directors', path: 'Team' },
       { name: 'About us', path: 'About' },
     ],
   },

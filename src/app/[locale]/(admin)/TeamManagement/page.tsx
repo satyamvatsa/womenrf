@@ -79,7 +79,7 @@ const defaultMembers: TeamMember[] = [
     categoryId: 'cat-1',
     imageUrl: '/images/Alex_Neve.jpeg',
     bio: 'Alex Neve is a visiting and adjunct professor in international human rights law at the University of Ottawa and Dalhousie University, and a Senior Fellow with the University of Ottawa\u2019s Graduate School of Public and International Affairs. He presently serves as a Member of the UN Human Rights Council\u2019s Independent International Fact-Finding Mission on Venezuela. He was Secretary General of Amnesty International Canada\u2019s English Branch from 2000 \u2013 2020. He is a lawyer, with a Master\u2019s Degree in International Human Rights Law from the University of Essex. Alex was the 2025 CBC Massey Lecturer, addressing the theme of Universal: Renewing Human Rights in a Fractured World. Alex Neve is an Officer of the Order of Canada.',
-    linkedinUrl: '',
+    linkedinUrl: 'https://www.linkedin.com/in/alexneve',
     email: '',
   },
   {
@@ -88,8 +88,8 @@ const defaultMembers: TeamMember[] = [
     role: 'Board Member',
     categoryId: 'cat-1',
     imageUrl: '/images/Saba_Ghori.jpeg',
-    bio: '',
-    linkedinUrl: '',
+    bio: 'Saba Ghori currently serves as the Director for the Center on Global Rights for Women at the Battered Women\u2019s Justice Project, an international legal resource center on gender-based violence, advancing systemic and community-level changes to ensure safety, justice, and accountability for survivors of violence against women. Saba is also an independent consultant and advisor with numerous women\u2019s rights organizations including Safepath Prosperity, Vital Voices, Too Young To Wed, and BLOOM Charity on strategic planning, program assessment, fundraising, and institutional partnerships.',
+    linkedinUrl: 'https://www.linkedin.com/in/sabaghori',
     email: '',
   },
 ];

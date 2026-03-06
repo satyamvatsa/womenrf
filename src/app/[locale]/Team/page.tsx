@@ -57,6 +57,7 @@ export default function TeamPage() {
       alt: 'Alex Neve',
       bio: t('team.alex.bio'),
       links: [
+        { label: 'LinkedIn', href: 'https://www.linkedin.com/in/alexneve', icon: 'linkedin' },
         { label: 'Email', href: 'mailto:', icon: 'mail' },
       ],
     },
@@ -67,6 +68,7 @@ export default function TeamPage() {
       alt: 'Saba Ghori',
       bio: t('team.saba.bio'),
       links: [
+        { label: 'LinkedIn', href: 'https://www.linkedin.com/in/sabaghori', icon: 'linkedin' },
         { label: 'Email', href: 'mailto:', icon: 'mail' },
       ],
     },

@@ -14,8 +14,7 @@ if (!uri) {
   process.exit(1);
 }
 
-const teamPath = join(__dirname, '..', 'data', 'team.json');
-const teamData = JSON.parse(readFileSync(teamPath, 'utf-8'));
+const sections = ['team', 'header', 'footer'];
 
 console.log(`Connecting to MongoDB (${dbName})...`);
 const client = new MongoClient(uri, {
@@ -26,40 +25,47 @@ const client = new MongoClient(uri, {
 try {
   await client.connect();
   await client.db(dbName).command({ ping: 1 });
-  console.log('Connected successfully.');
+  console.log('Connected successfully.\n');
 
   const db = client.db(dbName);
   const contentColl = db.collection('content');
+  const versionsColl = db.collection('content_versions');
+  const auditColl = db.collection('audit');
   const now = new Date();
 
-  const existing = await contentColl.findOne({ _id: 'team' });
-  if (existing) {
-    const versionsColl = db.collection('content_versions');
-    await versionsColl.insertOne({
-      section: 'team',
-      data: existing.data,
-      savedAt: now,
-    });
-    console.log('Backed up existing team data to content_versions.');
+  for (const section of sections) {
+    const filePath = join(__dirname, '..', 'data', `${section}.json`);
+    let data;
+    try {
+      data = JSON.parse(readFileSync(filePath, 'utf-8'));
+    } catch {
+      console.log(`Skipping ${section}: no local data file found.`);
+      continue;
+    }
+
+    const existing = await contentColl.findOne({ _id: section });
+    if (existing) {
+      await versionsColl.insertOne({ section, data: existing.data, savedAt: now });
+      console.log(`[${section}] Backed up existing data.`);
+    }
+
+    await contentColl.updateOne(
+      { _id: section },
+      { $set: { data, updatedAt: now } },
+      { upsert: true },
+    );
+
+    await auditColl.insertOne({ savedAt: now, section, action: 'seed', detail: 'seed script' });
+
+    if (section === 'team') {
+      console.log(`[${section}] Seeded ${data.members.length} members.`);
+      data.members.forEach((m) => console.log(`  - ${m.name} (${m.role})`));
+    } else {
+      console.log(`[${section}] Seeded successfully.`);
+    }
   }
 
-  await contentColl.updateOne(
-    { _id: 'team' },
-    { $set: { data: teamData, updatedAt: now } },
-    { upsert: true },
-  );
-
-  console.log(`Seeded team data: ${teamData.members.length} members, ${teamData.categories.length} categories.`);
-  teamData.members.forEach((m) => console.log(`  - ${m.name} (${m.role})`));
-
-  await db.collection('audit').insertOne({
-    savedAt: now,
-    section: 'team',
-    action: 'seed',
-    detail: 'seed-team-to-mongo script',
-  });
-
-  console.log('Done.');
+  console.log('\nDone.');
 } catch (err) {
   console.error('Error:', err.message || err);
   process.exit(1);
