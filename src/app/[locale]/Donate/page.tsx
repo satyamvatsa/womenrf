@@ -546,8 +546,92 @@ export default function DonatePage() {
         </div>
       </section>
 
-      {/* Other Ways to Give */}
+      {/* Bank Wire Transfer */}
       <section className="bg-white py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-12 text-left">
+            <div className="inline-block bg-wrf-black px-8 py-6">
+              <h2 className="text-3xl font-bold text-white">{t('donate.bank.title')}</h2>
+            </div>
+            <p className="mt-4 text-lg text-gray-600">
+              {t('donate.bank.description')}
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2">
+            {/* Account Details */}
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-wrf-purple text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="20" height="14" x="2" y="5" rx="2" />
+                    <line x1="2" x2="22" y1="10" y2="10" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">{t('donate.bank.accountDetails')}</h3>
+              </div>
+              <dl className="space-y-3">
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountName')}</dt>
+                  <dd className="mt-0.5 text-base font-medium text-gray-900">Women&apos;s Rights First</dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountNumber')}</dt>
+                  <dd className="mt-0.5 font-mono text-base font-medium text-gray-900">435062707479</dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountAddress')}</dt>
+                  <dd className="mt-0.5 text-base text-gray-900">3783 Tonbridge Pl, Woodbridge, VA 22192</dd>
+                </div>
+              </dl>
+            </div>
+
+            {/* Bank Details */}
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-wrf-coral text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="3" x2="21" y1="22" y2="22" />
+                    <line x1="6" x2="6" y1="18" y2="11" />
+                    <line x1="10" x2="10" y1="18" y2="11" />
+                    <line x1="14" x2="14" y1="18" y2="11" />
+                    <line x1="18" x2="18" y1="18" y2="11" />
+                    <polygon points="12 2 20 7 4 7" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">{t('donate.bank.bankDetails')}</h3>
+              </div>
+              <dl className="space-y-3">
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.bankName')}</dt>
+                  <dd className="mt-0.5 text-base font-medium text-gray-900">Bank of America, N.A.</dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.bankAddress')}</dt>
+                  <dd className="mt-0.5 text-base text-gray-900">222 Broadway, New York, NY 10038</dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.swiftCode')}</dt>
+                  <dd className="mt-0.5 font-mono text-base font-bold text-wrf-purple">BOFAUS3N</dd>
+                </div>
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.routingCode')}</dt>
+                  <dd className="mt-0.5 font-mono text-base font-bold text-wrf-purple">051000017</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <div className="mt-8 rounded-lg border-l-4 border-wrf-purple bg-purple-50 p-6">
+            <p className="text-sm text-gray-700">
+              {t('donate.bank.note')}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Other Ways to Give */}
+      <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid items-start gap-12 lg:grid-cols-5">
             <div className="lg:col-span-3 text-left">

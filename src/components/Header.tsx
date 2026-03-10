@@ -106,6 +106,7 @@ export default function Header() {
       links: [
         { href: '/FAQ', label: t('header.menuSection.info.faq') },
         { href: '/News', label: t('header.menuSection.info.news') },
+        { href: '/Events', label: t('header.menuSection.info.events') },
         { href: '/Vacancies', label: t('header.menuSection.info.vacancies') },
         { href: '/PrivacyPolicy', label: t('header.menuSection.info.privacy') },
       ],
@@ -129,6 +130,7 @@ export default function Header() {
     : [
     { href: '/About', label: t('header.nav.wrf') },
     { href: '/News', label: t('header.nav.news') },
+    { href: '/Events', label: t('header.nav.events') },
     { href: '/Vacancies', label: t('header.nav.vacancies') },
   ];
 

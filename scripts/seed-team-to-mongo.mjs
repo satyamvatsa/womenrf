@@ -14,7 +14,7 @@ if (!uri) {
   process.exit(1);
 }
 
-const sections = ['team', 'header', 'footer'];
+const sections = ['team', 'header', 'footer', 'events'];
 
 console.log(`Connecting to MongoDB (${dbName})...`);
 const client = new MongoClient(uri, {
@@ -60,6 +60,9 @@ try {
     if (section === 'team') {
       console.log(`[${section}] Seeded ${data.members.length} members.`);
       data.members.forEach((m) => console.log(`  - ${m.name} (${m.role})`));
+    } else if (section === 'events') {
+      console.log(`[${section}] Seeded ${data.events.length} events.`);
+      data.events.forEach((e) => console.log(`  - ${e.title}`));
     } else {
       console.log(`[${section}] Seeded successfully.`);
     }

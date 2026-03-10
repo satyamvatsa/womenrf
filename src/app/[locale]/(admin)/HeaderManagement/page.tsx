@@ -82,6 +82,7 @@ type MegaMenuColumn = {
 const defaultNavLinks: NavLink[] = [
   { text: 'WRF', path: 'About' },
   { text: ' News and updates', path: 'News' },
+  { text: 'Events', path: 'Events' },
   { text: 'Vacancies', path: 'Vacancies' },
   { text: '', path: '' },
 ];
@@ -111,7 +112,8 @@ const defaultMegaColumns: MegaMenuColumn[] = [
     color: 'support',
     links: [
       { name: 'Questions and answers', path: 'FAQ' },
-      { name: 'News and events', path: 'News' },
+      { name: 'News and updates', path: 'News' },
+      { name: 'Events', path: 'Events' },
       { name: 'Careers and vacancies', path: 'Vacancies' },
       { name: 'Privacy policy ', path: 'PrivacyPolicy' },
     ],

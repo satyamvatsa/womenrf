@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
 
+const DEFAULT_HERO_BG = '/images/GettyImages-1232002648.jpg';
+
 function getLocalePrefix(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
   if (segments.length > 0 && ['en', 'fa', 'ps'].includes(segments[0])) {
@@ -27,6 +29,8 @@ export default function Hero() {
       .catch(() => {});
   }, []);
 
+  const heroImageUrl = adminData?.heroImageUrl || DEFAULT_HERO_BG;
+
   const HERO_BG_MAP: Record<string, string> = {
     'bg-primary': 'bg-wrf-black',
     'bg-secondary': 'bg-wrf-purple',
@@ -40,9 +44,11 @@ export default function Hero() {
   if (adminData?.showHero === false) return null;
 
   return (
+    <>
+      <link rel="preload" as="image" href={heroImageUrl} />
     <section
-      className="relative overflow-hidden bg-[#CCCCCC] py-20 md:py-32"
-      style={adminData?.heroImageUrl ? { backgroundImage: `url(${adminData.heroImageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}
+      className="relative overflow-hidden py-20 md:py-32"
+      style={{ backgroundImage: `url(${heroImageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#3d3060' }}
     >
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -80,5 +86,6 @@ export default function Hero() {
         </div>
       </div>
     </section>
+    </>
   );
 }

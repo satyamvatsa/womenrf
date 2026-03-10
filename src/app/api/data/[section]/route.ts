@@ -35,6 +35,7 @@ const VALID_SECTIONS = [
   'newsletter-subscribers',
   'job-applications',
   'donation-intents',
+  'events',
 ];
 
 function isAuthorized(request: NextRequest): boolean {
