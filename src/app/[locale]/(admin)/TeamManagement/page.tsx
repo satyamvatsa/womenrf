@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { AdminShell } from '@/components/AdminShell';
-import { loadAdminData, saveAdminData } from '@/lib/adminApi';
+import { loadAdminData, saveAdminData, uploadAdminImage } from '@/lib/adminApi';
 
 const SvgPlus = ({ className }: { className?: string }) => (
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -45,6 +45,7 @@ const CATEGORY_COLOR_OPTIONS = [
 ];
 
 type Category = { id: string; name: string; description: string; colorClass: string };
+type MemberTranslation = { name: string; role: string; bio: string };
 type TeamMember = {
   id: string;
   name: string;
@@ -54,6 +55,7 @@ type TeamMember = {
   bio: string;
   linkedinUrl: string;
   email: string;
+  translations?: { fa?: MemberTranslation; ps?: MemberTranslation };
 };
 
 const defaultCategories: Category[] = [
@@ -109,6 +111,14 @@ export default function TeamManagementPage() {
   const [memberBio, setMemberBio] = useState('');
   const [memberLinkedinUrl, setMemberLinkedinUrl] = useState('');
   const [memberEmail, setMemberEmail] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [translationTab, setTranslationTab] = useState<'en' | 'fa' | 'ps'>('en');
+  const [memberNameFa, setMemberNameFa] = useState('');
+  const [memberRoleFa, setMemberRoleFa] = useState('');
+  const [memberBioFa, setMemberBioFa] = useState('');
+  const [memberNamePs, setMemberNamePs] = useState('');
+  const [memberRolePs, setMemberRolePs] = useState('');
+  const [memberBioPs, setMemberBioPs] = useState('');
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
 
   useEffect(() => {
@@ -134,6 +144,13 @@ export default function TeamManagementPage() {
     setMemberBio('');
     setMemberLinkedinUrl('');
     setMemberEmail('');
+    setTranslationTab('en');
+    setMemberNameFa('');
+    setMemberRoleFa('');
+    setMemberBioFa('');
+    setMemberNamePs('');
+    setMemberRolePs('');
+    setMemberBioPs('');
     setDialogOpen(true);
   };
 
@@ -146,6 +163,13 @@ export default function TeamManagementPage() {
     setMemberBio(m.bio || '');
     setMemberLinkedinUrl(m.linkedinUrl || '');
     setMemberEmail(m.email || '');
+    setTranslationTab('en');
+    setMemberNameFa(m.translations?.fa?.name || '');
+    setMemberRoleFa(m.translations?.fa?.role || '');
+    setMemberBioFa(m.translations?.fa?.bio || '');
+    setMemberNamePs(m.translations?.ps?.name || '');
+    setMemberRolePs(m.translations?.ps?.role || '');
+    setMemberBioPs(m.translations?.ps?.bio || '');
     setDialogOpen(true);
   };
 
@@ -156,6 +180,13 @@ export default function TeamManagementPage() {
 
   const handleSaveMember = (e: React.FormEvent) => {
     e.preventDefault();
+    const translations: TeamMember['translations'] = {};
+    if (memberNameFa || memberRoleFa || memberBioFa) {
+      translations.fa = { name: memberNameFa, role: memberRoleFa, bio: memberBioFa };
+    }
+    if (memberNamePs || memberRolePs || memberBioPs) {
+      translations.ps = { name: memberNamePs, role: memberRolePs, bio: memberBioPs };
+    }
     const memberData = {
       name: memberName,
       role: memberRole,
@@ -164,6 +195,7 @@ export default function TeamManagementPage() {
       bio: memberBio,
       linkedinUrl: memberLinkedinUrl,
       email: memberEmail,
+      translations,
     };
     let updatedMembers: TeamMember[];
     if (editingMemberId) {
@@ -411,27 +443,111 @@ export default function TeamManagementPage() {
                 </select>
               </div>
               <div>
-                <label className={labelClass}>Photo URL</label>
-                <input
-                  type="url"
-                  className={inputClass}
-                  value={memberImageUrl}
-                  onChange={(e) => setMemberImageUrl(e.target.value)}
-                  placeholder="https://example.com/photo.jpg"
-                />
+                <label className={labelClass}>Photo</label>
+                <p className="text-xs text-gray-500 mb-2">Upload an image or paste a URL below.</p>
+                <div className="flex gap-2 flex-wrap items-start">
+                  <input
+                    type="text"
+                    className={`${inputClass} flex-1 min-w-[200px]`}
+                    value={memberImageUrl}
+                    onChange={(e) => setMemberImageUrl(e.target.value)}
+                    placeholder="/images/photo.jpg or https://..."
+                  />
+                  <label className="inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md text-sm font-medium h-9 px-3 py-2 border border-input bg-background hover:bg-gray-50 cursor-pointer disabled:opacity-50">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      className="sr-only"
+                      disabled={uploadingImage}
+                      onChange={async (e) => {
+                        const f = e.target.files?.[0];
+                        if (!f) return;
+                        setUploadingImage(true);
+                        const url = await uploadAdminImage(f, 'team');
+                        if (url) setMemberImageUrl(url);
+                        setUploadingImage(false);
+                        e.target.value = '';
+                      }}
+                    />
+                    {uploadingImage ? 'Uploading…' : 'Upload image'}
+                  </label>
+                </div>
                 {memberImageUrl && (
-                  <img src={memberImageUrl} alt="Preview" className="mt-2 h-20 w-20 rounded object-cover border" />
+                  <div className="mt-2 rounded border overflow-hidden bg-gray-100 inline-block w-20 h-20">
+                    <img src={memberImageUrl} alt="Preview" className="w-full h-full object-cover" onError={(e) => { e.currentTarget.style.display = 'none'; }} />
+                  </div>
                 )}
               </div>
-              <div>
-                <label className={labelClass}>Bio</label>
-                <textarea
-                  className={`${inputClass} h-32 resize-y`}
-                  value={memberBio}
-                  onChange={(e) => setMemberBio(e.target.value)}
-                  placeholder="Brief biography of the team member..."
-                />
+
+              {/* Language Tabs */}
+              <div className="border-t pt-4 mt-2">
+                <label className={`${labelClass} mb-2 block`}>Content &amp; Translations</label>
+                <div className="flex gap-1 mb-3">
+                  {(['en', 'fa', 'ps'] as const).map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => setTranslationTab(lang)}
+                      className={`px-3 py-1.5 text-sm font-medium rounded-t-md border border-b-0 transition-colors ${
+                        translationTab === lang
+                          ? 'bg-white text-primary border-input'
+                          : 'bg-gray-100 text-gray-500 border-transparent hover:text-gray-700'
+                      }`}
+                    >
+                      {lang === 'en' ? 'English' : lang === 'fa' ? 'فارسی/دری' : 'پښتو'}
+                    </button>
+                  ))}
+                </div>
+
+                {translationTab === 'en' && (
+                  <div className="space-y-3">
+                    <div>
+                      <label className={labelClass}>Bio</label>
+                      <textarea
+                        className={`${inputClass} h-32 resize-y`}
+                        value={memberBio}
+                        onChange={(e) => setMemberBio(e.target.value)}
+                        placeholder="Brief biography of the team member..."
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {translationTab === 'fa' && (
+                  <div className="space-y-3" dir="rtl">
+                    <div>
+                      <label className={labelClass}>نام (Name)</label>
+                      <input type="text" className={inputClass} value={memberNameFa} onChange={(e) => setMemberNameFa(e.target.value)} placeholder="نام به فارسی/دری" />
+                    </div>
+                    <div>
+                      <label className={labelClass}>نقش (Role)</label>
+                      <input type="text" className={inputClass} value={memberRoleFa} onChange={(e) => setMemberRoleFa(e.target.value)} placeholder="مثلاً عضو هیئت مدیره" />
+                    </div>
+                    <div>
+                      <label className={labelClass}>بیوگرافی (Bio)</label>
+                      <textarea className={`${inputClass} h-32 resize-y`} value={memberBioFa} onChange={(e) => setMemberBioFa(e.target.value)} placeholder="بیوگرافی به فارسی/دری..." />
+                    </div>
+                  </div>
+                )}
+
+                {translationTab === 'ps' && (
+                  <div className="space-y-3" dir="rtl">
+                    <div>
+                      <label className={labelClass}>نوم (Name)</label>
+                      <input type="text" className={inputClass} value={memberNamePs} onChange={(e) => setMemberNamePs(e.target.value)} placeholder="نوم په پښتو" />
+                    </div>
+                    <div>
+                      <label className={labelClass}>رول (Role)</label>
+                      <input type="text" className={inputClass} value={memberRolePs} onChange={(e) => setMemberRolePs(e.target.value)} placeholder="د بیلګې په توګه د اداره مجلس غړی" />
+                    </div>
+                    <div>
+                      <label className={labelClass}>بیوګرافي (Bio)</label>
+                      <textarea className={`${inputClass} h-32 resize-y`} value={memberBioPs} onChange={(e) => setMemberBioPs(e.target.value)} placeholder="بیوګرافي په پښتو..." />
+                    </div>
+                  </div>
+                )}
               </div>
+
               <div>
                 <label className={labelClass}>LinkedIn URL</label>
                 <input

@@ -82,24 +82,31 @@ export default function TeamPage() {
       .catch(() => {});
   }, []);
 
-  const displayMembers = adminData && adminData.members?.length > 0 && locale === 'en'
+  const getLocalizedField = (member: any, field: string) => {
+    if (locale !== 'en' && member.translations?.[locale]?.[field]) {
+      return member.translations[locale][field];
+    }
+    return member[field] || '';
+  };
+
+  const displayMembers = adminData && adminData.members?.length > 0
     ? adminData.members.map((m: any) => {
         const links: { label: string; href: string; icon: string }[] = [];
         if (m.linkedinUrl) links.push({ label: 'LinkedIn', href: m.linkedinUrl, icon: 'linkedin' });
         if (m.email) links.push({ label: 'Email', href: `mailto:${m.email}`, icon: 'mail' });
         return {
-          name: m.name,
-          role: m.role || '',
+          name: getLocalizedField(m, 'name'),
+          role: getLocalizedField(m, 'role'),
           image: m.imageUrl || '',
           alt: m.name,
-          bio: m.bio || '',
+          bio: getLocalizedField(m, 'bio'),
           links: links.length > 0 ? links : (m.links || []),
           categoryId: m.categoryId,
         };
       })
     : BOARD_MEMBERS;
 
-  const teamSections = adminData && adminData.categories?.length > 0 && locale === 'en'
+  const teamSections = adminData && adminData.categories?.length > 0
     ? adminData.categories.map((cat: any) => ({
         title: cat.name,
         description: cat.description || '',

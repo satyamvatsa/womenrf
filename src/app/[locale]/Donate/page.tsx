@@ -84,9 +84,15 @@ export default function DonatePage() {
   const [monthlyName, setMonthlyName] = useState('');
   const [monthlyEmail, setMonthlyEmail] = useState('');
   const [monthlyIntentStatus, setMonthlyIntentStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [paypalStatus, setPaypalStatus] = useState<'idle' | 'processing' | 'success' | 'error' | 'cancelled'>('idle');
+  const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null);
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const amountRef = useRef<{ amount: number | null; otherAmount: string }>({ amount: 50, otherAmount: '' });
   amountRef.current = { amount, otherAmount };
+  const paypalStatusRef = useRef(setPaypalStatus);
+  paypalStatusRef.current = setPaypalStatus;
+  const paypalOrderIdRef = useRef(setPaypalOrderId);
+  paypalOrderIdRef.current = setPaypalOrderId;
 
   const [adminDonations, setAdminDonations] = useState<Record<string, any> | null>(null);
   const [adminOptions, setAdminOptions] = useState<Record<string, any> | null>(null);
@@ -105,7 +111,7 @@ export default function DonatePage() {
   // Load PayPal Donate button when client ID is set
   useEffect(() => {
     if (!PAYPAL_CLIENT_ID || !paypalContainerRef.current) return;
-    const src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=CAD&intent=capture`;
+    const src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD&intent=capture`;
     const runRender = () => {
       const w = window as unknown as { paypal?: { Buttons: (opts: unknown) => { render: (el: HTMLElement) => void } } };
       if (!w.paypal?.Buttons || !paypalContainerRef.current) return;
@@ -113,6 +119,7 @@ export default function DonatePage() {
       w.paypal.Buttons({
         style: { label: 'donate', layout: 'vertical' },
         createOrder(_data: unknown, actions: { order: { create: (opts: { purchase_units: unknown[] }) => Promise<string> } }) {
+          paypalStatusRef.current('processing');
           const { amount: amt, otherAmount: other } = amountRef.current;
           const value = other.trim()
             ? Math.max(0, parseFloat(other) || 0)
@@ -120,12 +127,23 @@ export default function DonatePage() {
           const finalValue = value > 0 ? value : 25;
           return actions.order.create({
             purchase_units: [{
-              amount: { currency_code: 'CAD', value: finalValue.toFixed(2) },
+              amount: { currency_code: 'USD', value: finalValue.toFixed(2) },
               description: "One-time donation to Women's Rights First",
             }],
           });
         },
-        onApprove() {},
+        onApprove(_data: unknown, actions: { order: { capture: () => Promise<{ id: string; status: string }> } }) {
+          return actions.order.capture().then((details: { id: string; status: string }) => {
+            paypalOrderIdRef.current(details.id);
+            paypalStatusRef.current('success');
+          });
+        },
+        onCancel() {
+          paypalStatusRef.current('cancelled');
+        },
+        onError() {
+          paypalStatusRef.current('error');
+        },
       }).render(paypalContainerRef.current);
     };
     const existing = document.querySelector('script[src*="paypal.com/sdk/js"]');
@@ -345,10 +363,49 @@ export default function DonatePage() {
                 <div className="pt-4">
                   {PAYPAL_CLIENT_ID ? (
                     <div className="rounded border border-gray-200 bg-gray-50/50 p-6">
-                      <p className="mb-4 text-sm text-gray-600">
-                        Select an amount above, then use the button below to pay securely with PayPal.
-                      </p>
-                      <div ref={paypalContainerRef} className="min-h-[120px]" />
+                      {paypalStatus === 'success' ? (
+                        <div className="rounded-lg bg-green-50 border border-green-200 p-6 text-center">
+                          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-600"><path d="M20 6 9 17l-5-5"/></svg>
+                          </div>
+                          <h4 className="text-lg font-bold text-green-800">Thank you for your donation!</h4>
+                          <p className="mt-1 text-sm text-green-700">
+                            Your payment has been processed successfully.{paypalOrderId && <> Order ID: <span className="font-mono">{paypalOrderId}</span></>}
+                          </p>
+                          <button type="button" onClick={() => { setPaypalStatus('idle'); setPaypalOrderId(null); }} className="mt-4 text-sm font-medium text-green-700 underline hover:text-green-900">Make another donation</button>
+                        </div>
+                      ) : paypalStatus === 'error' ? (
+                        <div className="rounded-lg bg-red-50 border border-red-200 p-6 text-center">
+                          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-600"><circle cx="12" cy="12" r="10"/><line x1="15" x2="9" y1="9" y2="15"/><line x1="9" x2="15" y1="9" y2="15"/></svg>
+                          </div>
+                          <h4 className="text-lg font-bold text-red-800">Payment failed</h4>
+                          <p className="mt-1 text-sm text-red-700">Something went wrong while processing your payment. Please try again.</p>
+                          <button type="button" onClick={() => setPaypalStatus('idle')} className="mt-4 text-sm font-medium text-red-700 underline hover:text-red-900">Try again</button>
+                        </div>
+                      ) : paypalStatus === 'cancelled' ? (
+                        <div className="rounded-lg bg-yellow-50 border border-yellow-200 p-6 text-center">
+                          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-600"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" x2="12" y1="9" y2="13"/><line x1="12" x2="12.01" y1="17" y2="17"/></svg>
+                          </div>
+                          <h4 className="text-lg font-bold text-yellow-800">Payment cancelled</h4>
+                          <p className="mt-1 text-sm text-yellow-700">You cancelled the payment. No charges were made.</p>
+                          <button type="button" onClick={() => setPaypalStatus('idle')} className="mt-4 text-sm font-medium text-yellow-700 underline hover:text-yellow-900">Try again</button>
+                        </div>
+                      ) : (
+                        <>
+                          <p className="mb-4 text-sm text-gray-600">
+                            Select an amount above, then use the button below to pay securely with PayPal.
+                          </p>
+                          {paypalStatus === 'processing' && (
+                            <div className="mb-4 flex items-center justify-center gap-2 text-sm text-gray-500">
+                              <svg className="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                              Processing your payment...
+                            </div>
+                          )}
+                          <div ref={paypalContainerRef} className="min-h-[120px]" />
+                        </>
+                      )}
                     </div>
                   ) : (
                     <div className="rounded border-2 border-dashed border-gray-200 bg-gray-50/50 p-6">
