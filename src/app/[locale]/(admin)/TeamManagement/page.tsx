@@ -514,34 +514,70 @@ export default function TeamManagementPage() {
                 )}
 
                 {translationTab === 'fa' && (
-                  <div className="space-y-3" dir="rtl">
-                    <div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center" dir="rtl">
+                      <p className="text-xs text-gray-500">متن انگلیسی در زیر هر فیلد نمایش داده شده است</p>
+                      <button
+                        type="button"
+                        className="text-xs px-2 py-1 rounded border border-input bg-gray-50 hover:bg-gray-100 text-gray-600"
+                        dir="ltr"
+                        onClick={() => {
+                          if (!memberNameFa) setMemberNameFa(memberName);
+                          if (!memberRoleFa) setMemberRoleFa(memberRole);
+                          if (!memberBioFa) setMemberBioFa(memberBio);
+                        }}
+                      >
+                        Copy empty fields from English
+                      </button>
+                    </div>
+                    <div dir="rtl">
                       <label className={labelClass}>نام (Name)</label>
+                      {memberName && <p className="text-xs text-gray-400 mt-0.5 mb-1" dir="ltr">EN: {memberName}</p>}
                       <input type="text" className={inputClass} value={memberNameFa} onChange={(e) => setMemberNameFa(e.target.value)} placeholder="نام به فارسی/دری" />
                     </div>
-                    <div>
+                    <div dir="rtl">
                       <label className={labelClass}>نقش (Role)</label>
+                      {memberRole && <p className="text-xs text-gray-400 mt-0.5 mb-1" dir="ltr">EN: {memberRole}</p>}
                       <input type="text" className={inputClass} value={memberRoleFa} onChange={(e) => setMemberRoleFa(e.target.value)} placeholder="مثلاً عضو هیئت مدیره" />
                     </div>
-                    <div>
+                    <div dir="rtl">
                       <label className={labelClass}>بیوگرافی (Bio)</label>
+                      {memberBio && <p className="text-xs text-gray-400 mt-0.5 mb-1 line-clamp-2" dir="ltr">EN: {memberBio}</p>}
                       <textarea className={`${inputClass} h-32 resize-y`} value={memberBioFa} onChange={(e) => setMemberBioFa(e.target.value)} placeholder="بیوگرافی به فارسی/دری..." />
                     </div>
                   </div>
                 )}
 
                 {translationTab === 'ps' && (
-                  <div className="space-y-3" dir="rtl">
-                    <div>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center" dir="rtl">
+                      <p className="text-xs text-gray-500">د انګلیسي متن د هر ساحې لاندې ښودل شوی</p>
+                      <button
+                        type="button"
+                        className="text-xs px-2 py-1 rounded border border-input bg-gray-50 hover:bg-gray-100 text-gray-600"
+                        dir="ltr"
+                        onClick={() => {
+                          if (!memberNamePs) setMemberNamePs(memberName);
+                          if (!memberRolePs) setMemberRolePs(memberRole);
+                          if (!memberBioPs) setMemberBioPs(memberBio);
+                        }}
+                      >
+                        Copy empty fields from English
+                      </button>
+                    </div>
+                    <div dir="rtl">
                       <label className={labelClass}>نوم (Name)</label>
+                      {memberName && <p className="text-xs text-gray-400 mt-0.5 mb-1" dir="ltr">EN: {memberName}</p>}
                       <input type="text" className={inputClass} value={memberNamePs} onChange={(e) => setMemberNamePs(e.target.value)} placeholder="نوم په پښتو" />
                     </div>
-                    <div>
+                    <div dir="rtl">
                       <label className={labelClass}>رول (Role)</label>
+                      {memberRole && <p className="text-xs text-gray-400 mt-0.5 mb-1" dir="ltr">EN: {memberRole}</p>}
                       <input type="text" className={inputClass} value={memberRolePs} onChange={(e) => setMemberRolePs(e.target.value)} placeholder="د بیلګې په توګه د اداره مجلس غړی" />
                     </div>
-                    <div>
+                    <div dir="rtl">
                       <label className={labelClass}>بیوګرافي (Bio)</label>
+                      {memberBio && <p className="text-xs text-gray-400 mt-0.5 mb-1 line-clamp-2" dir="ltr">EN: {memberBio}</p>}
                       <textarea className={`${inputClass} h-32 resize-y`} value={memberBioPs} onChange={(e) => setMemberBioPs(e.target.value)} placeholder="بیوګرافي په پښتو..." />
                     </div>
                   </div>

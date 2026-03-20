@@ -22,14 +22,18 @@ export default function Hero() {
   const { t } = useTranslation();
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const [dataLoaded, setDataLoaded] = useState(false);
   useEffect(() => {
     fetch('/api/data/homepage', { cache: 'no-store' })
       .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
+      .then(d => {
+        if (d && Object.keys(d).length > 0) setAdminData(d);
+        setDataLoaded(true);
+      })
+      .catch(() => setDataLoaded(true));
   }, []);
 
-  const heroImageUrl = adminData?.heroImageUrl || DEFAULT_HERO_BG;
+  const heroImageUrl = dataLoaded ? (adminData?.heroImageUrl || DEFAULT_HERO_BG) : '';
 
   const HERO_BG_MAP: Record<string, string> = {
     'bg-primary': 'bg-wrf-black',
@@ -45,10 +49,15 @@ export default function Hero() {
 
   return (
     <>
-      <link rel="preload" as="image" href={heroImageUrl} />
+      {heroImageUrl && <link rel="preload" as="image" href={heroImageUrl} />}
     <section
-      className="relative overflow-hidden py-20 md:py-32"
-      style={{ backgroundImage: `url(${heroImageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundColor: '#3d3060' }}
+      className="relative overflow-hidden py-20 md:py-32 transition-[background-image] duration-700 ease-in"
+      style={{
+        backgroundImage: heroImageUrl ? `url(${heroImageUrl})` : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: '#3d3060',
+      }}
     >
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
