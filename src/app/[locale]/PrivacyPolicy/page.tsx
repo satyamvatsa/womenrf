@@ -88,7 +88,7 @@ export default function PrivacyPolicyPage() {
     support: 'bg-wrf-footer-mauve',
   };
 
-  const displayArticles = adminData && adminData.articles?.length > 0
+  const displayArticles = adminData && adminData.articles?.length > 0 && locale === 'en'
     ? adminData.articles.map((a: any) => ({
         title: a.title,
         bgClass: a.bgClass || POLICY_BG_MAP[a.backgroundColor] || 'bg-wrf-black',

@@ -27,11 +27,11 @@ function resolveColor(colorName: string | undefined, fallback: string): string {
   return COLOR_MAP[colorName] || colorName;
 }
 
-const DEFAULT_CORE_VALUES = [
-  { id: '1', title: 'Equality & Justice', description: '', color: 'wrf-black' },
-  { id: '2', title: 'Empowerment & Leadership', description: '', color: 'wrf-purple' },
-  { id: '3', title: 'Community & Solidarity', description: '', color: 'wrf-coral' },
-  { id: '4', title: 'Innovation & Sustainability', description: '', color: 'wrf-footer-mauve' },
+const CORE_VALUE_KEYS = [
+  { id: '1', titleKey: 'about.values.equality', descKey: 'about.values.equality.desc', color: 'wrf-black' },
+  { id: '2', titleKey: 'about.values.empowerment', descKey: 'about.values.empowerment.desc', color: 'wrf-purple' },
+  { id: '3', titleKey: 'about.values.community', descKey: 'about.values.community.desc', color: 'wrf-coral' },
+  { id: '4', titleKey: 'about.values.innovation', descKey: 'about.values.innovation.desc', color: 'wrf-footer-mauve' },
 ];
 
 const DEFAULT_TEAM = [
@@ -47,12 +47,12 @@ const DEFAULT_IMPACT_STATS = [
   { id: '4', value: '$2.1M', label: 'Funds Raised', color: 'wrf-footer-mauve', textColor: 'wrf-coral' },
 ];
 
-const DEFAULT_GET_INVOLVED = [
-  { id: '1', label: 'Volunteer', href: '/Volunteer', color: 'wrf-black' },
-  { id: '2', label: 'Careers', href: '/Vacancies', color: 'wrf-purple' },
-  { id: '3', label: 'Partner With Us', href: '/Partnership', color: 'wrf-coral' },
-  { id: '4', label: 'News & Updates', href: '/News', color: 'wrf-footer-mauve' },
-  { id: '5', label: 'Contact Us', href: '/Contact', color: 'wrf-black' },
+const GET_INVOLVED_KEYS = [
+  { id: '1', labelKey: 'about.getInvolved.volunteer', href: '/Volunteer', color: 'wrf-black' },
+  { id: '2', labelKey: 'about.getInvolved.careers', href: '/Vacancies', color: 'wrf-purple' },
+  { id: '3', labelKey: 'about.getInvolved.partner', href: '/Partnership', color: 'wrf-coral' },
+  { id: '4', labelKey: 'about.getInvolved.news', href: '/News', color: 'wrf-footer-mauve' },
+  { id: '5', labelKey: 'about.getInvolved.contact', href: '/Contact', color: 'wrf-black' },
 ];
 
 export default function AboutPage() {
@@ -71,28 +71,29 @@ export default function AboutPage() {
       .catch(() => {});
   }, []);
 
-  const timelineData = (Array.isArray(adminData?.timeline) && adminData.timeline.length > 0)
+  const translatedTimeline = [
+    { id: '1', year: '2019', title: t('about.journey.2019.title'), description: t('about.journey.2019.description') },
+    { id: '2', year: '2020', title: t('about.journey.2020.title'), description: t('about.journey.2020.description') },
+    { id: '3', year: '2021', title: t('about.journey.2021.title'), description: t('about.journey.2021.description') },
+    { id: '4', year: '2022', title: t('about.journey.2022.title'), description: t('about.journey.2022.description') },
+    { id: '5', year: '2023', title: t('about.journey.2023.title'), description: t('about.journey.2023.description') },
+    { id: '6', year: '2024', title: t('about.journey.2024.title'), description: t('about.journey.2024.description') },
+  ];
+  const timelineData = (Array.isArray(adminData?.timeline) && adminData.timeline.length > 0 && locale === 'en')
     ? adminData.timeline
-    : [
-        { id: '1', year: '2019', title: t('about.journey.2019.title'), description: t('about.journey.2019.description') },
-        { id: '2', year: '2020', title: t('about.journey.2020.title'), description: t('about.journey.2020.description') },
-        { id: '3', year: '2021', title: t('about.journey.2021.title'), description: t('about.journey.2021.description') },
-        { id: '4', year: '2022', title: t('about.journey.2022.title'), description: t('about.journey.2022.description') },
-        { id: '5', year: '2023', title: t('about.journey.2023.title'), description: t('about.journey.2023.description') },
-        { id: '6', year: '2024', title: t('about.journey.2024.title'), description: t('about.journey.2024.description') },
-      ];
+    : translatedTimeline;
 
-  const impactData = (Array.isArray(adminData?.impactStats) && adminData.impactStats.length > 0)
+  const impactData = (Array.isArray(adminData?.impactStats) && adminData.impactStats.length > 0 && locale === 'en')
     ? adminData.impactStats
     : DEFAULT_IMPACT_STATS;
 
-  const teamData = (Array.isArray(adminData?.teamMembers) && adminData.teamMembers.length > 0)
+  const teamData = (Array.isArray(adminData?.teamMembers) && adminData.teamMembers.length > 0 && locale === 'en')
     ? adminData.teamMembers
     : DEFAULT_TEAM;
 
-  const linksData = (Array.isArray(adminData?.getInvolvedLinks) && adminData.getInvolvedLinks.length > 0)
+  const linksData = (Array.isArray(adminData?.getInvolvedLinks) && adminData.getInvolvedLinks.length > 0 && locale === 'en')
     ? adminData.getInvolvedLinks
-    : DEFAULT_GET_INVOLVED;
+    : GET_INVOLVED_KEYS.map(l => ({ id: l.id, label: t(l.labelKey), href: l.href, color: l.color }));
 
   return (
     <div className="bg-white">
@@ -130,11 +131,11 @@ export default function AboutPage() {
                 style={{ backgroundColor: resolveColor(adminData?.visionTitleBgColor, '#6B5B95') }}
               >
                 <h2 className="text-3xl font-bold text-white">
-                  {(locale === 'en' && adminData?.visionTitle) || 'Our Vision'}
+                  {(locale === 'en' && adminData?.visionTitle) || t('about.vision.title')}
                 </h2>
               </div>
               <p className="mb-8 mt-6 max-w-3xl text-lg leading-relaxed text-gray-700">
-                {(locale === 'en' && adminData?.visionContent) || 'A just and peaceful Afghanistan where women can exercise agency with pride, dignity and freedom.'}
+                {(locale === 'en' && adminData?.visionContent) || t('about.vision.content')}
               </p>
             </ScrollReveal>
             <ScrollReveal variant="slideRight">
@@ -216,9 +217,9 @@ export default function AboutPage() {
             </p>
           </ScrollReveal>
           <div className="grid gap-1 md:grid-cols-2">
-            {(Array.isArray(adminData?.coreValues) && adminData.coreValues.length > 0
+            {(Array.isArray(adminData?.coreValues) && adminData.coreValues.length > 0 && locale === 'en'
               ? adminData.coreValues
-              : DEFAULT_CORE_VALUES
+              : CORE_VALUE_KEYS.map(v => ({ id: v.id, title: t(v.titleKey), description: t(v.descKey), color: v.color }))
             ).map((val: { id: string; title: string; description: string; color: string }) => (
               <ScrollReveal key={val.id} variant="slideUpSm">
                 <div
@@ -275,16 +276,16 @@ export default function AboutPage() {
               style={{ backgroundColor: resolveColor(adminData?.operationsTitleBgColor, '#E07A7A') }}
             >
               <h2 className="text-3xl font-bold text-white">
-                {(locale === 'en' && adminData?.operationsTitle) || 'Areas of Operations'}
+                {(locale === 'en' && adminData?.operationsTitle) || t('about.operations.title')}
               </h2>
             </div>
           </ScrollReveal>
           <div className="grid gap-1 md:grid-cols-2">
             {[
-              { key: 'ops1', title: (locale === 'en' && adminData?.opsArea1Title) || 'Peace Building and Social Cohesion', desc: (locale === 'en' && adminData?.opsArea1Desc) || '', bg: 'bg-wrf-black' },
-              { key: 'ops2', title: (locale === 'en' && adminData?.opsArea2Title) || 'Legal Empowerment and International Accountability', desc: (locale === 'en' && adminData?.opsArea2Desc) || '', bg: 'bg-wrf-purple' },
-              { key: 'ops3', title: (locale === 'en' && adminData?.opsArea3Title) || 'Digital Transformation and Open Gender Data', desc: (locale === 'en' && adminData?.opsArea3Desc) || '', bg: 'bg-wrf-coral' },
-              { key: 'ops4', title: (locale === 'en' && adminData?.opsArea4Title) || 'Representation and Advocacy', desc: (locale === 'en' && adminData?.opsArea4Desc) || '', bg: 'bg-wrf-footer-mauve' },
+              { key: 'ops1', title: (locale === 'en' && adminData?.opsArea1Title) || t('about.operations.peace'), desc: (locale === 'en' && adminData?.opsArea1Desc) || '', bg: 'bg-wrf-black' },
+              { key: 'ops2', title: (locale === 'en' && adminData?.opsArea2Title) || t('about.operations.legal'), desc: (locale === 'en' && adminData?.opsArea2Desc) || '', bg: 'bg-wrf-purple' },
+              { key: 'ops3', title: (locale === 'en' && adminData?.opsArea3Title) || t('about.operations.digital'), desc: (locale === 'en' && adminData?.opsArea3Desc) || '', bg: 'bg-wrf-coral' },
+              { key: 'ops4', title: (locale === 'en' && adminData?.opsArea4Title) || t('about.operations.advocacy'), desc: (locale === 'en' && adminData?.opsArea4Desc) || '', bg: 'bg-wrf-footer-mauve' },
             ].map((item) => (
               <ScrollReveal key={item.key} variant="slideUpSm">
                 <div className={`overflow-hidden shadow-inner ${item.bg}`}>
@@ -403,7 +404,7 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold text-white">{t('about.people.title')}</h2>
               </div>
               <p className="text-lg leading-relaxed text-gray-700">
-                {adminData?.teamDescription || t('about.people.description')}
+                {(locale === 'en' && adminData?.teamDescription) || t('about.people.description')}
               </p>
               <p className="mt-4 text-lg leading-relaxed text-gray-700">
                 {t('about.people.together')}

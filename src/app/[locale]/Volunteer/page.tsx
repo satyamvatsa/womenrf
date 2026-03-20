@@ -63,7 +63,7 @@ function CheckIcon({ className }: { className?: string }) {
 }
 
 export default function VolunteerPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
   const [testimonialData, setTestimonialData] = useState<Record<string, any> | null>(null);
@@ -293,7 +293,7 @@ export default function VolunteerPage() {
             </p>
           </div>
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {(adminData?.roles && Array.isArray(adminData.roles) && adminData.roles.length > 0
+            {(adminData?.roles && Array.isArray(adminData.roles) && adminData.roles.length > 0 && locale === 'en'
               ? adminData.roles.map((r: any) => ({
                   title: r.title,
                   description: r.description,

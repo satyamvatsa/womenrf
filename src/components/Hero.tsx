@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
 
-const DEFAULT_HERO_BG = '/images/GettyImages-1232002648.jpg';
+const DEFAULT_HERO_BG = '/images/hero_background.jpeg';
 
 function getLocalePrefix(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
@@ -22,18 +22,23 @@ export default function Hero() {
   const { t } = useTranslation();
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const [heroImageUrl, setHeroImageUrl] = useState(DEFAULT_HERO_BG);
   useEffect(() => {
     fetch('/api/data/homepage', { cache: 'no-store' })
       .then(r => r.json())
       .then(d => {
-        if (d && Object.keys(d).length > 0) setAdminData(d);
-        setDataLoaded(true);
+        if (d && Object.keys(d).length > 0) {
+          setAdminData(d);
+          const adminImage = d.heroImageUrl;
+          if (adminImage && adminImage !== DEFAULT_HERO_BG) {
+            const img = new Image();
+            img.onload = () => setHeroImageUrl(adminImage);
+            img.src = adminImage;
+          }
+        }
       })
-      .catch(() => setDataLoaded(true));
+      .catch(() => {});
   }, []);
-
-  const heroImageUrl = dataLoaded ? (adminData?.heroImageUrl || DEFAULT_HERO_BG) : '';
 
   const HERO_BG_MAP: Record<string, string> = {
     'bg-primary': 'bg-wrf-black',
@@ -49,11 +54,11 @@ export default function Hero() {
 
   return (
     <>
-      {heroImageUrl && <link rel="preload" as="image" href={heroImageUrl} />}
+      <link rel="preload" as="image" href={heroImageUrl} />
     <section
-      className="relative overflow-hidden py-20 md:py-32 transition-[background-image] duration-700 ease-in"
+      className="relative overflow-hidden py-20 md:py-32"
       style={{
-        backgroundImage: heroImageUrl ? `url(${heroImageUrl})` : 'none',
+        backgroundImage: `url(${heroImageUrl})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundColor: '#3d3060',
