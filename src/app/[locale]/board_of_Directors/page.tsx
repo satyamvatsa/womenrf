@@ -91,14 +91,48 @@ export default function FoundersPage() {
   ];
 
   const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const [teamData, setTeamData] = useState<Record<string, any> | null>(null);
+  
   useEffect(() => {
     fetch('/api/data/founders', { cache: 'no-store' })
       .then(r => r.json())
       .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
       .catch(() => {});
+    
+    fetch('/api/data/team', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(d => { if (d && Object.keys(d).length > 0) setTeamData(d); })
+      .catch(() => {});
   }, []);
 
-  const displayFounders = adminData && adminData.founders?.length > 0 && locale === 'en'
+  const getLocalizedField = (member: any, field: string) => {
+    if (locale !== 'en' && member.translations?.[locale]?.[field]) {
+      return member.translations[locale][field];
+    }
+    return member[field] || '';
+  };
+
+  const cfoMembers = teamData?.members?.filter((m: any) => {
+    const role = (m.role || '').toLowerCase();
+    return role === 'chief financial officer';
+  }).map((m: any) => {
+    const links: { label: string; href: string; icon: string }[] = [];
+    if (m.linkedinUrl) links.push({ label: 'LinkedIn', href: m.linkedinUrl, icon: 'linkedin' });
+    if (m.email) links.push({ label: 'Email', href: `mailto:${m.email}`, icon: 'mail' });
+    return {
+      name: getLocalizedField(m, 'name'),
+      role: getLocalizedField(m, 'role'),
+      image: m.imageUrl || '',
+      alt: m.name || '',
+      bio: getLocalizedField(m, 'bio'),
+      expertise: [],
+      links: links.length > 0 ? links : [],
+      bgClass: 'bg-wrf-purple',
+      imageRight: false,
+    };
+  }) || [];
+
+  const foundersFromAdmin = adminData && adminData.founders?.length > 0 && locale === 'en'
     ? adminData.founders.map((f: any, i: number) => ({
         name: f.name,
         role: f.title || '',
@@ -111,6 +145,8 @@ export default function FoundersPage() {
         imageRight: i % 2 !== 0,
       }))
     : FOUNDERS;
+
+  const displayFounders = [...foundersFromAdmin, ...cfoMembers];
 
   return (
     <div className="bg-white">

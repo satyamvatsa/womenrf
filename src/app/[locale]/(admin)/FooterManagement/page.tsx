@@ -105,8 +105,8 @@ const defaultLinkColumns: LinkColumn[] = [
     backgroundColor: 'secondary',
     textColor: 'white',
     links: [
-      { text: 'Our team', url: 'Founders' },
-      { text: 'Board of Directors', url: 'Team' },
+      { text: 'Our team', url: 'our_team' },
+      { text: 'Board of Directors', url: 'board_of_Directors' },
       { text: 'About WRF', url: 'About' },
       { text: 'Questions & Answers', url: 'FAQ' },
       { text: 'News & Events', url: 'News' },

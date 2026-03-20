@@ -33,8 +33,8 @@ export default function Footer() {
       title: t('footer.sections.wrfInfo'),
       className: 'bg-wrf-purple',
       links: [
-        { label: t('footer.sections.wrfInfo.founders'), href: '/Founders' },
-        { label: t('footer.sections.wrfInfo.team'), href: '/Team' },
+        { label: t('footer.sections.wrfInfo.ourTeam'), href: '/our_team' },
+        { label: t('footer.sections.wrfInfo.boardOfDirectors'), href: '/board_of_Directors' },
         { label: t('footer.sections.wrfInfo.about'), href: '/About' },
         { label: t('footer.sections.wrfInfo.faq'), href: '/FAQ' },
         { label: t('footer.sections.wrfInfo.news'), href: '/News' },
@@ -69,13 +69,25 @@ export default function Footer() {
     support: 'bg-wrf-footer-mauve',
   };
 
+  const URL_FIXES: Record<string, string> = {
+    '/Founders': '/our_team',
+    '/Team': '/board_of_Directors',
+  };
+
+  const LABEL_FIXES: Record<string, string> = {
+    'Our team': 'Our Team',
+  };
+
+  const fixUrl = (url: string): string => URL_FIXES[url] || url;
+  const fixLabel = (label: string): string => LABEL_FIXES[label] || label;
+
   const linkColumns = adminData?.linkColumns && currentLocale === 'en'
     ? adminData.linkColumns.map((col: any, idx: number) => ({
         title: col.title,
         className: col.className || BG_MAP[col.backgroundColor] || ['bg-wrf-purple', 'bg-wrf-coral', 'bg-wrf-footer-mauve'][idx] || 'bg-wrf-purple',
         links: (col.links || []).map((l: any) => ({
-          label: l.label || l.text || '',
-          href: l.href || (l.url ? `/${l.url}` : '/'),
+          label: fixLabel(l.label || l.text || ''),
+          href: fixUrl(l.href || (l.url ? `/${l.url}` : '/')),
         })),
       }))
     : defaultLinkColumns;

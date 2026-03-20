@@ -51,17 +51,6 @@ export default function TeamPage() {
       ],
     },
     {
-      name: t('team.alex.name'),
-      role: t('team.alex.role'),
-      image: '/images/Alex_Neve.jpeg',
-      alt: 'Alex Neve',
-      bio: t('team.alex.bio'),
-      links: [
-        { label: 'LinkedIn', href: 'https://www.linkedin.com/in/alexneve', icon: 'linkedin' },
-        { label: 'Email', href: 'mailto:', icon: 'mail' },
-      ],
-    },
-    {
       name: t('team.saba.name'),
       role: t('team.saba.role'),
       image: '/images/Saba_Ghori.jpeg',
@@ -90,20 +79,25 @@ export default function TeamPage() {
   };
 
   const displayMembers = adminData && adminData.members?.length > 0
-    ? adminData.members.map((m: any) => {
-        const links: { label: string; href: string; icon: string }[] = [];
-        if (m.linkedinUrl) links.push({ label: 'LinkedIn', href: m.linkedinUrl, icon: 'linkedin' });
-        if (m.email) links.push({ label: 'Email', href: `mailto:${m.email}`, icon: 'mail' });
-        return {
-          name: getLocalizedField(m, 'name'),
-          role: getLocalizedField(m, 'role'),
-          image: m.imageUrl || '',
-          alt: m.name,
-          bio: getLocalizedField(m, 'bio'),
-          links: links.length > 0 ? links : (m.links || []),
-          categoryId: m.categoryId,
-        };
-      })
+    ? adminData.members
+        .filter((m: any) => {
+          const role = (m.role || '').toLowerCase();
+          return role !== 'chief financial officer';
+        })
+        .map((m: any) => {
+          const links: { label: string; href: string; icon: string }[] = [];
+          if (m.linkedinUrl) links.push({ label: 'LinkedIn', href: m.linkedinUrl, icon: 'linkedin' });
+          if (m.email) links.push({ label: 'Email', href: `mailto:${m.email}`, icon: 'mail' });
+          return {
+            name: getLocalizedField(m, 'name'),
+            role: getLocalizedField(m, 'role'),
+            image: m.imageUrl || '',
+            alt: m.name,
+            bio: getLocalizedField(m, 'bio'),
+            links: links.length > 0 ? links : (m.links || []),
+            categoryId: m.categoryId,
+          };
+        })
     : BOARD_MEMBERS;
 
   const teamSections = adminData && adminData.categories?.length > 0

@@ -71,12 +71,19 @@ export default function Header() {
     white: 'text-white',
   };
 
+  const URL_FIXES: Record<string, string> = {
+    '/Founders': '/our_team',
+    '/Team': '/board_of_Directors',
+  };
+
+  const fixUrl = (url: string): string => URL_FIXES[url] || url;
+
   const MENU_SECTIONS: { title: string; titleClass: string; links: { href: string; label: string }[] }[] = adminData?.megaColumns && currentLocale === 'en'
     ? adminData.megaColumns.map((col: any) => ({
         title: col.title,
         titleClass: col.titleClass || COLOR_MAP[col.color] || 'text-white',
         links: (col.links || []).map((l: any) => ({
-          href: l.href || (l.path ? `/${l.path}` : '/'),
+          href: fixUrl(l.href || (l.path ? `/${l.path}` : '/')),
           label: l.label || l.name || '',
         })),
       }))
@@ -85,8 +92,8 @@ export default function Header() {
       title: t('header.menuSection.wrf.title'),
       titleClass: 'text-wrf-purple',
       links: [
-        { href: '/Founders', label: t('header.menuSection.wrf.founders') },
-        { href: '/Team', label: t('header.menuSection.wrf.team') },
+        { href: '/our_team', label: t('header.menuSection.wrf.ourTeam') },
+        { href: '/board_of_Directors', label: t('header.menuSection.wrf.boardOfDirectors') },
         { href: '/About', label: t('header.menuSection.wrf.about') },
       ],
     },
