@@ -12,10 +12,10 @@ export default function AboutSectionNav() {
   const manualClick = useRef(false);
 
   const NAV_LINKS = [
-    { href: '#vision', label: 'OUR VISION', icon: 'eye' },
+    { href: '#vision', label: t('about.nav.vision'), icon: 'eye' },
     { href: '#mission', label: t('about.nav.mission'), icon: 'hand-heart' },
     { href: '#values', label: t('about.nav.values'), icon: 'book-open' },
-    { href: '#operations', label: 'AREAS OF OPERATIONS', icon: 'globe' },
+    { href: '#operations', label: t('about.nav.operations'), icon: 'globe' },
     { href: '#history', label: t('about.nav.journey'), icon: 'milestone' },
     { href: '#impact', label: t('about.nav.impact'), icon: 'chart-column' },
     { href: '#team', label: t('about.nav.people'), icon: 'users' },

@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const PARTNERS = [
   { name: 'Google', url: 'https://google.com', logo: '/images/partners/google.svg' },
@@ -17,14 +17,8 @@ const PARTNERS = [
 ];
 
 export default function Partners() {
-  const { t, locale } = useTranslation();
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  useEffect(() => {
-    fetch('/api/data/homepage', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-  }, []);
+  const { t } = useTranslation();
+  const adminData = useCmsData<Record<string, any>>('homepage');
 
   const partners = adminData?.partnersList?.length
     ? adminData.partnersList.map((p: any) => ({
@@ -34,10 +28,9 @@ export default function Partners() {
       }))
     : PARTNERS;
 
-  // Read admin settings with fallbacks
   const showPartners = adminData?.showPartners !== undefined ? adminData.showPartners : true;
-  const partnersTitle = (locale === 'en' && adminData?.partnersTitle) || t('partners.title');
-  const partnersSubtitle = (locale === 'en' && adminData?.partnersSubtitle) || t('partners.description');
+  const partnersTitle = adminData?.partnersTitle || t('partners.title');
+  const partnersSubtitle = adminData?.partnersSubtitle || t('partners.description');
   const partnersTitleBg = adminData?.partnersTitleBg || 'bg-primary';
 
   const TITLE_BG_MAP: Record<string, string> = {

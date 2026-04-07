@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const HERO_BG = '/images/hr-manager-teamwork-hr-department-hr-process-vector.jpg';
 
@@ -14,13 +15,7 @@ export default function VacanciesPage() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [form, setForm] = useState({ fullName: '', email: '', phone: '', coverLetter: '', resumeUrl: '' });
 
-  const [adminData, setAdminData] = useState<Record<string, any> | any[] | null>(null);
-  useEffect(() => {
-    fetch('/api/data/vacancies', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d != null) setAdminData(d); })
-      .catch(() => {});
-  }, []);
+  const adminData = useCmsData<Record<string, any> | any[]>('vacancies');
 
   const vacanciesList = Array.isArray(adminData)
     ? adminData

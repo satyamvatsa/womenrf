@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 function CategoryIcon({ name }: { name: string }) {
   const paths: Record<string, React.ReactNode> = {
@@ -52,13 +53,7 @@ function NewsPageInner() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState(qFromUrl);
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  useEffect(() => {
-    fetch('/api/data/blog-posts', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-  }, []);
+  const adminData = useCmsData<Record<string, any>>('blog-posts');
   useEffect(() => {
     setSearchQuery((prev) => (qFromUrl !== prev ? qFromUrl : prev));
   }, [qFromUrl]);

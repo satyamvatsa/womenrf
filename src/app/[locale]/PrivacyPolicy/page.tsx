@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 function ChevronDown({ className }: { className?: string }) {
   return (
@@ -73,13 +74,7 @@ export default function PrivacyPolicyPage() {
     },
   ];
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  useEffect(() => {
-    fetch('/api/data/privacy-policy', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-  }, []);
+  const adminData = useCmsData<Record<string, any>>('privacy-policy');
 
   const POLICY_BG_MAP: Record<string, string> = {
     primary: 'bg-wrf-black',
@@ -88,7 +83,7 @@ export default function PrivacyPolicyPage() {
     support: 'bg-wrf-footer-mauve',
   };
 
-  const displayArticles = adminData && adminData.articles?.length > 0 && locale === 'en'
+  const displayArticles = adminData && adminData.articles?.length > 0
     ? adminData.articles.map((a: any) => ({
         title: a.title,
         bgClass: a.bgClass || POLICY_BG_MAP[a.backgroundColor] || 'bg-wrf-black',
@@ -96,7 +91,7 @@ export default function PrivacyPolicyPage() {
       }))
     : articles;
 
-  const pageTitle = (locale === 'en' && adminData?.pageTitle) || t('privacy.hero.title');
+  const pageTitle = adminData?.pageTitle || t('privacy.hero.title');
   const introduction = adminData?.introduction;
   const introductionIsHtml = typeof introduction === 'string' && (introduction.trim().startsWith('<'));
   const lastUpdatedRaw = adminData?.lastUpdated;

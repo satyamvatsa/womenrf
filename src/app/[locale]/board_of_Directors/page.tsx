@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 function SocialIcon({ href, icon, label }: { href: string; icon: string; label: string }) {
   const paths: Record<string, React.ReactNode> = {
@@ -36,7 +37,7 @@ function SocialIcon({ href, icon, label }: { href: string; icon: string; label: 
 }
 
 export default function TeamPage() {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
 
   const BOARD_MEMBERS = [
     {
@@ -74,24 +75,16 @@ export default function TeamPage() {
     },
   ];
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  useEffect(() => {
-    fetch('/api/data/team', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-  }, []);
+  const adminData = useCmsData<Record<string, any>>('team');
 
-  const getLocalizedField = (member: any, field: string) => {
-    if (locale !== 'en' && member.translations?.[locale]?.[field]) {
-      return member.translations[locale][field];
-    }
-    return member[field] || '';
-  };
+  const getField = (member: any, field: string) => member[field] || '';
 
-  const boardCategories = adminData?.categories
-    ?.filter((c: any) => c.name === 'Board of Directors')
-    .map((c: any) => c.id) || ['cat-1'];
+  const boardCategories = (() => {
+    const cats = adminData?.categories
+      ?.filter((c: any) => c.id === 'cat-1' || /board/i.test(c.name))
+      .map((c: any) => c.id);
+    return cats && cats.length > 0 ? cats : ['cat-1'];
+  })();
 
   const displayMembers = adminData && adminData.members?.length > 0
     ? adminData.members
@@ -101,11 +94,11 @@ export default function TeamPage() {
           if (m.linkedinUrl) links.push({ label: 'LinkedIn', href: m.linkedinUrl, icon: 'linkedin' });
           if (m.email) links.push({ label: 'Email', href: `mailto:${m.email}`, icon: 'mail' });
           return {
-            name: getLocalizedField(m, 'name'),
-            role: getLocalizedField(m, 'role'),
+            name: getField(m, 'name'),
+            role: getField(m, 'role'),
             image: m.imageUrl || '',
             alt: m.name,
-            bio: getLocalizedField(m, 'bio'),
+            bio: getField(m, 'bio'),
             links: links.length > 0 ? links : (m.links || []),
             categoryId: m.categoryId,
           };

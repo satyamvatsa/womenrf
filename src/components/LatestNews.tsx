@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 function getLocalePrefix(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
@@ -16,26 +16,14 @@ function getLocalePrefix(pathname: string): string {
 export default function LatestNews() {
   const pathname = usePathname();
   const localePrefix = getLocalePrefix(pathname);
-  const currentLocale = localePrefix.replace('/', '');
   const { t } = useTranslation();
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  const [newsData, setNewsData] = useState<Record<string, any> | null>(null);
-
-  useEffect(() => {
-    fetch('/api/data/homepage', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-    fetch('/api/data/news', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setNewsData(d); })
-      .catch(() => {});
-  }, []);
+  const adminData = useCmsData<Record<string, any>>('homepage');
+  const newsData = useCmsData<Record<string, any>>('news');
 
   const showNews = adminData?.showNews !== undefined ? adminData.showNews : true;
-  const title = (currentLocale === 'en' && adminData?.newsTitle) || t('latestNews.title');
-  const subtitle = (currentLocale === 'en' && adminData?.newsSubtitle) || t('latestNews.subtitle');
+  const title = adminData?.newsTitle || t('latestNews.title');
+  const subtitle = adminData?.newsSubtitle || t('latestNews.subtitle');
   const titleBg = adminData?.newsTitleBg || 'bg-primary';
   const buttonColor = adminData?.newsButtonColor || 'bg-primary';
 

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const HERO_BG =
   '/images/7.jpeg';
@@ -65,20 +66,9 @@ function CheckIcon({ className }: { className?: string }) {
 export default function VolunteerPage() {
   const { t, locale } = useTranslation();
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  const [testimonialData, setTestimonialData] = useState<Record<string, any> | null>(null);
+  const adminData = useCmsData<Record<string, any>>('volunteers');
+  const testimonialData = useCmsData<Record<string, any>>('testimonials');
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-
-  useEffect(() => {
-    fetch('/api/data/volunteers', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-    fetch('/api/data/testimonials', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setTestimonialData(d); })
-      .catch(() => {});
-  }, []);
 
   const SCROLL_LINKS = [
     { label: t('volunteer.nav.why'), id: 'why-volunteer' },

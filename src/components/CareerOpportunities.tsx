@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 function getLocalePrefix(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
@@ -16,26 +16,14 @@ function getLocalePrefix(pathname: string): string {
 export default function CareerOpportunities() {
   const pathname = usePathname();
   const localePrefix = getLocalePrefix(pathname);
-  const currentLocale = localePrefix.replace('/', '');
   const { t } = useTranslation();
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  const [vacancyData, setVacancyData] = useState<Record<string, any> | any[] | null>(null);
-
-  useEffect(() => {
-    fetch('/api/data/homepage', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-    fetch('/api/data/vacancies', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d != null) setVacancyData(d); })
-      .catch(() => {});
-  }, []);
+  const adminData = useCmsData<Record<string, any>>('homepage');
+  const vacancyData = useCmsData<Record<string, any> | any[]>('vacancies');
 
   const showVacancies = adminData?.showVacancies !== undefined ? adminData.showVacancies : true;
-  const title = (currentLocale === 'en' && adminData?.vacanciesTitle) || t('careers.title');
-  const subtitle = (currentLocale === 'en' && adminData?.vacanciesSubtitle) || t('careers.subtitle');
+  const title = adminData?.vacanciesTitle || t('careers.title');
+  const subtitle = adminData?.vacanciesSubtitle || t('careers.subtitle');
   const titleBg = adminData?.vacanciesTitleBg || 'bg-accent';
   const buttonColor = adminData?.vacanciesButtonColor || 'bg-primary';
 

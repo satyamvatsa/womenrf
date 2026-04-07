@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const LOCALES = [
   { code: 'en', label: 'ENG' },
@@ -58,7 +59,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [openAccordion, setOpenAccordion] = useState<number | null>(null);
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const adminData = useCmsData<Record<string, any>>('header');
   const [searchQuery, setSearchQuery] = useState('');
   const langDropdownDesktopRef = useRef<HTMLDivElement>(null);
   const langDropdownMobileRef = useRef<HTMLDivElement>(null);
@@ -78,7 +79,7 @@ export default function Header() {
 
   const fixUrl = (url: string): string => URL_FIXES[url] || url;
 
-  const MENU_SECTIONS: { title: string; titleClass: string; links: { href: string; label: string }[] }[] = adminData?.megaColumns && currentLocale === 'en'
+  const MENU_SECTIONS: { title: string; titleClass: string; links: { href: string; label: string }[] }[] = adminData?.megaColumns
     ? adminData.megaColumns.map((col: any) => ({
         title: col.title,
         titleClass: col.titleClass || COLOR_MAP[col.color] || 'text-white',
@@ -129,7 +130,7 @@ export default function Header() {
     },
   ];
 
-  const navLinks: { href: string; label: string }[] = adminData?.navLinks && currentLocale === 'en'
+  const navLinks: { href: string; label: string }[] = adminData?.navLinks
     ? adminData.navLinks.map((l: any) => ({
         href: l.href || (l.path ? `/${l.path}` : '/'),
         label: l.label || l.text || '',
@@ -150,13 +151,6 @@ export default function Header() {
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/data/header', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
   }, []);
 
   const closeMenu = () => {
@@ -214,7 +208,7 @@ export default function Header() {
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={(currentLocale === 'en' && adminData?.searchPlaceholder) || t('header.search.placeholder')}
+                  placeholder={adminData?.searchPlaceholder || t('header.search.placeholder')}
                   aria-label={t('header.search.label')}
                   className="h-11 w-full rounded-none border border-black bg-white pl-4 pr-12 text-sm text-gray-900 placeholder:text-gray-500 focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20 focus:ring-offset-0"
                 />
@@ -236,7 +230,7 @@ export default function Header() {
                 href={`${localePrefix}/${adminData?.donationButtonLink || 'Donate'}`}
                 className="inline-flex h-12 shrink-0 items-center justify-center whitespace-nowrap rounded-none bg-wrf-coral px-4 py-2 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-wrf-coral focus-visible:ring-offset-2 lg:px-5"
               >
-                {(currentLocale === 'en' && adminData?.donationButtonText) || t('header.donate')}
+                {adminData?.donationButtonText || t('header.donate')}
               </Link>
             )}
 
@@ -304,7 +298,7 @@ export default function Header() {
           <div className="flex shrink-0 items-center gap-2 sm:gap-4 lg:hidden">
             {currentLocale === 'en' && (
               <Link href={`${localePrefix}/${adminData?.donationButtonLink || 'Donate'}`} className="inline-flex h-9 items-center justify-center rounded-none bg-wrf-coral px-2.5 text-[11px] font-bold uppercase tracking-wider text-white sm:h-10 sm:px-4 sm:text-xs">
-                {(currentLocale === 'en' && adminData?.donationButtonText) || t('header.donateMobile')}
+                {adminData?.donationButtonText || t('header.donateMobile')}
               </Link>
             )}
             <div className="relative" ref={langDropdownMobileRef}>
@@ -394,7 +388,7 @@ export default function Header() {
                 ))}
               </div>
               <div className="flex items-center justify-between border-t border-gray-700 pt-8">
-                <p className="text-lg text-white">{(currentLocale === 'en' && adminData?.megaFooterText) || t('header.menu.cta')}</p>
+                <p className="text-lg text-white">{adminData?.megaFooterText || t('header.menu.cta')}</p>
                 <div className="flex items-center gap-6">
                   {currentLocale === 'en' && (
                     <Link
@@ -402,7 +396,7 @@ export default function Header() {
                       className="flex h-12 items-center bg-wrf-coral px-6 font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
                       onClick={closeMenu}
                     >
-                      {(currentLocale === 'en' && adminData?.megaFooterBtn1Text) || t('header.donateMobile')}
+                      {adminData?.megaFooterBtn1Text || t('header.donateMobile')}
                     </Link>
                   )}
                   <Link
@@ -410,7 +404,7 @@ export default function Header() {
                     className="flex h-12 items-center bg-wrf-purple px-6 font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
                     onClick={closeMenu}
                   >
-                    {(currentLocale === 'en' && adminData?.megaFooterBtn2Text) || t('header.menu.getInTouch')}
+                    {adminData?.megaFooterBtn2Text || t('header.menu.getInTouch')}
                   </Link>
                 </div>
               </div>
@@ -455,7 +449,7 @@ export default function Header() {
                     className="flex h-12 w-full items-center justify-center bg-wrf-coral font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
                     onClick={closeMenu}
                   >
-                    {(currentLocale === 'en' && adminData?.megaFooterBtn1Text) || t('header.donateMobile')}
+                    {adminData?.megaFooterBtn1Text || t('header.donateMobile')}
                   </Link>
                 )}
                 <Link
@@ -463,7 +457,7 @@ export default function Header() {
                   className="flex h-12 w-full items-center justify-center bg-wrf-purple font-bold uppercase tracking-wider text-white transition-opacity hover:opacity-90"
                   onClick={closeMenu}
                 >
-                  {(currentLocale === 'en' && adminData?.megaFooterBtn2Text) || t('header.menu.getInTouch')}
+                  {adminData?.megaFooterBtn2Text || t('header.menu.getInTouch')}
                 </Link>
               </div>
             </div>

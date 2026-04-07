@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 function getLocalePrefix(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
@@ -18,15 +19,8 @@ export default function Footer() {
   const localePrefix = getLocalePrefix(pathname);
   const currentLocale = localePrefix.replace('/', '');
   const [subscribed, setSubscribed] = useState(false);
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const adminData = useCmsData<Record<string, any>>('footer');
   const { t } = useTranslation();
-
-  useEffect(() => {
-    fetch('/api/data/footer', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-  }, []);
 
   const defaultLinkColumns = [
     {
@@ -81,7 +75,7 @@ export default function Footer() {
   const fixUrl = (url: string): string => URL_FIXES[url] || url;
   const fixLabel = (label: string): string => LABEL_FIXES[label] || label;
 
-  const linkColumns = adminData?.linkColumns && currentLocale === 'en'
+  const linkColumns = adminData?.linkColumns
     ? adminData.linkColumns.map((col: any, idx: number) => ({
         title: col.title,
         className: col.className || BG_MAP[col.backgroundColor] || ['bg-wrf-purple', 'bg-wrf-coral', 'bg-wrf-footer-mauve'][idx] || 'bg-wrf-purple',
@@ -127,14 +121,14 @@ export default function Footer() {
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-8 md:grid-cols-2">
             <div>
-              <h3 className="mb-4 text-2xl font-bold">{(currentLocale === 'en' && adminData?.newsletterTitle) || t('footer.contact.title')}</h3>
+              <h3 className="mb-4 text-2xl font-bold">{adminData?.newsletterTitle || t('footer.contact.title')}</h3>
               <p className="mb-6 text-gray-400">
-                {(currentLocale === 'en' && adminData?.newsletterSubtitle) || t('footer.contact.description')}
+                {adminData?.newsletterSubtitle || t('footer.contact.description')}
               </p>
               <form onSubmit={handleSubscribe} className="mb-4 flex gap-3">
                 <input
                   type="email"
-                  placeholder={(currentLocale === 'en' && adminData?.newsletterPlaceholder) || t('footer.contact.emailPlaceholder')}
+                  placeholder={adminData?.newsletterPlaceholder || t('footer.contact.emailPlaceholder')}
                   required
                   aria-label="Email"
                   disabled={subscribed}
@@ -159,7 +153,7 @@ export default function Footer() {
               )}
             </div>
             <div className="text-left md:text-right">
-              <h3 className="mb-4 text-2xl font-bold">{(currentLocale === 'en' && adminData?.socialTitle) || t('footer.social.title')}</h3>
+              <h3 className="mb-4 text-2xl font-bold">{adminData?.socialTitle || t('footer.social.title')}</h3>
               <p className="mb-6 text-gray-400">{t('footer.social.description')}</p>
               <div className="flex justify-start gap-4 md:justify-end">
                 <a href={getSocialUrl('facebook', '#')} target="_blank" rel="noopener noreferrer" className="flex h-10 w-10 items-center justify-center bg-white/10 text-white transition-colors hover:bg-wrf-coral" aria-label="Facebook">
@@ -218,7 +212,7 @@ export default function Footer() {
                   <path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" />
                   <circle cx="12" cy="10" r="3" />
                 </svg>
-                {(currentLocale === 'en' && adminData?.addressTitle) || t('footer.location.title')}
+                {adminData?.addressTitle || t('footer.location.title')}
               </h4>
               <div className="mb-6 whitespace-pre-line text-gray-400">{adminData?.addressContent || ''}</div>
               <div className="flex flex-col gap-3">
@@ -254,7 +248,7 @@ export default function Footer() {
           <div className="flex flex-col items-center justify-center gap-4 md:flex-row md:justify-start">
             <div className="flex flex-col items-center gap-4 md:flex-row md:gap-6">
               <p className="text-center text-sm text-gray-400 md:text-left">
-                {(currentLocale === 'en' && adminData?.copyrightText) || t('footer.copyright')}
+                {adminData?.copyrightText || t('footer.copyright')}
               </p>
               <div className="flex flex-col items-center gap-2 md:flex-row md:gap-4">
                 <Link href={adminData?.privacyPolicyUrl || `${localePrefix}/PrivacyPolicy`} className="text-sm text-gray-400 transition-colors hover:text-white">

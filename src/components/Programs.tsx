@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 function getLocalePrefix(pathname: string): string {
   const segments = pathname.split('/').filter(Boolean);
@@ -16,21 +16,10 @@ function getLocalePrefix(pathname: string): string {
 export default function Programs() {
   const pathname = usePathname();
   const localePrefix = getLocalePrefix(pathname);
-  const currentLocale = localePrefix.replace('/', '');
   const { t } = useTranslation();
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  const [homepageData, setHomepageData] = useState<Record<string, any> | null>(null);
-  useEffect(() => {
-    fetch('/api/data/programs', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-    fetch('/api/data/homepage', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setHomepageData(d); })
-      .catch(() => {});
-  }, []);
+  const adminData = useCmsData<Record<string, any>>('programs');
+  const homepageData = useCmsData<Record<string, any>>('homepage');
 
   const PROGRAMS = [
     {
@@ -63,7 +52,7 @@ export default function Programs() {
     },
   ];
 
-  const programs: { id: string; image: string; title: string; description: string; theme: 'primary' | 'secondary' }[] = adminData?.programs?.length && currentLocale === 'en'
+  const programs: { id: string; image: string; title: string; description: string; theme: 'primary' | 'secondary' }[] = adminData?.programs?.length
     ? adminData.programs
         .filter((p: any) => p.status === 'active' && p.featured)
         .slice(0, 4)
@@ -83,8 +72,8 @@ export default function Programs() {
     'bg-support-1': 'bg-wrf-footer-mauve',
   };
   const showPrograms = homepageData?.showPrograms !== undefined ? homepageData.showPrograms : true;
-  const progTitle = (currentLocale === 'en' && homepageData?.programsTitle) || t('programs.title');
-  const progSubtitle = (currentLocale === 'en' && homepageData?.programsSubtitle) || t('programs.description');
+  const progTitle = homepageData?.programsTitle || t('programs.title');
+  const progSubtitle = homepageData?.programsSubtitle || t('programs.description');
   const progTitleBg = PROG_BG_MAP[homepageData?.programsTitleBg] || 'bg-wrf-purple';
 
   if (!showPrograms) return null;

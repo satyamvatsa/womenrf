@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 type EventItem = {
   id: string;
@@ -74,19 +75,11 @@ function EventCard({ ev }: { ev: EventItem }) {
 
 export default function EventsPage() {
   const { t } = useTranslation();
-  const [events, setEvents] = useState<EventItem[]>([]);
+  const eventsData = useCmsData<Record<string, any>>('events');
+  const events: EventItem[] = eventsData?.events ?? [];
   const [activeTab, setActiveTab] = useState<Tab>('upcoming');
   const [weekOffset, setWeekOffset] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
-
-  useEffect(() => {
-    fetch('/api/data/events', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d?.events?.length) setEvents(d.events);
-      })
-      .catch(() => {});
-  }, []);
 
   const today = useMemo(() => {
     const d = new Date();

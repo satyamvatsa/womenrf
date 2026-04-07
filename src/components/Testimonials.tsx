@@ -1,27 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 export default function Testimonials() {
-  const { t, locale } = useTranslation();
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  const [testimonialData, setTestimonialData] = useState<Record<string, any> | null>(null);
-
-  useEffect(() => {
-    fetch('/api/data/homepage', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-    fetch('/api/data/testimonials', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setTestimonialData(d); })
-      .catch(() => {});
-  }, []);
+  const { t } = useTranslation();
+  const adminData = useCmsData<Record<string, any>>('homepage');
+  const testimonialData = useCmsData<Record<string, any>>('testimonials');
 
   const showTestimonials = adminData?.showTestimonials !== undefined ? adminData.showTestimonials : true;
-  const title = (locale === 'en' && adminData?.testimonialTitle) || t('testimonials.title');
-  const subtitle = (locale === 'en' && adminData?.testimonialSubtitle) || t('testimonials.subtitle');
+  const title = adminData?.testimonialTitle || t('testimonials.title');
+  const subtitle = adminData?.testimonialSubtitle || t('testimonials.subtitle');
   const titleBg = adminData?.testimonialTitleBg || 'bg-primary';
 
   const BG_MAP: Record<string, string> = {

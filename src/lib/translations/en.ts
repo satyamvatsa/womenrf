@@ -108,8 +108,10 @@ const en: Record<string, string> = {
   'footer.termsOfService': 'Terms of Service',
 
   // ─── About Page ───
+  'about.nav.vision': 'Our Vision',
   'about.nav.mission': 'Our Mission & History',
   'about.nav.values': 'Our Core Values',
+  'about.nav.operations': 'Areas of Operations',
   'about.nav.journey': 'Our Journey',
   'about.nav.impact': 'Our Impact in Numbers',
   'about.nav.people': 'Meet Our People',

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 type Speaker = { name: string; title: string };
 type SpeakerBio = { name: string; role: string; roleSubtitle?: string; bio: string };
@@ -72,19 +73,9 @@ export default function EventDetailPage() {
   const { t } = useTranslation();
   const params = useParams();
   const slug = params?.slug as string;
-  const [event, setEvent] = useState<EventDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/data/events', { cache: 'no-store' })
-      .then((r) => r.json())
-      .then((d) => {
-        const found = d?.events?.find((e: EventDetail) => e.slug === slug);
-        setEvent(found || null);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, [slug]);
+  const eventsData = useCmsData<Record<string, any>>('events');
+  const event: EventDetail | null = eventsData?.events?.find((e: EventDetail) => e.slug === slug) ?? null;
+  const loading = eventsData === null;
 
   if (loading) {
     return (

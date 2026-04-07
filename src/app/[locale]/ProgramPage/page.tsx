@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useState, useEffect } from 'react';
+import { Suspense, useState } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const PEACEBUILDING_HERO_BG =
   '/images/GettyImages-1232002648.jpg';
@@ -215,10 +216,10 @@ function LegalEmpowermentContent({ adminProgram }: { adminProgram?: any }) {
           <div className="max-w-4xl">
             <div className="bg-wrf-black p-8 shadow-2xl">
               <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-                {(locale === 'en' && adminProgram?.title) || t('program.legal.title')}
+                {adminProgram?.title || t('program.legal.title')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {(locale === 'en' && adminProgram?.description) || t('program.legal.heroDesc')}
+                {adminProgram?.description || t('program.legal.heroDesc')}
               </p>
             </div>
           </div>
@@ -469,10 +470,10 @@ function DigitalTransformationContent({ adminProgram }: { adminProgram?: any }) 
           <div className="max-w-4xl">
             <div className="bg-wrf-purple p-8 shadow-2xl">
               <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-                {(locale === 'en' && adminProgram?.title) || t('program.digital.title')}
+                {adminProgram?.title || t('program.digital.title')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {(locale === 'en' && adminProgram?.description) || t('program.digital.introDesc')}
+                {adminProgram?.description || t('program.digital.introDesc')}
               </p>
             </div>
           </div>
@@ -655,10 +656,10 @@ function RepresentationAdvocacyContent({ adminProgram }: { adminProgram?: any })
           <div className="max-w-4xl">
             <div className="bg-wrf-purple p-8 shadow-2xl">
               <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-                {(locale === 'en' && adminProgram?.title) || t('program.advocacy.title')}
+                {adminProgram?.title || t('program.advocacy.title')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {(locale === 'en' && adminProgram?.description) || t('program.advocacy.heroDesc')}
+                {adminProgram?.description || t('program.advocacy.heroDesc')}
               </p>
             </div>
           </div>
@@ -884,10 +885,10 @@ function PeacebuildingContent({ adminProgram }: { adminProgram?: any }) {
           <div className="max-w-4xl">
             <div className="bg-wrf-purple p-8 shadow-2xl">
               <h1 className="mb-4 text-3xl font-bold text-white lg:text-4xl">
-                {(locale === 'en' && adminProgram?.title) || t('program.peace.heroTitle')}
+                {adminProgram?.title || t('program.peace.heroTitle')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {(locale === 'en' && adminProgram?.description) || t('program.peace.heroDesc')}
+                {adminProgram?.description || t('program.peace.heroDesc')}
               </p>
             </div>
           </div>
@@ -1110,20 +1111,10 @@ function ProgramPageInner() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const slug = searchParams.get('slug') ?? '';
-  const [adminPrograms, setAdminPrograms] = useState<any[] | null>(null);
-
-  useEffect(() => {
-    fetch('/api/data/programs', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => {
-        if (d && Array.isArray(d.programs) && d.programs.length > 0) {
-          setAdminPrograms(d.programs);
-        } else if (d && Array.isArray(d) && d.length > 0) {
-          setAdminPrograms(d);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const programsData = useCmsData<Record<string, any>>('programs');
+  const adminPrograms = programsData?.programs?.length
+    ? programsData.programs
+    : Array.isArray(programsData) ? programsData : null;
 
   const adminProgram = adminPrograms?.find(
     (p: any) => p.slug === slug || p.slug === slug.toLowerCase()

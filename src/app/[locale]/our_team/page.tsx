@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const HERO_BG = '/images/GettyImages-1232002648.jpg';
 
@@ -54,7 +55,7 @@ function SocialIcon({ href, icon, label }: { href: string; icon: string; label: 
 }
 
 export default function FoundersPage() {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
 
   const FOUNDERS = [
     {
@@ -90,27 +91,8 @@ export default function FoundersPage() {
     },
   ];
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  const [teamData, setTeamData] = useState<Record<string, any> | null>(null);
-  
-  useEffect(() => {
-    fetch('/api/data/founders', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-    
-    fetch('/api/data/team', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setTeamData(d); })
-      .catch(() => {});
-  }, []);
-
-  const getLocalizedField = (member: any, field: string) => {
-    if (locale !== 'en' && member.translations?.[locale]?.[field]) {
-      return member.translations[locale][field];
-    }
-    return member[field] || '';
-  };
+  const adminData = useCmsData<Record<string, any>>('founders');
+  const teamData = useCmsData<Record<string, any>>('team');
 
   const managementMembers = teamData?.members?.filter((m: any) => {
     return m.categoryId === 'cat-2';
@@ -119,11 +101,11 @@ export default function FoundersPage() {
     if (m.linkedinUrl) links.push({ label: 'LinkedIn', href: m.linkedinUrl, icon: 'linkedin' });
     if (m.email) links.push({ label: 'Email', href: `mailto:${m.email}`, icon: 'mail' });
     return {
-      name: getLocalizedField(m, 'name'),
-      role: getLocalizedField(m, 'role'),
+      name: m.name || '',
+      role: m.role || '',
       image: m.imageUrl || '',
       alt: m.name || '',
-      bio: getLocalizedField(m, 'bio'),
+      bio: m.bio || '',
       expertise: [],
       links: links.length > 0 ? links : [],
       bgClass: 'bg-wrf-purple',
@@ -131,7 +113,7 @@ export default function FoundersPage() {
     };
   }) || [];
 
-  const foundersFromAdmin = adminData && adminData.founders?.length > 0 && locale === 'en'
+  const foundersFromAdmin = adminData && adminData.founders?.length > 0
     ? adminData.founders.map((f: any, i: number) => ({
         name: f.name,
         role: f.title || '',

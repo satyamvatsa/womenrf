@@ -1,15 +1,11 @@
 'use client';
 
-import { createContext, useContext, useMemo } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import en from './translations/en';
-import fa from './translations/fa';
-import ps from './translations/ps';
+import enFallback from './translations/en';
 
 export type Locale = 'en' | 'fa' | 'ps';
 type TranslationMap = Record<string, string>;
-
-const translationSets: Record<Locale, TranslationMap> = { en, fa, ps };
 
 interface TranslationContextValue {
   locale: Locale;
@@ -28,19 +24,36 @@ const TranslationContext = createContext<TranslationContextValue>({
 export function TranslationProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  const value = useMemo(() => {
+  const locale: Locale = useMemo(() => {
     const segments = pathname.split('/').filter(Boolean);
-    const locale: Locale =
-      segments[0] === 'fa' || segments[0] === 'ps' ? segments[0] : 'en';
-    const messages = translationSets[locale] || en;
+    return segments[0] === 'fa' || segments[0] === 'ps' ? segments[0] : 'en';
+  }, [pathname]);
+
+  const [dbStrings, setDbStrings] = useState<TranslationMap | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/translations?locale=${locale}`, { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled && data && typeof data === 'object' && Object.keys(data).length > 0) {
+          setDbStrings(data);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [locale]);
+
+  const value = useMemo(() => {
     const dir: 'ltr' | 'rtl' = locale === 'fa' || locale === 'ps' ? 'rtl' : 'ltr';
 
     const t = (key: string): string => {
-      return messages[key] ?? en[key] ?? key;
+      if (dbStrings?.[key]) return dbStrings[key];
+      return enFallback[key] ?? key;
     };
 
     return { locale, t, dir, localePrefix: `/${locale}` };
-  }, [pathname]);
+  }, [locale, dbStrings]);
 
   return (
     <TranslationContext.Provider value={value}>

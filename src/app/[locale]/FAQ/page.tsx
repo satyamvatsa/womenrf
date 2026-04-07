@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const HERO_BG =
   '/images/FILE%20PHOTO%20Afghan%20women%27s%20rights%20defenders%20and%20civil%20activists%20protest%20to%20call%20on%20the%20Taliban%20for%20the%20preservation%20of%20their%20achievements%20and%20education%2C%20in%20front%20of%20the%20presidential%20palace%20in%20Kabul.jpg';
@@ -182,15 +183,9 @@ export default function FAQPage() {
     },
   ];
 
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
-  useEffect(() => {
-    fetch('/api/data/faqs', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
-  }, []);
+  const adminData = useCmsData<Record<string, any>>('faqs');
 
-  const displayCategories = adminData && adminData.categories?.length > 0 && locale === 'en'
+  const displayCategories = adminData && adminData.categories?.length > 0
     ? [
         { id: 'all' as CategoryId, label: t('faq.categories.all'), count: 0, bg: 'bg-wrf-black' },
         ...[...((adminData.categories) || [])]
@@ -204,7 +199,7 @@ export default function FAQPage() {
       ]
     : CATEGORIES;
 
-  const displayFAQs = adminData && adminData.faqs?.length > 0 && locale === 'en'
+  const displayFAQs = adminData && adminData.faqs?.length > 0
     ? [...adminData.faqs]
         .filter((f: any) => f.isActive !== false)
         .sort((a: any, b: any) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999))

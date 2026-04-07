@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import ScrollReveal from './ScrollReveal';
 
@@ -9,6 +9,7 @@ const HERO_BG =
 
 import AboutSectionNav from './AboutSectionNav';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 /** Maps admin-saved color names to actual CSS hex values */
 const COLOR_MAP: Record<string, string> = {
@@ -57,18 +58,11 @@ const GET_INVOLVED_KEYS = [
 
 export default function AboutPage() {
   const { t, locale } = useTranslation();
-  const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+  const adminData = useCmsData<Record<string, any>>('about');
   const [openValue, setOpenValue] = useState<string | null>(null);
 
   const toggleValue = useCallback((key: string) => {
     setOpenValue((prev) => (prev === key ? null : key));
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/data/about', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminData(d); })
-      .catch(() => {});
   }, []);
 
   const translatedTimeline = [
@@ -79,19 +73,19 @@ export default function AboutPage() {
     { id: '5', year: '2023', title: t('about.journey.2023.title'), description: t('about.journey.2023.description') },
     { id: '6', year: '2024', title: t('about.journey.2024.title'), description: t('about.journey.2024.description') },
   ];
-  const timelineData = (Array.isArray(adminData?.timeline) && adminData.timeline.length > 0 && locale === 'en')
+  const timelineData = (Array.isArray(adminData?.timeline) && adminData.timeline.length > 0)
     ? adminData.timeline
     : translatedTimeline;
 
-  const impactData = (Array.isArray(adminData?.impactStats) && adminData.impactStats.length > 0 && locale === 'en')
+  const impactData = (Array.isArray(adminData?.impactStats) && adminData.impactStats.length > 0)
     ? adminData.impactStats
     : DEFAULT_IMPACT_STATS;
 
-  const teamData = (Array.isArray(adminData?.teamMembers) && adminData.teamMembers.length > 0 && locale === 'en')
+  const teamData = (Array.isArray(adminData?.teamMembers) && adminData.teamMembers.length > 0)
     ? adminData.teamMembers
     : DEFAULT_TEAM;
 
-  const linksData = (Array.isArray(adminData?.getInvolvedLinks) && adminData.getInvolvedLinks.length > 0 && locale === 'en')
+  const linksData = (Array.isArray(adminData?.getInvolvedLinks) && adminData.getInvolvedLinks.length > 0)
     ? adminData.getInvolvedLinks
     : GET_INVOLVED_KEYS.map(l => ({ id: l.id, label: t(l.labelKey), href: l.href, color: l.color }));
 
@@ -131,11 +125,11 @@ export default function AboutPage() {
                 style={{ backgroundColor: resolveColor(adminData?.visionTitleBgColor, '#6B5B95') }}
               >
                 <h2 className="text-3xl font-bold text-white">
-                  {(locale === 'en' && adminData?.visionTitle) || t('about.vision.title')}
+                  {adminData?.visionTitle || t('about.vision.title')}
                 </h2>
               </div>
               <p className="mb-8 mt-6 max-w-3xl text-lg leading-relaxed text-gray-700">
-                {(locale === 'en' && adminData?.visionContent) || t('about.vision.content')}
+                {adminData?.visionContent || t('about.vision.content')}
               </p>
             </ScrollReveal>
             <ScrollReveal variant="slideRight">
@@ -159,11 +153,11 @@ export default function AboutPage() {
                 style={{ backgroundColor: resolveColor(adminData?.titleBgColor, '#1a1a1a') }}
               >
                 <h2 className="text-3xl font-bold text-white">
-                  {(locale === 'en' && adminData?.sectionTitle) || t('about.mission.title')}
+                  {adminData?.sectionTitle || t('about.mission.title')}
                 </h2>
               </div>
               <p className="mb-8 mt-6 max-w-3xl text-lg leading-relaxed text-gray-700">
-                {(locale === 'en' && adminData?.content) || t('about.mission.description')}
+                {adminData?.content || t('about.mission.description')}
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <Link href={`/${locale}/${(adminData?.button1Url || 'Volunteer').replace(/^\//, '')}`}>
@@ -172,7 +166,7 @@ export default function AboutPage() {
                     className="inline-flex items-center rounded-none px-8 py-3 font-semibold text-white transition-none"
                     style={{ backgroundColor: resolveColor(adminData?.button1Color, '#6B5B95') }}
                   >
-                    {(locale === 'en' && adminData?.button1Text) || t('about.mission.join')}
+                    {adminData?.button1Text || t('about.mission.join')}
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 h-5 w-5">
                       <path d="M5 12h14" />
                       <path d="m12 5 7 7-7 7" />
@@ -185,7 +179,7 @@ export default function AboutPage() {
                     className="inline-flex items-center rounded-none px-8 py-3 font-semibold text-white transition-none"
                     style={{ backgroundColor: resolveColor(adminData?.button2Color, '#E07A7A') }}
                   >
-                    {(locale === 'en' && adminData?.button2Text) || t('about.mission.explore')}
+                    {adminData?.button2Text || t('about.mission.explore')}
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2 h-5 w-5">
                       <path d="M5 12h14" />
                       <path d="m12 5 7 7-7 7" />
@@ -276,16 +270,16 @@ export default function AboutPage() {
               style={{ backgroundColor: resolveColor(adminData?.operationsTitleBgColor, '#E07A7A') }}
             >
               <h2 className="text-3xl font-bold text-white">
-                {(locale === 'en' && adminData?.operationsTitle) || t('about.operations.title')}
+                {adminData?.operationsTitle || t('about.operations.title')}
               </h2>
             </div>
           </ScrollReveal>
           <div className="grid gap-1 md:grid-cols-2">
             {[
-              { key: 'ops1', title: (locale === 'en' && adminData?.opsArea1Title) || t('about.operations.peace'), desc: (locale === 'en' && adminData?.opsArea1Desc) || '', bg: 'bg-wrf-black' },
-              { key: 'ops2', title: (locale === 'en' && adminData?.opsArea2Title) || t('about.operations.legal'), desc: (locale === 'en' && adminData?.opsArea2Desc) || '', bg: 'bg-wrf-purple' },
-              { key: 'ops3', title: (locale === 'en' && adminData?.opsArea3Title) || t('about.operations.digital'), desc: (locale === 'en' && adminData?.opsArea3Desc) || '', bg: 'bg-wrf-coral' },
-              { key: 'ops4', title: (locale === 'en' && adminData?.opsArea4Title) || t('about.operations.advocacy'), desc: (locale === 'en' && adminData?.opsArea4Desc) || '', bg: 'bg-wrf-footer-mauve' },
+              { key: 'ops1', title: adminData?.opsArea1Title || t('about.operations.peace'), desc: adminData?.opsArea1Desc || '', bg: 'bg-wrf-black' },
+              { key: 'ops2', title: adminData?.opsArea2Title || t('about.operations.legal'), desc: adminData?.opsArea2Desc || '', bg: 'bg-wrf-purple' },
+              { key: 'ops3', title: adminData?.opsArea3Title || t('about.operations.digital'), desc: adminData?.opsArea3Desc || '', bg: 'bg-wrf-coral' },
+              { key: 'ops4', title: adminData?.opsArea4Title || t('about.operations.advocacy'), desc: adminData?.opsArea4Desc || '', bg: 'bg-wrf-footer-mauve' },
             ].map((item) => (
               <ScrollReveal key={item.key} variant="slideUpSm">
                 <div className={`overflow-hidden shadow-inner ${item.bg}`}>
@@ -404,7 +398,7 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold text-white">{t('about.people.title')}</h2>
               </div>
               <p className="text-lg leading-relaxed text-gray-700">
-                {(locale === 'en' && adminData?.teamDescription) || t('about.people.description')}
+                {adminData?.teamDescription || t('about.people.description')}
               </p>
               <p className="mt-4 text-lg leading-relaxed text-gray-700">
                 {t('about.people.together')}

@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const HERO_BG =
   '/images/8.jpeg';
@@ -54,19 +55,12 @@ function SocialIcon({ name }: { name: string }) {
 
 export default function ContactPage() {
   const { t } = useTranslation();
-  const [adminFooter, setAdminFooter] = useState<Record<string, any> | null>(null);
+  const adminFooter = useCmsData<Record<string, any>>('footer');
   const [contactName, setContactName] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [contactSubject, setContactSubject] = useState('');
   const [contactMessage, setContactMessage] = useState('');
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-
-  useEffect(() => {
-    fetch('/api/data/footer', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminFooter(d); })
-      .catch(() => {});
-  }, []);
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

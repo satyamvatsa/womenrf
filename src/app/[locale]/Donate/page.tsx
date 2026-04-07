@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '@/lib/TranslationContext';
+import { useCmsData } from '@/lib/useCmsData';
 
 const PAYPAL_CLIENT_ID = typeof process !== 'undefined' ? process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID : '';
 
@@ -94,19 +95,8 @@ export default function DonatePage() {
   const paypalOrderIdRef = useRef(setPaypalOrderId);
   paypalOrderIdRef.current = setPaypalOrderId;
 
-  const [adminDonations, setAdminDonations] = useState<Record<string, any> | null>(null);
-  const [adminOptions, setAdminOptions] = useState<Record<string, any> | null>(null);
-
-  useEffect(() => {
-    fetch('/api/data/donations', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminDonations(d); })
-      .catch(() => {});
-    fetch('/api/data/donation-options', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => { if (d && Object.keys(d).length > 0) setAdminOptions(d); })
-      .catch(() => {});
-  }, []);
+  const adminDonations = useCmsData<Record<string, any>>('donations');
+  const adminOptions = useCmsData<Record<string, any>>('donation-options');
 
   // Load PayPal Donate button when client ID is set
   useEffect(() => {
