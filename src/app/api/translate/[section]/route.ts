@@ -21,12 +21,17 @@ function isAuthorized(request: NextRequest): boolean {
   return auth.slice(7) === ADMIN_PASSWORD;
 }
 
-/** POST: Trigger translation for a section. Reads current English data and translates to fa/ps. */
+/**
+ * POST: Trigger translation for a section.
+ * Supports ?locale=fa to translate a single locale (recommended to stay within Lambda timeout).
+ * Omit locale to translate all target locales.
+ */
 export async function POST(
   request: NextRequest,
   context: { params: { section: string } }
 ) {
   const section = context.params.section;
+  const locale = request.nextUrl.searchParams.get('locale') || undefined;
 
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -44,16 +49,16 @@ export async function POST(
       return NextResponse.json({ error: 'No data found for section' }, { status: 404 });
     }
 
-    const translations = await translateCmsSection(data);
-    const locales: string[] = [];
+    const translations = await translateCmsSection(data, locale);
+    const savedLocales: string[] = [];
 
-    for (const [locale, translatedData] of Object.entries(translations)) {
-      await writeData(`${section}__${locale}`, translatedData);
-      locales.push(locale);
-      console.log(`[Translate API] ${section}__${locale} saved`);
+    for (const [loc, translatedData] of Object.entries(translations)) {
+      await writeData(`${section}__${loc}`, translatedData);
+      savedLocales.push(loc);
+      console.log(`[Translate API] ${section}__${loc} saved`);
     }
 
-    return NextResponse.json({ success: true, locales });
+    return NextResponse.json({ success: true, locales: savedLocales });
   } catch (error) {
     console.error(`[Translate API] ${section} failed:`, error);
     return NextResponse.json({ error: 'Translation failed' }, { status: 500 });

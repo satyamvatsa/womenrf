@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readData, writeData } from '@/lib/db';
-import { translateCmsSection } from '@/lib/translate-cms';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const maxDuration = 60;
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'NothingIsPermanent';
 
@@ -97,7 +95,7 @@ export async function GET(
   }
 }
 
-/** PUT: Update section data (admin auth required). Auto-translates to fa/ps in the background. */
+/** PUT: Update section data (admin auth required). Translation is triggered separately by the client. */
 export async function PUT(
   request: NextRequest,
   context: { params: { section: string } }
@@ -112,21 +110,6 @@ export async function PUT(
   try {
     const body = await request.json();
     await writeData(section, body);
-
-    // Fire-and-forget: kick off translation in the background so the
-    // response returns immediately and doesn't hit Lambda gateway timeout.
-    if (TRANSLATABLE_SECTIONS.has(section) && process.env.OPENAI_API_KEY) {
-      translateCmsSection(body)
-        .then(async (translations) => {
-          for (const [locale, translatedData] of Object.entries(translations)) {
-            await writeData(`${section}__${locale}`, translatedData);
-            console.log(`[Auto-translate] ${section}__${locale} saved`);
-          }
-        })
-        .catch((err) => {
-          console.error(`[Auto-translate] ${section} failed:`, err instanceof Error ? err.message : err);
-        });
-    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

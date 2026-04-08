@@ -22,9 +22,27 @@ export async function saveAdminData<T>(section: string, data: T): Promise<boolea
       },
       body: JSON.stringify(data),
     });
+    if (res.ok) {
+      triggerTranslation(section);
+    }
     return res.ok;
   } catch {
     return false;
+  }
+}
+
+/**
+ * Trigger background translation for a section.
+ * Fires separate per-locale requests so each gets its own Lambda timeout.
+ * Non-blocking — callers don't need to await this.
+ */
+export function triggerTranslation(section: string): void {
+  const locales = ['fa', 'ps'];
+  for (const locale of locales) {
+    fetch(`/api/translate/${section}?locale=${locale}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${ADMIN_PASSWORD}` },
+    }).catch(() => {});
   }
 }
 

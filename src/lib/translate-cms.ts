@@ -136,11 +136,14 @@ async function translateBatch(
 }
 
 /**
- * Translate a CMS section's data object from English to all target locales.
- * Returns { fa: translatedData, ps: translatedData }.
+ * Translate a CMS section's data object from English to target locales.
+ * Pass a single locale (e.g. 'fa') to translate one language only (recommended
+ * for Lambda environments to stay within timeout), or omit to translate all.
+ * Returns e.g. { fa: translatedData } or { fa: ..., ps: ... }.
  */
 export async function translateCmsSection(
   sectionData: unknown,
+  targetLocale?: string,
 ): Promise<Record<string, unknown>> {
   if (!process.env.OPENAI_API_KEY) return {};
 
@@ -155,9 +158,10 @@ export async function translateCmsSection(
 
   if (translatableEntries.length === 0) return {};
 
+  const locales = targetLocale ? [targetLocale] : TARGET_LOCALES;
   const results: Record<string, unknown> = {};
 
-  for (const locale of TARGET_LOCALES) {
+  for (const locale of locales) {
     try {
       const allTranslated: Record<string, string> = {};
 
