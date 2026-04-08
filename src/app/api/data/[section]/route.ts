@@ -113,16 +113,19 @@ export async function PUT(
     const body = await request.json();
     await writeData(section, body);
 
+    // Fire-and-forget: kick off translation in the background so the
+    // response returns immediately and doesn't hit Lambda gateway timeout.
     if (TRANSLATABLE_SECTIONS.has(section) && process.env.OPENAI_API_KEY) {
-      try {
-        const translations = await translateCmsSection(body);
-        for (const [locale, translatedData] of Object.entries(translations)) {
-          await writeData(`${section}__${locale}`, translatedData);
-          console.log(`[Auto-translate] ${section}__${locale} saved`);
-        }
-      } catch (err) {
-        console.error(`[Auto-translate] ${section} failed:`, err instanceof Error ? err.message : err);
-      }
+      translateCmsSection(body)
+        .then(async (translations) => {
+          for (const [locale, translatedData] of Object.entries(translations)) {
+            await writeData(`${section}__${locale}`, translatedData);
+            console.log(`[Auto-translate] ${section}__${locale} saved`);
+          }
+        })
+        .catch((err) => {
+          console.error(`[Auto-translate] ${section} failed:`, err instanceof Error ? err.message : err);
+        });
     }
 
     return NextResponse.json({ success: true });

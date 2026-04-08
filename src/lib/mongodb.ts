@@ -7,8 +7,8 @@ let cachedClient: MongoClient | null = null;
 let cachedDb: Db | null = null;
 let connectingPromise: Promise<MongoClient | null> | null = null;
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 2000;
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 1000;
 
 async function attemptConnect(): Promise<MongoClient | null> {
   if (!uri) return null;
@@ -16,9 +16,9 @@ async function attemptConnect(): Promise<MongoClient | null> {
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const client = new MongoClient(uri, {
-        serverSelectionTimeoutMS: 30000,
-        connectTimeoutMS: 30000,
-        socketTimeoutMS: 45000,
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
+        socketTimeoutMS: 15000,
         retryReads: true,
         retryWrites: true,
       });
