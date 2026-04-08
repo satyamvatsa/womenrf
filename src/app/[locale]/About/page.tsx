@@ -211,7 +211,7 @@ export default function AboutPage() {
             </p>
           </ScrollReveal>
           <div className="grid gap-1 md:grid-cols-2">
-            {(Array.isArray(adminData?.coreValues) && adminData.coreValues.length > 0 && locale === 'en'
+            {(Array.isArray(adminData?.coreValues) && adminData.coreValues.length > 0
               ? adminData.coreValues
               : CORE_VALUE_KEYS.map(v => ({ id: v.id, title: t(v.titleKey), description: t(v.descKey), color: v.color }))
             ).map((val: { id: string; title: string; description: string; color: string }) => (

@@ -4,6 +4,7 @@ import { translateCmsSection } from '@/lib/translate-cms';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const maxDuration = 60;
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'NothingIsPermanent';
 
@@ -113,16 +114,15 @@ export async function PUT(
     await writeData(section, body);
 
     if (TRANSLATABLE_SECTIONS.has(section) && process.env.OPENAI_API_KEY) {
-      translateCmsSection(body)
-        .then(async (translations) => {
-          for (const [locale, translatedData] of Object.entries(translations)) {
-            await writeData(`${section}__${locale}`, translatedData);
-            console.log(`[Auto-translate] ${section}__${locale} saved`);
-          }
-        })
-        .catch((err) => {
-          console.error(`[Auto-translate] ${section} failed:`, err instanceof Error ? err.message : err);
-        });
+      try {
+        const translations = await translateCmsSection(body);
+        for (const [locale, translatedData] of Object.entries(translations)) {
+          await writeData(`${section}__${locale}`, translatedData);
+          console.log(`[Auto-translate] ${section}__${locale} saved`);
+        }
+      } catch (err) {
+        console.error(`[Auto-translate] ${section} failed:`, err instanceof Error ? err.message : err);
+      }
     }
 
     return NextResponse.json({ success: true });
