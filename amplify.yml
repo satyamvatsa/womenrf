@@ -8,6 +8,10 @@ frontend:
       commands:
         - env | grep -e MONGODB_URI -e MONGODB_DB_NAME -e ADMIN_PASSWORD -e OPENAI_API_KEY -e NEXT_PUBLIC_PAYPAL_CLIENT_ID -e PAYPAL_CLIENT_SECRET -e AWS_S3_BUCKET_NAME -e AWS_S3_REGION -e AWS_S3_ACCESS_KEY_ID -e AWS_S3_SECRET_ACCESS_KEY -e AWS_S3_CDN_DOMAIN >> .env.production
         - npm run build
+    postBuild:
+      commands:
+        - echo "Starting automatic translation..."
+        - npx tsx scripts/post-deploy-translate.ts || echo "Translation completed or skipped"
   artifacts:
     baseDirectory: .next
     files:

@@ -1,13 +1,13 @@
 /**
- * Translates all UI strings from en.ts into Dari (fa) and Pashto (ps) via OpenAI,
- * then saves all three locales into the MongoDB `translations` collection.
- *
- * Usage:  npx tsx scripts/translate-ui-strings.ts
- *
- * Documents stored as:
- *   { _id: "en", strings: { "hero.title": "...", ... }, updatedAt: Date }
- *   { _id: "fa", strings: { "hero.title": "<translated>", ... }, updatedAt: Date }
- *   { _id: "ps", strings: { "hero.title": "<translated>", ... }, updatedAt: Date }
+ * Post-deploy script to trigger translation via API.
+ * Runs after deployment to regenerate translations with the latest prompt.
+ * 
+ * Usage: npx tsx scripts/post-deploy-translate.ts
+ * 
+ * Required env vars:
+ *   - MONGODB_URI
+ *   - MONGODB_DB_NAME (optional, defaults to 'womenrf')
+ *   - OPENAI_API_KEY
  */
 
 import 'dotenv/config';
@@ -72,21 +72,23 @@ async function translateBatch(
 }
 
 async function main() {
+  console.log('[Post-Deploy] Starting automatic translation...');
+  
   if (!MONGODB_URI) {
-    console.error('MONGODB_URI is not set. Add it to your .env file.');
-    process.exit(1);
+    console.error('[Post-Deploy] MONGODB_URI is not set. Skipping translation.');
+    process.exit(0);
   }
   if (!process.env.OPENAI_API_KEY) {
-    console.error('OPENAI_API_KEY is not set. Add it to your .env file.');
-    process.exit(1);
+    console.error('[Post-Deploy] OPENAI_API_KEY is not set. Skipping translation.');
+    process.exit(0);
   }
 
   const allKeys = Object.keys(en);
-  console.log(`Source: en.ts — ${allKeys.length} keys`);
+  console.log(`[Post-Deploy] Source: en.ts — ${allKeys.length} keys`);
 
   const client = new MongoClient(MONGODB_URI);
   await client.connect();
-  console.log('Connected to MongoDB');
+  console.log('[Post-Deploy] Connected to MongoDB');
 
   const db = client.db(DB_NAME);
   const coll = db.collection(COLLECTION);
@@ -97,13 +99,13 @@ async function main() {
     { $set: { strings: en, updatedAt: new Date() } },
     { upsert: true },
   );
-  console.log(`  [en] upserted ${allKeys.length} keys\n`);
+  console.log(`[Post-Deploy] [en] upserted ${allKeys.length} keys`);
 
   // 2. Translate to each target locale via OpenAI
   const entries = Object.entries(en);
 
   for (const locale of TARGET_LOCALES) {
-    console.log(`[TRANSLATE] ${locale} — ${entries.length} strings`);
+    console.log(`[Post-Deploy] Translating ${locale} — ${entries.length} strings`);
     try {
       const translated: Record<string, string> = {};
 
@@ -112,7 +114,7 @@ async function main() {
         const result = await translateBatch(batch, locale);
         Object.assign(translated, result);
         const done = Math.min(i + BATCH_SIZE, entries.length);
-        process.stdout.write(`  ${locale}: ${done}/${entries.length} done\r`);
+        console.log(`[Post-Deploy] ${locale}: ${done}/${entries.length} done`);
       }
 
       // Fill in any keys OpenAI may have missed with the English fallback
@@ -127,14 +129,17 @@ async function main() {
         { $set: { strings: translated, updatedAt: new Date() } },
         { upsert: true },
       );
-      console.log(`  [${locale}] saved ${Object.keys(translated).length} keys`);
+      console.log(`[Post-Deploy] [${locale}] saved ${Object.keys(translated).length} keys`);
     } catch (error) {
-      console.error(`  [${locale}] FAILED:`, error instanceof Error ? error.message : error);
+      console.error(`[Post-Deploy] [${locale}] FAILED:`, error instanceof Error ? error.message : error);
     }
   }
 
   await client.close();
-  console.log('\nDone! All UI strings translated via OpenAI and saved to MongoDB.');
+  console.log('[Post-Deploy] Translation complete!');
 }
 
-main().catch(console.error);
+main().catch((err) => {
+  console.error('[Post-Deploy] Error:', err);
+  process.exit(0); // Exit gracefully to not fail the deployment
+});
