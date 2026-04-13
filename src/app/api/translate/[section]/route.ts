@@ -49,7 +49,15 @@ export async function POST(
       return NextResponse.json({ error: 'No data found for section' }, { status: 404 });
     }
 
-    const translations = await translateCmsSection(data, locale);
+    // Load existing translations so we only re-translate new/changed strings
+    const targetLocales = locale ? [locale] : ['fa', 'ps'];
+    const existingTranslatedData: Record<string, unknown> = {};
+    for (const loc of targetLocales) {
+      const existing = await readData(`${section}__${loc}`);
+      if (existing) existingTranslatedData[loc] = existing;
+    }
+
+    const translations = await translateCmsSection(data, locale, existingTranslatedData);
     const savedLocales: string[] = [];
 
     for (const [loc, translatedData] of Object.entries(translations)) {

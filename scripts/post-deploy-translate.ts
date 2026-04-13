@@ -1,13 +1,8 @@
 /**
- * Post-deploy script to trigger translation via API.
- * Runs after deployment to regenerate translations with the latest prompt.
+ * Post-deploy script: delta-only translation.
+ * Only translates NEW or CHANGED strings — existing translations are preserved.
  * 
  * Usage: npx tsx scripts/post-deploy-translate.ts
- * 
- * Required env vars:
- *   - MONGODB_URI
- *   - MONGODB_DB_NAME (optional, defaults to 'womenrf')
- *   - OPENAI_API_KEY
  */
 
 import 'dotenv/config';
@@ -72,14 +67,14 @@ async function translateBatch(
 }
 
 async function main() {
-  console.log('[Post-Deploy] Starting automatic translation...');
-  
+  console.log('[Post-Deploy] Starting delta-only translation...');
+
   if (!MONGODB_URI) {
-    console.error('[Post-Deploy] MONGODB_URI is not set. Skipping translation.');
+    console.error('[Post-Deploy] MONGODB_URI is not set. Skipping.');
     process.exit(0);
   }
   if (!process.env.OPENAI_API_KEY) {
-    console.error('[Post-Deploy] OPENAI_API_KEY is not set. Skipping translation.');
+    console.error('[Post-Deploy] OPENAI_API_KEY is not set. Skipping.');
     process.exit(0);
   }
 
@@ -93,7 +88,6 @@ async function main() {
   const db = client.db(DB_NAME);
   const coll = db.collection(COLLECTION);
 
-  // 1. Seed English strings
   await coll.updateOne(
     { _id: 'en' as any },
     { $set: { strings: en, updatedAt: new Date() } },
@@ -101,20 +95,47 @@ async function main() {
   );
   console.log(`[Post-Deploy] [en] upserted ${allKeys.length} keys`);
 
-  // 2. Translate to each target locale via OpenAI
   const entries = Object.entries(en);
 
   for (const locale of TARGET_LOCALES) {
-    console.log(`[Post-Deploy] Translating ${locale} — ${entries.length} strings`);
     try {
-      const translated: Record<string, string> = {};
+      // Load existing translations from DB
+      const existingDoc = await coll.findOne({ _id: locale as any });
+      const existing: Record<string, string> = existingDoc?.strings || {};
 
-      for (let i = 0; i < entries.length; i += BATCH_SIZE) {
-        const batch = entries.slice(i, i + BATCH_SIZE);
+      // Find only new or changed strings
+      const toTranslate: [string, string][] = [];
+      const preserved: Record<string, string> = {};
+
+      for (const [key, enValue] of entries) {
+        if (existing[key] && existing[`__src__${key}`] === enValue) {
+          preserved[key] = existing[key];
+          preserved[`__src__${key}`] = existing[`__src__${key}`];
+        } else {
+          toTranslate.push([key, enValue]);
+        }
+      }
+
+      console.log(`[Post-Deploy] ${locale}: ${toTranslate.length} new/changed, ${Object.keys(preserved).filter(k => !k.startsWith('__src__')).length} preserved`);
+
+      if (toTranslate.length === 0) {
+        console.log(`[Post-Deploy] [${locale}] No changes — skipping translation`);
+        continue;
+      }
+
+      const translated: Record<string, string> = { ...preserved };
+
+      for (let i = 0; i < toTranslate.length; i += BATCH_SIZE) {
+        const batch = toTranslate.slice(i, i + BATCH_SIZE);
         const result = await translateBatch(batch, locale);
         Object.assign(translated, result);
-        const done = Math.min(i + BATCH_SIZE, entries.length);
-        console.log(`[Post-Deploy] ${locale}: ${done}/${entries.length} done`);
+        const done = Math.min(i + BATCH_SIZE, toTranslate.length);
+        console.log(`[Post-Deploy] ${locale}: ${done}/${toTranslate.length} done`);
+      }
+
+      // Store source English values for future delta checks
+      for (const [key, enValue] of entries) {
+        translated[`__src__${key}`] = enValue;
       }
 
       // Fill in any keys OpenAI may have missed with the English fallback
@@ -129,7 +150,9 @@ async function main() {
         { $set: { strings: translated, updatedAt: new Date() } },
         { upsert: true },
       );
-      console.log(`[Post-Deploy] [${locale}] saved ${Object.keys(translated).length} keys`);
+
+      const actualKeys = Object.keys(translated).filter(k => !k.startsWith('__src__')).length;
+      console.log(`[Post-Deploy] [${locale}] saved ${actualKeys} keys`);
     } catch (error) {
       console.error(`[Post-Deploy] [${locale}] FAILED:`, error instanceof Error ? error.message : error);
     }
@@ -141,5 +164,5 @@ async function main() {
 
 main().catch((err) => {
   console.error('[Post-Deploy] Error:', err);
-  process.exit(0); // Exit gracefully to not fail the deployment
+  process.exit(0);
 });

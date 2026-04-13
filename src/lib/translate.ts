@@ -65,21 +65,41 @@ async function translateBatch(
 }
 
 /**
- * Translate all English strings to the target locale, processing in batches.
- * Returns the full translated map.
+ * Translate English strings to the target locale, processing in batches.
+ * Only translates NEW or CHANGED strings — existing translations are preserved.
+ * Pass `existingTranslations` (from DB) to enable delta-only mode.
+ * Returns the full translated map (existing + newly translated).
  */
 export async function translateAll(
   englishStrings: Record<string, string>,
   targetLocale: string,
   onProgress?: (done: number, total: number) => void,
+  existingTranslations?: Record<string, string>,
 ): Promise<Record<string, string>> {
-  const entries = Object.entries(englishStrings);
-  const total = entries.length;
   const result: Record<string, string> = {};
-  let done = 0;
+  const toTranslate: [string, string][] = [];
 
-  for (let i = 0; i < entries.length; i += BATCH_SIZE) {
-    const batch = entries.slice(i, i + BATCH_SIZE);
+  for (const [key, enValue] of Object.entries(englishStrings)) {
+    if (
+      existingTranslations &&
+      existingTranslations[key] &&
+      existingTranslations[`__src__${key}`] === enValue
+    ) {
+      result[key] = existingTranslations[key];
+    } else {
+      toTranslate.push([key, enValue]);
+    }
+  }
+
+  const total = toTranslate.length;
+  if (total === 0) {
+    onProgress?.(0, 0);
+    return { ...result };
+  }
+
+  let done = 0;
+  for (let i = 0; i < toTranslate.length; i += BATCH_SIZE) {
+    const batch = toTranslate.slice(i, i + BATCH_SIZE);
     const translated = await translateBatch(batch, targetLocale);
 
     for (const [key, value] of Object.entries(translated)) {
@@ -90,5 +110,11 @@ export async function translateAll(
     onProgress?.(done, total);
   }
 
-  return result;
+  // Store source English values alongside translations for future delta checks
+  const withSources: Record<string, string> = { ...result };
+  for (const [key, enValue] of Object.entries(englishStrings)) {
+    withSources[`__src__${key}`] = enValue;
+  }
+
+  return withSources;
 }

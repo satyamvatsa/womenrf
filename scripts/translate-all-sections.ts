@@ -1,3 +1,10 @@
+/**
+ * Delta-only CMS section translation.
+ * Only translates NEW or CHANGED strings — existing translations are preserved.
+ *
+ * Usage: npx tsx scripts/translate-all-sections.ts
+ */
+
 import 'dotenv/config';
 import { MongoClient } from 'mongodb';
 import OpenAI from 'openai';
@@ -45,6 +52,7 @@ const SKIP_PATTERNS = [
   /^submittedAt$/, /^updatedAt$/, /^savedAt$/, /^platform$/,
   /^path$/, /^key$/,
   /^backgroundColor$/, /^textColor$/, /^titleClass$/,
+  /^__translationSources$/,
 ];
 
 function shouldSkipKey(path: string): boolean {
@@ -79,6 +87,7 @@ function extractStrings(obj: unknown, prefix = ''): Map<string, string> {
   }
   if (typeof obj === 'object') {
     for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      if (key === '__translationSources') continue;
       const sub = extractStrings(value, prefix ? `${prefix}.${key}` : key);
       sub.forEach((v, k) => result.set(k, v));
     }
@@ -181,13 +190,41 @@ async function main() {
 
     for (const locale of TARGET_LOCALES) {
       try {
-        const allTranslated: Record<string, string> = {};
+        // Load existing translated data for delta comparison
+        const translatedSectionId = `${section}__${locale}`;
+        const existingDoc = await coll.findOne({ _id: translatedSectionId as any });
+        const existingSources: Record<string, string> = existingDoc?.data?.__translationSources || {};
+        const existingStrings = existingDoc?.data ? extractStrings(existingDoc.data) : new Map<string, string>();
 
-        for (let i = 0; i < translatableEntries.length; i += BATCH_SIZE) {
-          const batch = translatableEntries.slice(i, i + BATCH_SIZE);
+        // Only translate new or changed strings
+        const newEntries: [string, string][] = [];
+        const preserved: Record<string, string> = {};
+
+        for (const [path, enValue] of translatableEntries) {
+          const prevSource = existingSources[path];
+          const existingTranslation = existingStrings.get(path);
+
+          if (prevSource === enValue && existingTranslation) {
+            preserved[path] = existingTranslation;
+          } else {
+            newEntries.push([path, enValue]);
+          }
+        }
+
+        console.log(`  ${locale}: ${newEntries.length} new/changed, ${Object.keys(preserved).length} preserved`);
+
+        if (newEntries.length === 0) {
+          console.log(`  ${locale}: No changes — skipping`);
+          continue;
+        }
+
+        const allTranslated: Record<string, string> = { ...preserved };
+
+        for (let i = 0; i < newEntries.length; i += BATCH_SIZE) {
+          const batch = newEntries.slice(i, i + BATCH_SIZE);
           const translated = await translateBatch(batch, locale);
           Object.assign(allTranslated, translated);
-          process.stdout.write(`  ${locale}: ${Math.min(i + BATCH_SIZE, translatableEntries.length)}/${translatableEntries.length} done\r`);
+          process.stdout.write(`  ${locale}: ${Math.min(i + BATCH_SIZE, newEntries.length)}/${newEntries.length} done\r`);
         }
 
         const translatedData = JSON.parse(JSON.stringify(sectionData));
@@ -195,14 +232,20 @@ async function main() {
           setByPath(translatedData, path, translatedValue);
         }
 
-        const translatedSectionId = `${section}__${locale}`;
+        // Store English sources for future delta checks
+        const sources: Record<string, string> = {};
+        for (const [path, enValue] of translatableEntries) {
+          sources[path] = enValue;
+        }
+        translatedData.__translationSources = sources;
+
         await coll.updateOne(
           { _id: translatedSectionId as any },
           { $set: { data: translatedData, updatedAt: new Date() } },
           { upsert: true },
         );
 
-        console.log(`  ${locale}: ${Object.keys(allTranslated).length} strings saved as ${translatedSectionId}`);
+        console.log(`  ${locale}: ${newEntries.length} translated, ${Object.keys(allTranslated).length} total saved as ${translatedSectionId}`);
       } catch (error) {
         console.error(`  ${locale}: FAILED —`, error instanceof Error ? error.message : error);
       }

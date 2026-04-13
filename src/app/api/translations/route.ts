@@ -32,7 +32,13 @@ export async function GET(request: NextRequest) {
       .collection(TRANSLATIONS_COLLECTION)
       .findOne({ _id: locale as any });
 
-    return NextResponse.json(doc?.strings ?? {});
+    const strings: Record<string, string> = doc?.strings ?? {};
+    // Filter out internal __src__ keys used for delta tracking
+    const filtered: Record<string, string> = {};
+    for (const [key, value] of Object.entries(strings)) {
+      if (!key.startsWith('__src__')) filtered[key] = value;
+    }
+    return NextResponse.json(filtered);
   } catch (error) {
     console.error('[API] Error reading translations:', error);
     return NextResponse.json({}, { status: 500 });

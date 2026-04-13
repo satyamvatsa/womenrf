@@ -1,13 +1,8 @@
 /**
- * Translates all UI strings from en.ts into Dari (fa) and Pashto (ps) via OpenAI,
- * then saves all three locales into the MongoDB `translations` collection.
+ * Delta-only UI string translation.
+ * Only translates NEW or CHANGED strings — existing translations are preserved.
  *
  * Usage:  npx tsx scripts/translate-ui-strings.ts
- *
- * Documents stored as:
- *   { _id: "en", strings: { "hero.title": "...", ... }, updatedAt: Date }
- *   { _id: "fa", strings: { "hero.title": "<translated>", ... }, updatedAt: Date }
- *   { _id: "ps", strings: { "hero.title": "<translated>", ... }, updatedAt: Date }
  */
 
 import 'dotenv/config';
@@ -91,7 +86,6 @@ async function main() {
   const db = client.db(DB_NAME);
   const coll = db.collection(COLLECTION);
 
-  // 1. Seed English strings
   await coll.updateOne(
     { _id: 'en' as any },
     { $set: { strings: en, updatedAt: new Date() } },
@@ -99,23 +93,51 @@ async function main() {
   );
   console.log(`  [en] upserted ${allKeys.length} keys\n`);
 
-  // 2. Translate to each target locale via OpenAI
   const entries = Object.entries(en);
 
   for (const locale of TARGET_LOCALES) {
-    console.log(`[TRANSLATE] ${locale} — ${entries.length} strings`);
-    try {
-      const translated: Record<string, string> = {};
+    // Load existing translations from DB
+    const existingDoc = await coll.findOne({ _id: locale as any });
+    const existing: Record<string, string> = existingDoc?.strings || {};
 
-      for (let i = 0; i < entries.length; i += BATCH_SIZE) {
-        const batch = entries.slice(i, i + BATCH_SIZE);
+    // Find only new or changed strings
+    const toTranslate: [string, string][] = [];
+    const preserved: Record<string, string> = {};
+
+    for (const [key, enValue] of entries) {
+      if (existing[key] && existing[`__src__${key}`] === enValue) {
+        preserved[key] = existing[key];
+        preserved[`__src__${key}`] = existing[`__src__${key}`];
+      } else {
+        toTranslate.push([key, enValue]);
+      }
+    }
+
+    const preservedCount = Object.keys(preserved).filter(k => !k.startsWith('__src__')).length;
+    console.log(`[TRANSLATE] ${locale} — ${toTranslate.length} new/changed, ${preservedCount} preserved`);
+
+    if (toTranslate.length === 0) {
+      console.log(`  [${locale}] No changes — skipping\n`);
+      continue;
+    }
+
+    try {
+      const translated: Record<string, string> = { ...preserved };
+
+      for (let i = 0; i < toTranslate.length; i += BATCH_SIZE) {
+        const batch = toTranslate.slice(i, i + BATCH_SIZE);
         const result = await translateBatch(batch, locale);
         Object.assign(translated, result);
-        const done = Math.min(i + BATCH_SIZE, entries.length);
-        process.stdout.write(`  ${locale}: ${done}/${entries.length} done\r`);
+        const done = Math.min(i + BATCH_SIZE, toTranslate.length);
+        process.stdout.write(`  ${locale}: ${done}/${toTranslate.length} done\r`);
       }
 
-      // Fill in any keys OpenAI may have missed with the English fallback
+      // Store source English values for future delta checks
+      for (const [key, enValue] of entries) {
+        translated[`__src__${key}`] = enValue;
+      }
+
+      // Fill in any keys OpenAI may have missed
       for (const key of allKeys) {
         if (!translated[key]) {
           translated[key] = en[key];
@@ -127,14 +149,16 @@ async function main() {
         { $set: { strings: translated, updatedAt: new Date() } },
         { upsert: true },
       );
-      console.log(`  [${locale}] saved ${Object.keys(translated).length} keys`);
+
+      const actualKeys = Object.keys(translated).filter(k => !k.startsWith('__src__')).length;
+      console.log(`  [${locale}] saved ${actualKeys} keys`);
     } catch (error) {
       console.error(`  [${locale}] FAILED:`, error instanceof Error ? error.message : error);
     }
   }
 
   await client.close();
-  console.log('\nDone! All UI strings translated via OpenAI and saved to MongoDB.');
+  console.log('\nDone! UI strings translated (delta-only) and saved to MongoDB.');
 }
 
 main().catch(console.error);

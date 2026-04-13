@@ -73,12 +73,19 @@ export async function POST(request: NextRequest) {
     try {
       console.log(`[Translate] Starting ${locale}...`);
 
+      // Load existing translations so we only re-translate new/changed strings
+      const existingDoc = await db
+        .collection(TRANSLATIONS_COLLECTION)
+        .findOne({ _id: locale as any });
+      const existingTranslations: Record<string, string> = existingDoc?.strings || {};
+
       const translated = await translateAll(
         englishStrings,
         locale,
         (done, total) => {
-          console.log(`[Translate] ${locale}: ${done}/${total} keys`);
+          console.log(`[Translate] ${locale}: ${done}/${total} new/changed keys`);
         },
+        existingTranslations,
       );
 
       await db.collection(TRANSLATIONS_COLLECTION).updateOne(
@@ -94,11 +101,12 @@ export async function POST(request: NextRequest) {
         { upsert: true },
       );
 
+      const actualKeys = Object.keys(translated).filter(k => !k.startsWith('__src__')).length;
       results[locale] = {
-        keys: Object.keys(translated).length,
+        keys: actualKeys,
         status: 'success',
       };
-      console.log(`[Translate] ${locale} complete: ${Object.keys(translated).length} keys`);
+      console.log(`[Translate] ${locale} complete: ${actualKeys} keys`);
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error(`[Translate] ${locale} failed:`, msg);

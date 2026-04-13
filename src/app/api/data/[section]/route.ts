@@ -84,7 +84,9 @@ export async function GET(
     if (locale !== 'en' && VALID_LOCALES.includes(locale) && TRANSLATABLE_SECTIONS.has(section)) {
       const translated = await readData(`${section}__${locale}`);
       if (translated && typeof translated === 'object' && Object.keys(translated as object).length > 0) {
-        return NextResponse.json(translated);
+        // Strip internal delta-tracking metadata before serving
+        const { __translationSources, ...publicData } = translated as Record<string, unknown>;
+        return NextResponse.json(publicData);
       }
     }
     const data = await readData(section);

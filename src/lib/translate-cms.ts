@@ -145,13 +145,14 @@ async function translateBatch(
 
 /**
  * Translate a CMS section's data object from English to target locales.
- * Pass a single locale (e.g. 'fa') to translate one language only (recommended
- * for Lambda environments to stay within timeout), or omit to translate all.
+ * Only translates NEW or CHANGED strings — existing translations are preserved.
+ * Pass `existingTranslatedData` to enable delta-only mode per locale.
  * Returns e.g. { fa: translatedData } or { fa: ..., ps: ... }.
  */
 export async function translateCmsSection(
   sectionData: unknown,
   targetLocale?: string,
+  existingTranslatedData?: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   if (!process.env.OPENAI_API_KEY) return {};
 
@@ -171,12 +172,35 @@ export async function translateCmsSection(
 
   for (const locale of locales) {
     try {
-      const allTranslated: Record<string, string> = {};
+      const existingData = existingTranslatedData?.[locale] as Record<string, unknown> | undefined;
+      const existingStrings = existingData ? extractStrings(existingData) : new Map<string, string>();
+      const existingSrcMap = existingData
+        ? extractStrings((existingData as any).__translationSources)
+        : new Map<string, string>();
 
-      for (let i = 0; i < translatableEntries.length; i += BATCH_SIZE) {
-        const batch = translatableEntries.slice(i, i + BATCH_SIZE);
-        const translated = await translateBatch(batch, locale);
-        Object.assign(allTranslated, translated);
+      // Only translate entries that are new or whose English source changed
+      const newEntries: [string, string][] = [];
+      const preserved: Record<string, string> = {};
+
+      for (const [path, enValue] of translatableEntries) {
+        const prevSource = existingSrcMap.get(path);
+        const existingTranslation = existingStrings.get(path);
+
+        if (prevSource === enValue && existingTranslation) {
+          preserved[path] = existingTranslation;
+        } else {
+          newEntries.push([path, enValue]);
+        }
+      }
+
+      const allTranslated: Record<string, string> = { ...preserved };
+
+      if (newEntries.length > 0) {
+        for (let i = 0; i < newEntries.length; i += BATCH_SIZE) {
+          const batch = newEntries.slice(i, i + BATCH_SIZE);
+          const translated = await translateBatch(batch, locale);
+          Object.assign(allTranslated, translated);
+        }
       }
 
       const translatedData = JSON.parse(JSON.stringify(sectionData));
@@ -184,8 +208,17 @@ export async function translateCmsSection(
         setByPath(translatedData, path, translatedValue);
       }
 
+      // Store English source values so future runs can detect changes
+      const sources: Record<string, string> = {};
+      for (const [path, enValue] of translatableEntries) {
+        sources[path] = enValue;
+      }
+      (translatedData as any).__translationSources = sources;
+
       results[locale] = translatedData;
-      console.log(`[CMS Translate] ${locale}: ${Object.keys(allTranslated).length} strings translated`);
+      console.log(
+        `[CMS Translate] ${locale}: ${newEntries.length} new/changed, ${Object.keys(preserved).length} preserved (${Object.keys(allTranslated).length} total)`
+      );
     } catch (error) {
       console.error(`[CMS Translate] ${locale} failed:`, error instanceof Error ? error.message : error);
     }
