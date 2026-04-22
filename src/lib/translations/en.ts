@@ -210,7 +210,7 @@ const en: Record<string, string> = {
   'donate.form.monthly': 'Monthly Giving',
   'donate.form.oneTimeSupport': 'One-Time Support',
   'donate.form.oneTimeDesc': 'Make an immediate impact with a one-time donation.',
-  'donate.form.chooseAmount': 'Choose an Amount (CAD)',
+  'donate.form.chooseAmount': 'Choose an Amount (USD)',
   'donate.form.other': 'Other',
   'donate.form.fullName': 'Full Name',
   'donate.form.email': 'Email Address',

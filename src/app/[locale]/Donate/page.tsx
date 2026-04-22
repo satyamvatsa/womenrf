@@ -87,13 +87,18 @@ export default function DonatePage() {
   const [monthlyIntentStatus, setMonthlyIntentStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [paypalStatus, setPaypalStatus] = useState<'idle' | 'processing' | 'success' | 'error' | 'cancelled'>('idle');
   const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null);
+  const [emailSent, setEmailSent] = useState(false);
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const amountRef = useRef<{ amount: number | null; otherAmount: string }>({ amount: 50, otherAmount: '' });
   amountRef.current = { amount, otherAmount };
+  const donorInfoRef = useRef<{ name: string; email: string }>({ name: '', email: '' });
+  donorInfoRef.current = { name, email };
   const paypalStatusRef = useRef(setPaypalStatus);
   paypalStatusRef.current = setPaypalStatus;
   const paypalOrderIdRef = useRef(setPaypalOrderId);
   paypalOrderIdRef.current = setPaypalOrderId;
+  const emailSentRef = useRef(setEmailSent);
+  emailSentRef.current = setEmailSent;
 
   const adminDonations = useCmsData<Record<string, any>>('donations');
   const adminOptions = useCmsData<Record<string, any>>('donation-options');
@@ -122,11 +127,36 @@ export default function DonatePage() {
             }],
           });
         },
-        onApprove(_data: unknown, actions: { order: { capture: () => Promise<{ id: string; status: string }> } }) {
-          return actions.order.capture().then((details: { id: string; status: string }) => {
-            paypalOrderIdRef.current(details.id);
-            paypalStatusRef.current('success');
-          });
+        async onApprove(_data: unknown, actions: { order: { capture: () => Promise<{ id: string; status: string }> } }) {
+          const details = await actions.order.capture();
+          paypalOrderIdRef.current(details.id);
+          paypalStatusRef.current('success');
+          
+          const { amount: amt, otherAmount: other } = amountRef.current;
+          const value = other.trim()
+            ? Math.max(0, parseFloat(other) || 0)
+            : (amt ?? 0);
+          const finalAmount = value > 0 ? value : 25;
+          const { name: donorName, email: donorEmail } = donorInfoRef.current;
+          
+          if (donorName && donorEmail) {
+            try {
+              await fetch('/api/donate/confirm', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  donorName,
+                  donorEmail,
+                  amount: finalAmount,
+                  transactionId: details.id,
+                  currency: 'USD',
+                }),
+              });
+              emailSentRef.current(true);
+            } catch (error) {
+              console.error('Failed to send confirmation email:', error);
+            }
+          }
         },
         onCancel() {
           paypalStatusRef.current('cancelled');
@@ -362,7 +392,12 @@ export default function DonatePage() {
                           <p className="mt-1 text-sm text-green-700">
                             Your payment has been processed successfully.{paypalOrderId && <> Order ID: <span className="font-mono">{paypalOrderId}</span></>}
                           </p>
-                          <button type="button" onClick={() => { setPaypalStatus('idle'); setPaypalOrderId(null); }} className="mt-4 text-sm font-medium text-green-700 underline hover:text-green-900">Make another donation</button>
+                          {emailSent && (
+                            <p className="mt-2 text-sm text-green-600">
+                              A confirmation email has been sent to {email}.
+                            </p>
+                          )}
+                          <button type="button" onClick={() => { setPaypalStatus('idle'); setPaypalOrderId(null); setEmailSent(false); }} className="mt-4 text-sm font-medium text-green-700 underline hover:text-green-900">Make another donation</button>
                         </div>
                       ) : paypalStatus === 'error' ? (
                         <div className="rounded-lg bg-red-50 border border-red-200 p-6 text-center">
@@ -426,7 +461,7 @@ export default function DonatePage() {
                                 body: JSON.stringify({
                                   type: 'one-time',
                                   amount: value,
-                                  currency: 'CAD',
+                                  currency: 'USD',
                                   fullName: name,
                                   email,
                                 }),
@@ -471,7 +506,7 @@ export default function DonatePage() {
                 </div>
 
                 <div>
-                  <label className="text-lg font-bold">Choose a Monthly Amount (CAD)</label>
+                  <label className="text-lg font-bold">Choose a Monthly Amount (USD)</label>
                   <div className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-5">
                     {[10, 25, 50, 100].map((value) => (
                       <button
@@ -555,7 +590,7 @@ export default function DonatePage() {
                               body: JSON.stringify({
                                 type: 'monthly',
                                 amount: value,
-                                currency: 'CAD',
+                                currency: 'USD',
                                 fullName: monthlyName,
                                 email: monthlyEmail,
                               }),
