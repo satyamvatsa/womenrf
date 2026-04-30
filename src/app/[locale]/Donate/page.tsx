@@ -113,6 +113,13 @@ export default function DonatePage() {
       paypalContainerRef.current.innerHTML = '';
       w.paypal.Buttons({
         style: { label: 'donate', layout: 'vertical' },
+        onClick() {
+          const { name: n, email: e } = donorInfoRef.current;
+          if (!n.trim() || !e.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim())) {
+            alert('Please enter your full name and a valid email address before donating.');
+            throw new Error('Validation failed');
+          }
+        },
         createOrder(_data: unknown, actions: { order: { create: (opts: { purchase_units: unknown[] }) => Promise<string> } }) {
           paypalStatusRef.current('processing');
           const { amount: amt, otherAmount: other } = amountRef.current;
@@ -139,9 +146,9 @@ export default function DonatePage() {
           const finalAmount = value > 0 ? value : 25;
           const { name: donorName, email: donorEmail } = donorInfoRef.current;
           
-          if (donorName && donorEmail) {
+          if (donorName && donorEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorEmail)) {
             try {
-              await fetch('/api/donate/confirm', {
+              const res = await fetch('/api/donate/confirm', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -152,7 +159,11 @@ export default function DonatePage() {
                   currency: 'USD',
                 }),
               });
-              emailSentRef.current(true);
+              if (res.ok) {
+                emailSentRef.current(true);
+              } else {
+                console.error('Email API returned error:', res.status);
+              }
             } catch (error) {
               console.error('Failed to send confirmation email:', error);
             }
