@@ -175,7 +175,23 @@ export default function VacanciesPage() {
                   </div>
                   <h3 className="mb-2 text-lg font-bold text-wrf-black">{v.title}</h3>
                   {v.description && (
-                    <p className="mb-4 flex-1 text-sm leading-relaxed text-gray-600">{v.description}</p>
+                    <div className="mb-4 flex-1 text-sm leading-relaxed text-gray-600">
+                      {v.description.split('\n').map((para: string, i: number) => (
+                        para.trim() ? (
+                          <p key={i} className={i > 0 ? 'mt-2' : ''}>{para}</p>
+                        ) : null
+                      ))}
+                    </div>
+                  )}
+                  {v.requirements && (
+                    <div className="mb-4 text-sm leading-relaxed text-gray-600">
+                      <h4 className="mb-1 font-semibold text-wrf-black">{t('vacancies.requirements') || 'Requirements'}</h4>
+                      {v.requirements.split('\n').map((para: string, i: number) => (
+                        para.trim() ? (
+                          <p key={i} className={i > 0 ? 'mt-2' : ''}>{para}</p>
+                        ) : null
+                      ))}
+                    </div>
                   )}
                   <div className="mt-auto flex flex-wrap items-center gap-4 border-t border-gray-100 pt-4 text-sm text-gray-500">
                     {v.location && (

@@ -353,6 +353,7 @@ const en: Record<string, string> = {
   'vacancies.filter.all': 'All Categories',
   'vacancies.empty.title': 'No Matching Vacancies',
   'vacancies.empty.description': 'Please try adjusting your search or filter criteria.',
+  'vacancies.requirements': 'Requirements',
   'vacancies.apply.button': 'Apply',
   'vacancies.apply.title': 'Apply for this position',
   'vacancies.apply.subtitle': 'Submit your application. We will review it and get back to you.',

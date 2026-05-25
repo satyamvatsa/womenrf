@@ -69,7 +69,13 @@ export default function CareerOpportunities() {
                 </div>
                 <h3 className="mb-2 text-lg font-bold text-wrf-black">{v.title}</h3>
                 {v.description && (
-                  <p className="mb-4 flex-1 text-sm leading-relaxed text-gray-600">{v.description}</p>
+                  <div className="mb-4 flex-1 text-sm leading-relaxed text-gray-600">
+                    {v.description.split('\n').map((para: string, i: number) => (
+                      para.trim() ? (
+                        <p key={i} className={i > 0 ? 'mt-2' : ''}>{para}</p>
+                      ) : null
+                    ))}
+                  </div>
                 )}
                 <div className="mt-auto flex flex-wrap items-center gap-4 border-t border-gray-100 pt-4 text-sm text-gray-500">
                   {v.location && (
