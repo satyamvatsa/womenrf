@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readData, writeData } from '@/lib/db';
+import { sendJobApplicationNotification, sendJobApplicationConfirmation } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -32,6 +33,24 @@ export async function POST(
       status: 'new',
     });
     await writeData(section, list);
+
+    if (section === 'job-applications' && body.email && body.position) {
+      const emailParams = {
+        fullName: body.fullName || 'Applicant',
+        email: body.email,
+        phone: body.phone,
+        position: body.position,
+        coverLetter: body.coverLetter || '',
+        resumeUrl: body.resumeUrl,
+      };
+
+      // Fire both emails without blocking the response
+      Promise.allSettled([
+        sendJobApplicationNotification(emailParams),
+        sendJobApplicationConfirmation(emailParams),
+      ]).catch(() => {});
+    }
+
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Invalid data' }, { status: 400 });

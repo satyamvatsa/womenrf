@@ -13,6 +13,13 @@ function getLocalePrefix(pathname: string): string {
   return '/en';
 }
 
+const TYPE_COLORS: Record<string, string> = {
+  'full-time': 'bg-wrf-purple text-white',
+  'part-time': 'bg-wrf-coral text-white',
+  'contract': 'bg-amber-500 text-white',
+  'internship': 'bg-teal-500 text-white',
+};
+
 export default function CareerOpportunities() {
   const pathname = usePathname();
   const localePrefix = getLocalePrefix(pathname);
@@ -45,6 +52,11 @@ export default function CareerOpportunities() {
       : []);
   const openVacancies = vacanciesList.filter((v: any) => v.status === 'open');
 
+  const truncate = (text: string, maxLen = 150) => {
+    if (!text || text.length <= maxLen) return text;
+    return text.slice(0, maxLen).trimEnd() + '…';
+  };
+
   return (
     <section id="careers" className="bg-gray-50 py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -56,49 +68,65 @@ export default function CareerOpportunities() {
         </div>
 
         {openVacancies.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {openVacancies.slice(0, 3).map((v: any) => (
-              <div key={v.id} className="flex flex-col bg-white p-6 shadow-md transition-shadow duration-300 hover:shadow-xl">
-                <div className="mb-3 flex flex-wrap items-center gap-2">
-                  {v.type && (
-                    <span className="bg-wrf-purple px-3 py-1 text-xs font-semibold text-white">{v.type}</span>
-                  )}
-                  {v.category && (
-                    <span className="bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">{v.category}</span>
+              <div key={v.id} className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5 transition-all duration-300 hover:shadow-lg hover:ring-wrf-purple/20">
+                {/* Card header */}
+                <div className="flex items-start gap-4 p-5 pb-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-wrf-purple/10 to-wrf-coral/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-wrf-purple">
+                      <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /><rect width="20" height="14" x="2" y="6" rx="2" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    {v.category && (
+                      <p className="mb-0.5 text-xs font-medium text-wrf-purple">{v.category}</p>
+                    )}
+                    <h3 className="text-base font-bold leading-snug text-wrf-black group-hover:text-wrf-purple transition-colors">
+                      {v.title}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="flex-1 px-5">
+                  {v.description && (
+                    <p className="text-sm leading-relaxed text-gray-500">{truncate(v.description)}</p>
                   )}
                 </div>
-                <h3 className="mb-2 text-lg font-bold text-wrf-black">{v.title}</h3>
-                {v.description && (
-                  <div className="mb-4 flex-1 text-sm leading-relaxed text-gray-600">
-                    {v.description.split('\n').map((para: string, i: number) => (
-                      para.trim() ? (
-                        <p key={i} className={i > 0 ? 'mt-2' : ''}>{para}</p>
-                      ) : null
-                    ))}
+
+                {/* Card footer */}
+                <div className="mt-4 border-t border-gray-100 px-5 py-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {v.type && (
+                      <span className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${TYPE_COLORS[v.type] || 'bg-gray-200 text-gray-700'}`}>
+                        {v.type}
+                      </span>
+                    )}
+                    {v.location && (
+                      <span className="flex items-center gap-1 text-xs text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {v.location}
+                      </span>
+                    )}
+                    {v.deadline && (
+                      <span className="flex items-center gap-1 text-xs text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
+                        {new Date(v.deadline).toLocaleDateString()}
+                      </span>
+                    )}
                   </div>
-                )}
-                <div className="mt-auto flex flex-wrap items-center gap-4 border-t border-gray-100 pt-4 text-sm text-gray-500">
-                  {v.location && (
-                    <span className="flex items-center gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {v.location}
-                    </span>
-                  )}
-                  {v.deadline && (
-                    <span className="flex items-center gap-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-                      {new Date(v.deadline).toLocaleDateString()}
-                    </span>
-                  )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="rounded bg-white p-8 text-center shadow-md">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="mx-auto mb-4 text-gray-300">
-              <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /><rect width="20" height="14" x="2" y="6" rx="2" />
-            </svg>
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-black/5">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-gray-400">
+                <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /><rect width="20" height="14" x="2" y="6" rx="2" />
+              </svg>
+            </div>
             <p className="text-gray-500">{t('careers.noOpenings')}</p>
           </div>
         )}
@@ -106,7 +134,7 @@ export default function CareerOpportunities() {
         <div className="mt-10 text-left">
           <Link
             href={`${localePrefix}/Vacancies`}
-            className={`inline-flex items-center gap-2 ${btnBgClass} px-8 py-3 font-semibold text-white transition-colors hover:opacity-90`}
+            className={`inline-flex items-center gap-2 rounded-xl ${btnBgClass} px-8 py-3 font-semibold text-white shadow-sm transition-all hover:opacity-90 hover:shadow-md`}
           >
             {t('careers.viewAll')}
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
