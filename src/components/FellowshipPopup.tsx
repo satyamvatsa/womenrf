@@ -9,11 +9,16 @@ const APPLICATION_LINK = 'https://docs.google.com/forms/d/e/1FAIpQLSeIOe382YD2bm
 const STORAGE_KEY = 'wrf_fellowship_popup_dismissed';
 
 export default function FellowshipPopup() {
+  // Temporarily disabled — set to true to re-enable
+  const ENABLED = false;
+
   const [visible, setVisible] = useState(false);
   const pathname = usePathname();
   const { localePrefix } = useTranslation();
 
   useEffect(() => {
+    if (!ENABLED) return;
+
     // Only show on the homepage (locale root paths like /en, /fa, /ps)
     const segments = (pathname ?? '').split('/').filter(Boolean);
     const isHome = segments.length <= 1;
@@ -28,7 +33,7 @@ export default function FellowshipPopup() {
 
     const timer = setTimeout(() => setVisible(true), 1200);
     return () => clearTimeout(timer);
-  }, [pathname]);
+  }, [pathname, ENABLED]);
 
   const dismiss = () => {
     setVisible(false);

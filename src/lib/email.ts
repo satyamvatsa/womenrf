@@ -21,6 +21,18 @@ export interface JobApplicationEmailParams {
   resumeUrl?: string;
 }
 
+async function fetchResumeAttachment(url: string): Promise<{ filename: string; content: Buffer } | null> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const buffer = Buffer.from(await res.arrayBuffer());
+    const filename = decodeURIComponent(url.split('/').pop() || 'resume.pdf');
+    return { filename, content: buffer };
+  } catch {
+    return null;
+  }
+}
+
 export async function sendJobApplicationNotification(params: JobApplicationEmailParams) {
   const fromEmail = process.env.FROM_EMAIL || 'communication@womenrf.org';
   const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -96,6 +108,12 @@ ${params.resumeUrl ? `Resume: ${params.resumeUrl}` : ''}
 Cover Letter:
 ${params.coverLetter}`;
 
+  const attachments: { filename: string; content: Buffer }[] = [];
+  if (params.resumeUrl) {
+    const file = await fetchResumeAttachment(params.resumeUrl);
+    if (file) attachments.push(file);
+  }
+
   await transporter.sendMail({
     from: `"Women's Rights First" <${fromEmail}>`,
     to: WRF_NOTIFICATION_EMAIL,
@@ -103,6 +121,7 @@ ${params.coverLetter}`;
     subject: `New Application: ${params.position} - ${params.fullName}`,
     text,
     html,
+    attachments,
   });
 }
 

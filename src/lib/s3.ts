@@ -1,9 +1,9 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
-const bucket = process.env.AWS_S3_BUCKET_NAME || '';
-const region = process.env.AWS_S3_REGION || 'ap-south-1';
-const accessKeyId = process.env.AWS_S3_ACCESS_KEY_ID || '';
-const secretAccessKey = process.env.AWS_S3_SECRET_ACCESS_KEY || '';
+const bucket = process.env.S3_BUCKET_NAME || process.env.AWS_S3_BUCKET_NAME || '';
+const region = process.env.S3_REGION || process.env.AWS_S3_REGION || 'ap-south-1';
+const accessKeyId = process.env.S3_ACCESS_KEY_ID || process.env.AWS_S3_ACCESS_KEY_ID || '';
+const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY || process.env.AWS_S3_SECRET_ACCESS_KEY || '';
 
 let _client: S3Client | null = null;
 
@@ -55,7 +55,7 @@ export async function uploadToS3(key: string, body: Buffer, filename: string): P
   );
 
   // If a custom CDN/CloudFront domain is set, use that; otherwise use the default S3 URL
-  const cdnDomain = process.env.AWS_S3_CDN_DOMAIN;
+  const cdnDomain = process.env.S3_CDN_DOMAIN || process.env.AWS_S3_CDN_DOMAIN;
   if (cdnDomain) {
     return `https://${cdnDomain}/${key}`;
   }
