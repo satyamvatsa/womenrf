@@ -19,18 +19,11 @@ export interface JobApplicationEmailParams {
   position: string;
   coverLetter: string;
   resumeUrl?: string;
-}
-
-async function fetchResumeAttachment(url: string): Promise<{ filename: string; content: Buffer } | null> {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const buffer = Buffer.from(await res.arrayBuffer());
-    const filename = decodeURIComponent(url.split('/').pop() || 'resume.pdf');
-    return { filename, content: buffer };
-  } catch {
-    return null;
-  }
+  resumeAttachment?: {
+    filename: string;
+    content: Buffer;
+    contentType: string;
+  };
 }
 
 export async function sendJobApplicationNotification(params: JobApplicationEmailParams) {
@@ -75,7 +68,7 @@ export async function sendJobApplicationNotification(params: JobApplicationEmail
                         <td style="padding:6px 0;font-size:13px;color:#6b7280;">Date:</td>
                         <td style="padding:6px 0;font-size:14px;color:#1a1a1a;">${date}</td>
                       </tr>
-                      ${params.resumeUrl ? `<tr><td style="padding:6px 0;font-size:13px;color:#6b7280;">Resume:</td><td style="padding:6px 0;font-size:14px;"><a href="${params.resumeUrl}" style="color:#6B5B95;text-decoration:none;">View Resume</a></td></tr>` : ''}
+                      ${params.resumeAttachment ? `<tr><td style="padding:6px 0;font-size:13px;color:#6b7280;">Resume:</td><td style="padding:6px 0;font-size:14px;color:#1a1a1a;">Attached</td></tr>` : ''}
                     </table>
                   </td>
                 </tr>
@@ -103,15 +96,18 @@ Name: ${params.fullName}
 Email: ${params.email}
 ${params.phone ? `Phone: ${params.phone}` : ''}
 Date: ${date}
-${params.resumeUrl ? `Resume: ${params.resumeUrl}` : ''}
+${params.resumeAttachment ? `Resume: Attached` : ''}
 
 Cover Letter:
 ${params.coverLetter}`;
 
-  const attachments: { filename: string; content: Buffer }[] = [];
-  if (params.resumeUrl) {
-    const file = await fetchResumeAttachment(params.resumeUrl);
-    if (file) attachments.push(file);
+  const attachments: { filename: string; content: Buffer; contentType?: string }[] = [];
+  if (params.resumeAttachment) {
+    attachments.push({
+      filename: params.resumeAttachment.filename,
+      content: params.resumeAttachment.content,
+      contentType: params.resumeAttachment.contentType,
+    });
   }
 
   await transporter.sendMail({

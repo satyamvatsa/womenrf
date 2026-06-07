@@ -83,37 +83,23 @@ export default function VacanciesPage() {
     e.preventDefault();
     if (!applyVacancy) return;
     setSubmitting(true);
+    setUploading(!!resumeFile);
     try {
-      let finalResumeUrl = form.resumeUrl.trim() || undefined;
-
+      const fd = new FormData();
+      fd.append('fullName', form.fullName.trim());
+      fd.append('email', form.email.trim());
+      fd.append('phone', form.phone.trim());
+      fd.append('position', applyVacancy.title || applyVacancy.id);
+      fd.append('vacancyId', applyVacancy.id);
+      fd.append('coverLetter', form.coverLetter.trim());
       if (resumeFile) {
-        setUploading(true);
-        const fd = new FormData();
-        fd.append('file', resumeFile);
-        const uploadRes = await fetch('/api/upload-resume', { method: 'POST', body: fd });
-        const uploadData = await uploadRes.json();
-        setUploading(false);
-        if (!uploadRes.ok) {
-          alert(uploadData?.error || 'Resume upload failed. Please try again.');
-          setSubmitting(false);
-          return;
-        }
-        finalResumeUrl = uploadData.url;
+        fd.append('resume', resumeFile);
+      } else if (form.resumeUrl.trim()) {
+        fd.append('resumeUrl', form.resumeUrl.trim());
       }
 
-      const res = await fetch('/api/submit/job-applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fullName: form.fullName.trim(),
-          email: form.email.trim(),
-          phone: form.phone.trim(),
-          position: applyVacancy.title || applyVacancy.id,
-          vacancyId: applyVacancy.id,
-          coverLetter: form.coverLetter.trim(),
-          resumeUrl: finalResumeUrl,
-        }),
-      });
+      const res = await fetch('/api/apply', { method: 'POST', body: fd });
+      setUploading(false);
       const data = await res.json();
       if (res.ok && data.success) {
         setSubmitSuccess(true);
