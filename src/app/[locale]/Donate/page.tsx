@@ -134,8 +134,8 @@ export default function DonatePage() {
   const amountRef = useRef<{ amount: number | null; otherAmount: string }>({ amount: 50, otherAmount: '' });
   amountRef.current = { amount, otherAmount };
   const validatedAmountRef = useRef<number>(50);
-  const donorInfoRef = useRef<{ name: string; email: string }>({ name: '', email: '' });
-  donorInfoRef.current = { name, email };
+  const donorInfoRef = useRef<{ name: string; email: string; phone: string; organization: string }>({ name: '', email: '', phone: '', organization: '' });
+  donorInfoRef.current = { name, email, phone: `${countryCode} ${phone}`, organization };
   const paypalStatusRef = useRef(setPaypalStatus);
   paypalStatusRef.current = setPaypalStatus;
   const paypalOrderIdRef = useRef(setPaypalOrderId);
@@ -188,7 +188,7 @@ export default function DonatePage() {
           paypalStatusRef.current('success');
           
           const finalAmount = validatedAmountRef.current;
-          const { name: donorName, email: donorEmail } = donorInfoRef.current;
+          const { name: donorName, email: donorEmail, phone: donorPhone, organization: donorOrg } = donorInfoRef.current;
           
           if (donorName && donorEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorEmail)) {
             try {
@@ -201,6 +201,8 @@ export default function DonatePage() {
                   amount: finalAmount,
                   transactionId: details.id,
                   currency: 'USD',
+                  phone: donorPhone,
+                  organization: donorOrg,
                 }),
               });
               if (res.ok) {

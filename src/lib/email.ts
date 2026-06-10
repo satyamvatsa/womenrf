@@ -333,6 +333,8 @@ export interface DonationEmailParams {
   amount: number;
   transactionId: string;
   currency?: string;
+  phone?: string;
+  organization?: string;
 }
 
 export async function sendDonationConfirmation({
@@ -341,6 +343,8 @@ export async function sendDonationConfirmation({
   amount,
   transactionId,
   currency = 'USD',
+  phone = '',
+  organization = '',
 }: DonationEmailParams) {
   const subject = `Thank You for Your Donation - Women's Rights First`;
   
@@ -469,5 +473,96 @@ communication@womenrf.org
     subject,
     text,
     html,
+  });
+
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const adminHtml = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f5f5f5;">
+  <table role="presentation" style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding:30px 40px 20px;text-align:center;background:linear-gradient(135deg,#10B981 0%,#059669 100%);border-radius:8px 8px 0 0;">
+              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">Donation Received!</h1>
+              <p style="margin:8px 0 0;color:rgba(255,255,255,0.85);font-size:14px;">${currency} $${amount.toFixed(2)} via PayPal</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:30px 40px;">
+              <p style="margin:0 0 16px;font-size:15px;color:#333;">A new donation has been successfully processed through PayPal.</p>
+              <table role="presentation" style="width:100%;border-collapse:collapse;margin-bottom:20px;background-color:#f9fafb;border-radius:6px;">
+                <tr>
+                  <td style="padding:15px 20px;">
+                    <table role="presentation" style="width:100%;border-collapse:collapse;">
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;width:35%;">Full Name:</td>
+                        <td style="padding:6px 0;font-size:14px;font-weight:600;color:#1a1a1a;">${donorName}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Mobile Number:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;">${phone || 'N/A'}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Email Address:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;"><a href="mailto:${donorEmail}" style="color:#6B5B95;text-decoration:none;">${donorEmail}</a></td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Organization Name:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;">${organization || 'N/A'}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Amount:</td>
+                        <td style="padding:6px 0;font-size:18px;font-weight:700;color:#10B981;">${currency} $${amount.toFixed(2)}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Transaction ID:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;font-family:monospace;">${transactionId}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Date:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;">${date}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 40px;background-color:#f9fafb;border-radius:0 0 8px 8px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#9ca3af;">\u00a9 ${new Date().getFullYear()} Women's Rights First. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const adminText = `Donation Received!
+
+Full Name: ${donorName}
+Mobile Number: ${phone || 'N/A'}
+Email Address: ${donorEmail}
+Organization Name: ${organization || 'N/A'}
+Amount: ${currency} $${amount.toFixed(2)}
+Transaction ID: ${transactionId}
+Date: ${date}
+
+This donation was processed successfully via PayPal.`;
+
+  await transporter.sendMail({
+    from: `"Women's Rights First" <${fromEmail}>`,
+    to: WRF_NOTIFICATION_EMAIL,
+    replyTo: donorEmail,
+    subject: `Donation Received: ${donorName} - ${currency} $${amount.toFixed(2)}`,
+    text: adminText,
+    html: adminHtml,
   });
 }

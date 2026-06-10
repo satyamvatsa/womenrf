@@ -1,16 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendDonationConfirmation } from '@/lib/email';
+import { getDb } from '@/lib/mongodb';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { donorName, donorEmail, amount, transactionId, currency } = body;
+    const { donorName, donorEmail, amount, transactionId, currency, phone, organization } = body;
 
     if (!donorName || !donorEmail || !amount || !transactionId) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       );
+    }
+
+    const parsedAmount = parseFloat(amount);
+    const donationRecord = {
+      donorName,
+      donorEmail,
+      phone: phone || '',
+      organization: organization || '',
+      amount: parsedAmount,
+      currency: currency || 'USD',
+      transactionId,
+      createdAt: new Date(),
+    };
+
+    try {
+      const db = await getDb();
+      if (db) {
+        await db.collection('donations').insertOne(donationRecord);
+      }
+    } catch (dbError) {
+      console.error('Failed to save donation to database:', dbError);
     }
 
     if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
@@ -24,9 +46,11 @@ export async function POST(req: NextRequest) {
     await sendDonationConfirmation({
       donorName,
       donorEmail,
-      amount: parseFloat(amount),
+      amount: parsedAmount,
       transactionId,
       currency: currency || 'USD',
+      phone: phone || '',
+      organization: organization || '',
     });
 
     return NextResponse.json({ success: true });
