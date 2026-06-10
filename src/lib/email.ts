@@ -214,6 +214,119 @@ communication@womenrf.org`;
   });
 }
 
+export interface DonationIntentNotificationParams {
+  fullName: string;
+  email: string;
+  phone: string;
+  organization: string;
+  amount: number;
+  type: 'one-time' | 'monthly';
+  currency?: string;
+}
+
+export async function sendDonationIntentNotification({
+  fullName,
+  email,
+  phone,
+  organization,
+  amount,
+  type,
+  currency = 'USD',
+}: DonationIntentNotificationParams) {
+  const fromEmail = process.env.FROM_EMAIL || 'communication@womenrf.org';
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background-color:#f5f5f5;">
+  <table role="presentation" style="width:100%;border-collapse:collapse;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" style="width:100%;max-width:600px;background-color:#ffffff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding:30px 40px 20px;text-align:center;background:linear-gradient(135deg,#6B5B95 0%,#EC4899 100%);border-radius:8px 8px 0 0;">
+              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">New Donation Intent</h1>
+              <p style="margin:8px 0 0;color:rgba(255,255,255,0.8);font-size:14px;">${type === 'monthly' ? 'Monthly' : 'One-time'} \u2014 ${currency} $${amount.toFixed(2)}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:30px 40px;">
+              <p style="margin:0 0 16px;font-size:15px;color:#333;">A new donor has submitted their details and would like assistance completing a safe donation.</p>
+              <table role="presentation" style="width:100%;border-collapse:collapse;margin-bottom:20px;background-color:#f9fafb;border-radius:6px;">
+                <tr>
+                  <td style="padding:15px 20px;">
+                    <table role="presentation" style="width:100%;border-collapse:collapse;">
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;width:35%;">Full Name:</td>
+                        <td style="padding:6px 0;font-size:14px;font-weight:600;color:#1a1a1a;">${fullName}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Email:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;"><a href="mailto:${email}" style="color:#6B5B95;text-decoration:none;">${email}</a></td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Phone:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;">${phone}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Organization:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;">${organization}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Amount:</td>
+                        <td style="padding:6px 0;font-size:14px;font-weight:700;color:#6B5B95;">${currency} $${amount.toFixed(2)}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Type:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;">${type === 'monthly' ? 'Monthly Recurring' : 'One-time'}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;font-size:13px;color:#6b7280;">Date:</td>
+                        <td style="padding:6px 0;font-size:14px;color:#1a1a1a;">${date}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <p style="margin:0;font-size:14px;color:#555;">Please get back to this donor to help them complete their safe donation.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 40px;background-color:#f9fafb;border-radius:0 0 8px 8px;text-align:center;">
+              <p style="margin:0;font-size:12px;color:#9ca3af;">\u00a9 ${new Date().getFullYear()} Women's Rights First. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  const text = `New Donation Intent
+
+Full Name: ${fullName}
+Email: ${email}
+Phone: ${phone}
+Organization: ${organization}
+Amount: ${currency} $${amount.toFixed(2)}
+Type: ${type === 'monthly' ? 'Monthly Recurring' : 'One-time'}
+Date: ${date}
+
+Please get back to this donor to help them complete their safe donation.`;
+
+  await transporter.sendMail({
+    from: `"Women's Rights First" <${fromEmail}>`,
+    to: WRF_NOTIFICATION_EMAIL,
+    replyTo: email,
+    subject: `New Donation Intent: ${fullName} - ${currency} $${amount.toFixed(2)} (${type === 'monthly' ? 'Monthly' : 'One-time'})`,
+    text,
+    html,
+  });
+}
+
 export interface DonationEmailParams {
   donorName: string;
   donorEmail: string;

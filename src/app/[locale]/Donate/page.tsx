@@ -71,6 +71,42 @@ function OtherWayIcon({ name }: { name: string }) {
   );
 }
 
+const COUNTRY_CODES = [
+  { code: '+1', label: 'US/CA +1' },
+  { code: '+44', label: 'UK +44' },
+  { code: '+93', label: 'AF +93' },
+  { code: '+61', label: 'AU +61' },
+  { code: '+49', label: 'DE +49' },
+  { code: '+33', label: 'FR +33' },
+  { code: '+91', label: 'IN +91' },
+  { code: '+92', label: 'PK +92' },
+  { code: '+971', label: 'AE +971' },
+  { code: '+966', label: 'SA +966' },
+  { code: '+90', label: 'TR +90' },
+  { code: '+31', label: 'NL +31' },
+  { code: '+46', label: 'SE +46' },
+  { code: '+47', label: 'NO +47' },
+  { code: '+358', label: 'FI +358' },
+  { code: '+353', label: 'IE +353' },
+  { code: '+34', label: 'ES +34' },
+  { code: '+39', label: 'IT +39' },
+  { code: '+81', label: 'JP +81' },
+  { code: '+82', label: 'KR +82' },
+  { code: '+86', label: 'CN +86' },
+  { code: '+55', label: 'BR +55' },
+  { code: '+27', label: 'ZA +27' },
+  { code: '+234', label: 'NG +234' },
+  { code: '+254', label: 'KE +254' },
+];
+
+const MAX_PHONE_DIGITS: Record<string, number> = {
+  '+1': 10, '+44': 10, '+93': 9, '+61': 9, '+49': 11,
+  '+33': 9, '+91': 10, '+92': 10, '+971': 9, '+966': 9,
+  '+90': 10, '+31': 9, '+46': 10, '+47': 8, '+358': 10,
+  '+353': 9, '+34': 9, '+39': 10, '+81': 10, '+82': 10,
+  '+86': 11, '+55': 11, '+27': 9, '+234': 10, '+254': 9,
+};
+
 export default function DonatePage() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<'one-time' | 'monthly'>('one-time');
@@ -78,12 +114,18 @@ export default function DonatePage() {
   const [otherAmount, setOtherAmount] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [countryCode, setCountryCode] = useState('+1');
+  const [organization, setOrganization] = useState('');
   const [otherWaysExpandedId, setOtherWaysExpandedId] = useState<string | null>(null);
   const [intentStatus, setIntentStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [monthlyAmount, setMonthlyAmount] = useState<number | null>(25);
   const [monthlyOtherAmount, setMonthlyOtherAmount] = useState('');
   const [monthlyName, setMonthlyName] = useState('');
   const [monthlyEmail, setMonthlyEmail] = useState('');
+  const [monthlyPhone, setMonthlyPhone] = useState('');
+  const [monthlyCountryCode, setMonthlyCountryCode] = useState('+1');
+  const [monthlyOrganization, setMonthlyOrganization] = useState('');
   const [monthlyIntentStatus, setMonthlyIntentStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [paypalStatus, setPaypalStatus] = useState<'idle' | 'processing' | 'success' | 'error' | 'cancelled'>('idle');
   const [paypalOrderId, setPaypalOrderId] = useState<string | null>(null);
@@ -91,6 +133,7 @@ export default function DonatePage() {
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const amountRef = useRef<{ amount: number | null; otherAmount: string }>({ amount: 50, otherAmount: '' });
   amountRef.current = { amount, otherAmount };
+  const validatedAmountRef = useRef<number>(50);
   const donorInfoRef = useRef<{ name: string; email: string }>({ name: '', email: '' });
   donorInfoRef.current = { name, email };
   const paypalStatusRef = useRef(setPaypalStatus);
@@ -119,14 +162,19 @@ export default function DonatePage() {
             alert('Please enter your full name and a valid email address before donating.');
             throw new Error('Validation failed');
           }
+          const { amount: amt, otherAmount: other } = amountRef.current;
+          const computed = other.trim()
+            ? Math.max(0, parseFloat(other) || 0)
+            : (amt ?? 0);
+          if (computed <= 0) {
+            alert('Please select or enter a donation amount.');
+            throw new Error('Amount validation failed');
+          }
+          validatedAmountRef.current = computed;
         },
         createOrder(_data: unknown, actions: { order: { create: (opts: { purchase_units: unknown[] }) => Promise<string> } }) {
           paypalStatusRef.current('processing');
-          const { amount: amt, otherAmount: other } = amountRef.current;
-          const value = other.trim()
-            ? Math.max(0, parseFloat(other) || 0)
-            : (amt ?? 0);
-          const finalValue = value > 0 ? value : 25;
+          const finalValue = validatedAmountRef.current;
           return actions.order.create({
             purchase_units: [{
               amount: { currency_code: 'USD', value: finalValue.toFixed(2) },
@@ -139,11 +187,7 @@ export default function DonatePage() {
           paypalOrderIdRef.current(details.id);
           paypalStatusRef.current('success');
           
-          const { amount: amt, otherAmount: other } = amountRef.current;
-          const value = other.trim()
-            ? Math.max(0, parseFloat(other) || 0)
-            : (amt ?? 0);
-          const finalAmount = value > 0 ? value : 25;
+          const finalAmount = validatedAmountRef.current;
           const { name: donorName, email: donorEmail } = donorInfoRef.current;
           
           if (donorName && donorEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(donorEmail)) {
@@ -389,6 +433,45 @@ export default function DonatePage() {
                       className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
                     />
                   </div>
+                  <div>
+                    <label htmlFor="donor-phone" className="text-sm font-medium">
+                      Phone Number
+                    </label>
+                    <div className="mt-1 flex">
+                      <select
+                        value={countryCode}
+                        onChange={(e) => { setCountryCode(e.target.value); const max = MAX_PHONE_DIGITS[e.target.value] || 10; setPhone((p) => p.slice(0, max)); }}
+                        className="h-10 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-2 text-sm focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.code} value={c.code}>{c.label}</option>
+                        ))}
+                      </select>
+                      <input
+                        id="donor-phone"
+                        type="tel"
+                        required
+                        maxLength={MAX_PHONE_DIGITS[countryCode] || 10}
+                        value={phone}
+                        onChange={(e) => { const max = MAX_PHONE_DIGITS[countryCode] || 10; const v = e.target.value.replace(/[^0-9]/g, '').slice(0, max); setPhone(v); }}
+                        placeholder="9876543210"
+                        className="h-10 w-full rounded-r-md border border-gray-300 px-3 py-2 focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="donor-org" className="text-sm font-medium">
+                      Organization
+                    </label>
+                    <input
+                      id="donor-org"
+                      type="text"
+                      required
+                      value={organization}
+                      onChange={(e) => setOrganization(e.target.value)}
+                      className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
+                    />
+                  </div>
                 </div>
 
                 <div className="pt-4">
@@ -475,6 +558,8 @@ export default function DonatePage() {
                                   currency: 'USD',
                                   fullName: name,
                                   email,
+                                  phone: `${countryCode} ${phone}`,
+                                  organization,
                                 }),
                               });
                               if (res.ok) setIntentStatus('success');
@@ -494,6 +579,8 @@ export default function DonatePage() {
                               intentStatus === 'sending' ||
                               !name.trim() ||
                               !email.trim() ||
+                              !phone.trim() ||
+                              !organization.trim() ||
                               (otherAmount.trim() ? parseFloat(otherAmount) || 0 : amount ?? 0) <= 0
                             }
                             className="inline-flex items-center justify-center rounded-none bg-wrf-purple px-8 py-3 font-semibold text-white transition-colors hover:bg-wrf-purple/90 disabled:opacity-50"
@@ -573,6 +660,45 @@ export default function DonatePage() {
                       className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-wrf-coral focus:outline-none focus:ring-2 focus:ring-wrf-coral/20"
                     />
                   </div>
+                  <div>
+                    <label htmlFor="monthly-donor-phone" className="text-sm font-medium">
+                      Phone Number
+                    </label>
+                    <div className="mt-1 flex">
+                      <select
+                        value={monthlyCountryCode}
+                        onChange={(e) => { setMonthlyCountryCode(e.target.value); const max = MAX_PHONE_DIGITS[e.target.value] || 10; setMonthlyPhone((p) => p.slice(0, max)); }}
+                        className="h-10 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-2 text-sm focus:border-wrf-coral focus:outline-none focus:ring-2 focus:ring-wrf-coral/20"
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.code} value={c.code}>{c.label}</option>
+                        ))}
+                      </select>
+                      <input
+                        id="monthly-donor-phone"
+                        type="tel"
+                        required
+                        maxLength={MAX_PHONE_DIGITS[monthlyCountryCode] || 10}
+                        value={monthlyPhone}
+                        onChange={(e) => { const max = MAX_PHONE_DIGITS[monthlyCountryCode] || 10; const v = e.target.value.replace(/[^0-9]/g, '').slice(0, max); setMonthlyPhone(v); }}
+                        placeholder="9876543210"
+                        className="h-10 w-full rounded-r-md border border-gray-300 px-3 py-2 focus:border-wrf-coral focus:outline-none focus:ring-2 focus:ring-wrf-coral/20"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="monthly-donor-org" className="text-sm font-medium">
+                      Organization
+                    </label>
+                    <input
+                      id="monthly-donor-org"
+                      type="text"
+                      required
+                      value={monthlyOrganization}
+                      onChange={(e) => setMonthlyOrganization(e.target.value)}
+                      className="mt-1 h-10 w-full rounded-md border border-gray-300 px-3 py-2 focus:border-wrf-coral focus:outline-none focus:ring-2 focus:ring-wrf-coral/20"
+                    />
+                  </div>
                 </div>
 
                 <div className="pt-4">
@@ -604,6 +730,8 @@ export default function DonatePage() {
                                 currency: 'USD',
                                 fullName: monthlyName,
                                 email: monthlyEmail,
+                                phone: `${monthlyCountryCode} ${monthlyPhone}`,
+                                organization: monthlyOrganization,
                               }),
                             });
                             if (res.ok) setMonthlyIntentStatus('success');
@@ -623,6 +751,8 @@ export default function DonatePage() {
                             monthlyIntentStatus === 'sending' ||
                             !monthlyName.trim() ||
                             !monthlyEmail.trim() ||
+                            !monthlyPhone.trim() ||
+                            !monthlyOrganization.trim() ||
                             (monthlyOtherAmount.trim() ? parseFloat(monthlyOtherAmount) || 0 : monthlyAmount ?? 0) <= 0
                           }
                           className="inline-flex items-center justify-center rounded-none bg-wrf-coral px-8 py-3 font-semibold text-white transition-colors hover:bg-wrf-coral/90 disabled:opacity-50"
