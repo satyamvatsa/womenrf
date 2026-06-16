@@ -107,6 +107,162 @@ const MAX_PHONE_DIGITS: Record<string, number> = {
   '+86': 11, '+55': 11, '+27': 9, '+234': 10, '+254': 9,
 };
 
+function DonationInquiryForm({ t }: { t: (key: string) => string }) {
+  const [fullName, setFullName] = useState('');
+  const [emailAddr, setEmailAddr] = useState('');
+  const [phoneNum, setPhoneNum] = useState('');
+  const [phoneCode, setPhoneCode] = useState('+1');
+  const [org, setOrg] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fullName.trim() || !emailAddr.trim()) return;
+    setStatus('sending');
+    try {
+      const res = await fetch('/api/submit/donation-intents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'inquiry',
+          fullName: fullName.trim(),
+          email: emailAddr.trim(),
+          phone: `${phoneCode} ${phoneNum}`.trim(),
+          organization: org.trim(),
+        }),
+      });
+      if (res.ok) {
+        setStatus('success');
+        setFullName('');
+        setEmailAddr('');
+        setPhoneNum('');
+        setOrg('');
+      } else {
+        setStatus('error');
+      }
+    } catch {
+      setStatus('error');
+    }
+  };
+
+  if (status === 'success') {
+    return (
+      <section className="bg-gray-50 py-20">
+        <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="rounded-lg border border-green-200 bg-green-50 p-8">
+            <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-12 w-12 text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-lg font-medium text-green-800">{t('donate.inquiry.success')}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="bg-gray-50 py-20">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-left">
+          <div className="inline-block bg-wrf-purple px-8 py-6">
+            <h2 className="text-3xl font-bold text-white">{t('donate.inquiry.title')}</h2>
+          </div>
+          <p className="mt-4 text-lg text-gray-600">
+            {t('donate.inquiry.description')}
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5 rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
+          <div>
+            <label htmlFor="inquiry-name" className="block text-sm font-semibold text-gray-700 mb-1">
+              {t('donate.inquiry.fullName')} <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="inquiry-name"
+              type="text"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder={t('donate.inquiry.fullNamePlaceholder')}
+              className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="inquiry-email" className="block text-sm font-semibold text-gray-700 mb-1">
+              {t('donate.inquiry.email')} <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="inquiry-email"
+              type="email"
+              required
+              value={emailAddr}
+              onChange={(e) => setEmailAddr(e.target.value)}
+              placeholder={t('donate.inquiry.emailPlaceholder')}
+              className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="inquiry-phone" className="block text-sm font-semibold text-gray-700 mb-1">
+              {t('donate.inquiry.phone')}
+            </label>
+            <div className="flex gap-2">
+              <select
+                value={phoneCode}
+                onChange={(e) => setPhoneCode(e.target.value)}
+                className="rounded-md border border-gray-300 px-3 py-3 text-sm focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
+              >
+                {COUNTRY_CODES.map((c) => (
+                  <option key={c.code} value={c.code}>{c.label}</option>
+                ))}
+              </select>
+              <input
+                id="inquiry-phone"
+                type="tel"
+                value={phoneNum}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D/g, '');
+                  const max = MAX_PHONE_DIGITS[phoneCode] || 15;
+                  setPhoneNum(digits.slice(0, max));
+                }}
+                placeholder={t('donate.inquiry.phonePlaceholder')}
+                className="flex-1 rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="inquiry-org" className="block text-sm font-semibold text-gray-700 mb-1">
+              {t('donate.inquiry.organization')}
+            </label>
+            <input
+              id="inquiry-org"
+              type="text"
+              value={org}
+              onChange={(e) => setOrg(e.target.value)}
+              placeholder={t('donate.inquiry.organizationPlaceholder')}
+              className="w-full rounded-md border border-gray-300 px-4 py-3 text-sm focus:border-wrf-purple focus:outline-none focus:ring-2 focus:ring-wrf-purple/20"
+            />
+          </div>
+
+          {status === 'error' && (
+            <p className="text-sm text-red-600">{t('donate.inquiry.error')}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={status === 'sending'}
+            className="w-full rounded-md bg-wrf-purple px-8 py-3 font-semibold text-white transition-colors hover:bg-wrf-purple/90 disabled:opacity-50"
+          >
+            {status === 'sending' ? t('donate.inquiry.sending') : t('donate.inquiry.submit')}
+          </button>
+        </form>
+      </div>
+    </section>
+  );
+}
+
 export default function DonatePage() {
   const { t } = useTranslation();
   const [tab, setTab] = useState<'one-time' | 'monthly'>('one-time');
@@ -771,89 +927,96 @@ export default function DonatePage() {
         </div>
       </section>
 
-      {/* Bank Wire Transfer */}
-      <section className="bg-white py-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-12 text-left">
-            <div className="inline-block bg-wrf-black px-8 py-6">
-              <h2 className="text-3xl font-bold text-white">{t('donate.bank.title')}</h2>
-            </div>
-            <p className="mt-4 text-lg text-gray-600">
-              {t('donate.bank.description')}
-            </p>
-          </div>
-
-          <div className="grid gap-8 md:grid-cols-2">
-            {/* Account Details */}
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-wrf-purple text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <rect width="20" height="14" x="2" y="5" rx="2" />
-                    <line x1="2" x2="22" y1="10" y2="10" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">{t('donate.bank.accountDetails')}</h3>
+      {/* Bank Wire Transfer — controlled by admin toggle */}
+      {(adminDonations?.showBankDetails !== false) && (
+        <section className="bg-white py-20">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-left">
+              <div className="inline-block bg-wrf-black px-8 py-6">
+                <h2 className="text-3xl font-bold text-white">{t('donate.bank.title')}</h2>
               </div>
-              <dl className="space-y-3">
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountName')}</dt>
-                  <dd className="mt-0.5 text-base font-medium text-gray-900">Women&apos;s Rights First</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountNumber')}</dt>
-                  <dd className="mt-0.5 font-mono text-base font-medium text-gray-900">435062707479</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountAddress')}</dt>
-                  <dd className="mt-0.5 text-base text-gray-900">3783 Tonbridge Pl, Woodbridge, VA 22192</dd>
-                </div>
-              </dl>
+              <p className="mt-4 text-lg text-gray-600">
+                {t('donate.bank.description')}
+              </p>
             </div>
 
-            {/* Bank Details */}
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
-              <div className="mb-6 flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-wrf-coral text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="3" x2="21" y1="22" y2="22" />
-                    <line x1="6" x2="6" y1="18" y2="11" />
-                    <line x1="10" x2="10" y1="18" y2="11" />
-                    <line x1="14" x2="14" y1="18" y2="11" />
-                    <line x1="18" x2="18" y1="18" y2="11" />
-                    <polygon points="12 2 20 7 4 7" />
-                  </svg>
+            <div className="grid gap-8 md:grid-cols-2">
+              {/* Account Details */}
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-wrf-purple text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect width="20" height="14" x="2" y="5" rx="2" />
+                      <line x1="2" x2="22" y1="10" y2="10" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">{t('donate.bank.accountDetails')}</h3>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">{t('donate.bank.bankDetails')}</h3>
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountName')}</dt>
+                    <dd className="mt-0.5 text-base font-medium text-gray-900">Women&apos;s Rights First</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountNumber')}</dt>
+                    <dd className="mt-0.5 font-mono text-base font-medium text-gray-900">435062707479</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.accountAddress')}</dt>
+                    <dd className="mt-0.5 text-base text-gray-900">3783 Tonbridge Pl, Woodbridge, VA 22192</dd>
+                  </div>
+                </dl>
               </div>
-              <dl className="space-y-3">
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.bankName')}</dt>
-                  <dd className="mt-0.5 text-base font-medium text-gray-900">Bank of America, N.A.</dd>
+
+              {/* Bank Details */}
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-8">
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-wrf-coral text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="3" x2="21" y1="22" y2="22" />
+                      <line x1="6" x2="6" y1="18" y2="11" />
+                      <line x1="10" x2="10" y1="18" y2="11" />
+                      <line x1="14" x2="14" y1="18" y2="11" />
+                      <line x1="18" x2="18" y1="18" y2="11" />
+                      <polygon points="12 2 20 7 4 7" />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900">{t('donate.bank.bankDetails')}</h3>
                 </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.bankAddress')}</dt>
-                  <dd className="mt-0.5 text-base text-gray-900">222 Broadway, New York, NY 10038</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.swiftCode')}</dt>
-                  <dd className="mt-0.5 font-mono text-base font-bold text-wrf-purple">BOFAUS3N</dd>
-                </div>
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.routingCode')}</dt>
-                  <dd className="mt-0.5 font-mono text-base font-bold text-wrf-purple">051000017</dd>
-                </div>
-              </dl>
+                <dl className="space-y-3">
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.bankName')}</dt>
+                    <dd className="mt-0.5 text-base font-medium text-gray-900">Bank of America, N.A.</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.bankAddress')}</dt>
+                    <dd className="mt-0.5 text-base text-gray-900">222 Broadway, New York, NY 10038</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.swiftCode')}</dt>
+                    <dd className="mt-0.5 font-mono text-base font-bold text-wrf-purple">BOFAUS3N</dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs font-semibold uppercase tracking-wider text-gray-500">{t('donate.bank.routingCode')}</dt>
+                    <dd className="mt-0.5 font-mono text-base font-bold text-wrf-purple">051000017</dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+
+            <div className="mt-8 rounded-lg border-l-4 border-wrf-purple bg-purple-50 p-6">
+              <p className="text-sm text-gray-700">
+                {t('donate.bank.note')}
+              </p>
             </div>
           </div>
+        </section>
+      )}
 
-          <div className="mt-8 rounded-lg border-l-4 border-wrf-purple bg-purple-50 p-6">
-            <p className="text-sm text-gray-700">
-              {t('donate.bank.note')}
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Donation Inquiry Form — controlled by admin toggle */}
+      {(adminDonations?.showDonationInquiryForm !== false) && (
+        <DonationInquiryForm t={t} />
+      )}
 
       {/* Other Ways to Give */}
       <section className="bg-gray-50 py-20">

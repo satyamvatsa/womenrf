@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readData, writeData } from '@/lib/db';
-import { sendJobApplicationNotification, sendJobApplicationConfirmation, sendDonationIntentNotification } from '@/lib/email';
+import { sendJobApplicationNotification, sendJobApplicationConfirmation, sendDonationIntentNotification, sendDonationInquiryNotification, sendDonationInquiryConfirmation } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -52,15 +52,28 @@ export async function POST(
     }
 
     if (section === 'donation-intents' && body.email && body.fullName) {
-      sendDonationIntentNotification({
-        fullName: body.fullName,
-        email: body.email,
-        phone: body.phone || '',
-        organization: body.organization || '',
-        amount: parseFloat(body.amount) || 0,
-        type: body.type || 'one-time',
-        currency: body.currency || 'USD',
-      }).catch(() => {});
+      if (body.type === 'inquiry') {
+        const inquiryParams = {
+          fullName: body.fullName,
+          email: body.email,
+          phone: body.phone || '',
+          organization: body.organization || '',
+        };
+        Promise.allSettled([
+          sendDonationInquiryNotification(inquiryParams),
+          sendDonationInquiryConfirmation(inquiryParams),
+        ]).catch(() => {});
+      } else {
+        sendDonationIntentNotification({
+          fullName: body.fullName,
+          email: body.email,
+          phone: body.phone || '',
+          organization: body.organization || '',
+          amount: parseFloat(body.amount) || 0,
+          type: body.type || 'one-time',
+          currency: body.currency || 'USD',
+        }).catch(() => {});
+      }
     }
 
     return NextResponse.json({ success: true });

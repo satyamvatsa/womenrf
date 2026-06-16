@@ -43,7 +43,7 @@ const defaultOtherWays = {
 };
 
 export default function DonationManagementPage() {
-  const [activeTab, setActiveTab] = useState<'hero' | 'content'>('hero');
+  const [activeTab, setActiveTab] = useState<'hero' | 'content' | 'bankwire'>('hero');
   const [pageTitle, setPageTitle] = useState(defaultHero.pageTitle);
   const [subtitle, setSubtitle] = useState(defaultHero.subtitle);
   const [heroBackgroundImageUrl, setHeroBackgroundImageUrl] = useState(defaultHero.heroBackgroundImageUrl);
@@ -55,8 +55,12 @@ export default function DonationManagementPage() {
   const [otherWaysTitle, setOtherWaysTitle] = useState(defaultOtherWays.otherWaysTitle);
   const [otherWaysDescription, setOtherWaysDescription] = useState(defaultOtherWays.otherWaysDescription);
 
+  const [showBankDetails, setShowBankDetails] = useState(true);
+  const [showDonationInquiryForm, setShowDonationInquiryForm] = useState(true);
+
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
   const [saveOtherWaysStatus, setSaveOtherWaysStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
+  const [saveBankWireStatus, setSaveBankWireStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
   const [uploadingField, setUploadingField] = useState<'hero' | 'triangle' | null>(null);
 
   useEffect(() => {
@@ -71,19 +75,23 @@ export default function DonationManagementPage() {
       if (data.subtitleTextColor !== undefined) setSubtitleTextColor(data.subtitleTextColor);
       if (data.otherWaysTitle !== undefined) setOtherWaysTitle(data.otherWaysTitle);
       if (data.otherWaysDescription !== undefined) setOtherWaysDescription(data.otherWaysDescription);
+      if (data.showBankDetails !== undefined) setShowBankDetails(data.showBankDetails);
+      if (data.showDonationInquiryForm !== undefined) setShowDonationInquiryForm(data.showDonationInquiryForm);
     });
   }, []);
+
+  const getAllData = () => ({
+    pageTitle, subtitle,
+    heroBackgroundImageUrl, heroTriangleImageUrl,
+    titleBackgroundColor, titleTextColor, subtitleTextColor,
+    otherWaysTitle, otherWaysDescription,
+    showBankDetails, showDonationInquiryForm,
+  });
 
   const handleSaveHero = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveStatus('saving');
-    const data = {
-      pageTitle, subtitle,
-      heroBackgroundImageUrl, heroTriangleImageUrl,
-      titleBackgroundColor, titleTextColor, subtitleTextColor,
-      otherWaysTitle, otherWaysDescription,
-    };
-    const ok = await saveAdminData('donations', data);
+    const ok = await saveAdminData('donations', getAllData());
     setSaveStatus(ok ? 'saved' : 'error');
     setTimeout(() => setSaveStatus('idle'), 3000);
   };
@@ -91,15 +99,17 @@ export default function DonationManagementPage() {
   const handleSaveOtherWays = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaveOtherWaysStatus('saving');
-    const data = {
-      pageTitle, subtitle,
-      heroBackgroundImageUrl, heroTriangleImageUrl,
-      titleBackgroundColor, titleTextColor, subtitleTextColor,
-      otherWaysTitle, otherWaysDescription,
-    };
-    const ok = await saveAdminData('donations', data);
+    const ok = await saveAdminData('donations', getAllData());
     setSaveOtherWaysStatus(ok ? 'saved' : 'error');
     setTimeout(() => setSaveOtherWaysStatus('idle'), 3000);
+  };
+
+  const handleSaveBankWire = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaveBankWireStatus('saving');
+    const ok = await saveAdminData('donations', getAllData());
+    setSaveBankWireStatus(ok ? 'saved' : 'error');
+    setTimeout(() => setSaveBankWireStatus('idle'), 3000);
   };
 
   const inputClass =
@@ -126,7 +136,7 @@ export default function DonationManagementPage() {
           <div
             role="tablist"
             aria-orientation="horizontal"
-            className="h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-600 grid w-full grid-cols-2"
+            className="h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-600 grid w-full grid-cols-3"
           >
             <button
               type="button"
@@ -140,6 +150,19 @@ export default function DonationManagementPage() {
               onClick={() => setActiveTab('hero')}
             >
               Hero Section
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={activeTab === 'bankwire'}
+              aria-controls="donation-tabpanel-bankwire"
+              id="donation-tab-bankwire"
+              className={`inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                activeTab === 'bankwire' ? 'bg-background text-foreground shadow-sm' : ''
+              }`}
+              onClick={() => setActiveTab('bankwire')}
+            >
+              Bank Wire Transfer
             </button>
             <button
               type="button"
@@ -313,6 +336,81 @@ export default function DonationManagementPage() {
                   {saveStatus === 'saving' && <span className="text-sm text-gray-500 ml-3">Saving...</span>}
                   {saveStatus === 'saved' && <span className="text-sm text-green-600 ml-3">Saved successfully!</span>}
                   {saveStatus === 'error' && <span className="text-sm text-red-600 ml-3">Error saving. Try again.</span>}
+                </form>
+              </div>
+            </div>
+          </div>
+
+          {/* Bank Wire Transfer tab panel */}
+          <div
+            role="tabpanel"
+            id="donation-tabpanel-bankwire"
+            aria-labelledby="donation-tab-bankwire"
+            tabIndex={0}
+            className="mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            hidden={activeTab !== 'bankwire'}
+          >
+            <div className={cardClass}>
+              <div className="flex flex-col space-y-1.5 p-6">
+                <h3 className="text-2xl font-semibold leading-none tracking-tight">Bank Wire Transfer Settings</h3>
+                <p className="text-sm text-gray-500">
+                  Control the visibility of the bank wire transfer details and the donation inquiry form on the public Donate page.
+                </p>
+              </div>
+              <div className="p-6 pt-0">
+                <form onSubmit={handleSaveBankWire} className="space-y-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                      <div>
+                        <p className="font-medium">Show Bank Account &amp; Bank Details</p>
+                        <p className="text-sm text-gray-500">When enabled, the Account Details and Bank Details cards are visible on the Donate page.</p>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={showBankDetails}
+                        onClick={() => setShowBankDetails(!showBankDetails)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          showBankDetails ? 'bg-primary' : 'bg-gray-200'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            showBankDetails ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-lg border p-4">
+                      <div>
+                        <p className="font-medium">Show Donation Inquiry Form</p>
+                        <p className="text-sm text-gray-500">When enabled, a form asking for name, email, phone and organization is shown so your team can follow up with potential donors.</p>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={showDonationInquiryForm}
+                        onClick={() => setShowDonationInquiryForm(!showDonationInquiryForm)}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                          showDonationInquiryForm ? 'bg-primary' : 'bg-gray-200'
+                        }`}
+                      >
+                        <span
+                          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                            showDonationInquiryForm ? 'translate-x-6' : 'translate-x-1'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="submit" className={btnPrimary}>
+                    Save Bank Wire Settings
+                  </button>
+                  {saveBankWireStatus === 'saving' && <span className="text-sm text-gray-500 ml-3">Saving...</span>}
+                  {saveBankWireStatus === 'saved' && <span className="text-sm text-green-600 ml-3">Saved successfully!</span>}
+                  {saveBankWireStatus === 'error' && <span className="text-sm text-red-600 ml-3">Error saving. Try again.</span>}
                 </form>
               </div>
             </div>

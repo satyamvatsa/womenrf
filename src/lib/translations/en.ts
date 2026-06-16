@@ -245,6 +245,22 @@ const en: Record<string, string> = {
   'donate.bank.routingCode': 'International Routing Code',
   'donate.bank.note': 'Please include "Donation - Women\'s Rights First" as the payment reference when making your transfer. For international transfers, please use the SWIFT code. For domestic U.S. transfers, use the routing code.',
 
+  // ─── Donate: Inquiry Form ───
+  'donate.inquiry.title': 'Get Help with Your Donation',
+  'donate.inquiry.description': 'Fill out the form below and our team will get back to you to help with providing safe donation options.',
+  'donate.inquiry.fullName': 'Full Name',
+  'donate.inquiry.fullNamePlaceholder': 'Enter your full name',
+  'donate.inquiry.email': 'Email Address',
+  'donate.inquiry.emailPlaceholder': 'you@example.com',
+  'donate.inquiry.phone': 'Phone Number',
+  'donate.inquiry.phonePlaceholder': 'Enter your phone number',
+  'donate.inquiry.organization': 'Organization',
+  'donate.inquiry.organizationPlaceholder': 'Organization you work for (optional)',
+  'donate.inquiry.submit': 'Submit Inquiry',
+  'donate.inquiry.sending': 'Sending...',
+  'donate.inquiry.success': 'Thank you! Our team will reach out to you shortly to assist with your donation.',
+  'donate.inquiry.error': 'Something went wrong. Please try again or email us at communication@womenrf.org.',
+
   // ─── FAQ Page ───
   'faq.hero.title': 'Frequently asked question',
   'faq.hero.description': "Find answers to the most common questions about our programs, services, and how we support women's rights.",
