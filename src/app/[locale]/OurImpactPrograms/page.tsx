@@ -248,6 +248,20 @@ export default function OurImpactProgramsPage() {
                           </svg>
                         </Link>
                       )}
+
+                      {/* Read More link for reports */}
+                      {item.type === 'report' && (
+                        <Link
+                          href={`${localePrefix}/OurImpactPrograms/${item.slug}`}
+                          className="inline-flex h-9 items-center justify-center gap-1 bg-white text-wrf-black hover:bg-gray-100 px-3 py-1.5 text-sm font-semibold transition-colors"
+                        >
+                          {t('programs.learnMore')}
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="ml-2">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                          </svg>
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </article>
