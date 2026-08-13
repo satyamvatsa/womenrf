@@ -31,7 +31,7 @@ const STATUS_COLORS: Record<BlogPost['status'], string> = {
 };
 
 function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  return text.toLowerCase().replace(/[\s\p{P}\p{S}]+/gu, '-').replace(/(^-|-$)/g, '');
 }
 
 const emptyPost: Omit<BlogPost, 'id'> = {
