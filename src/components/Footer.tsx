@@ -39,6 +39,7 @@ export default function Footer() {
       title: t('footer.sections.whatWeDo'),
       className: 'bg-wrf-coral',
       links: [
+        { label: t('footer.sections.whatWeDo.allPrograms') || 'Our Impact Programs', href: '/OurImpactPrograms' },
         { label: t('footer.sections.whatWeDo.legal'), href: '/ProgramPage?slug=legal-empowerment-international-accountability' },
         { label: t('footer.sections.whatWeDo.peace'), href: '/ProgramPage?slug=peacebuilding-social-cohesion' },
         { label: t('footer.sections.whatWeDo.digital'), href: '/ProgramPage?slug=Digital-Transformation-and%20-Open%20-Gender%20-Data' },

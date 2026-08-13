@@ -36,6 +36,7 @@ const VALID_SECTIONS = [
   'job-applications',
   'donation-intents',
   'events',
+  'reports',
 ];
 
 const TRANSLATABLE_SECTIONS = new Set([
@@ -58,6 +59,7 @@ const TRANSLATABLE_SECTIONS = new Set([
   'faq',
   'faqs',
   'events',
+  'reports',
 ]);
 
 const VALID_LOCALES = ['en', 'fa', 'ps'];

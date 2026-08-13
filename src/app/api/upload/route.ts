@@ -7,9 +7,12 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'NothingIsPermanent';
-const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-const ALLOWED_FOLDERS = ['partners', 'team', 'about', 'programs', 'news', 'blog'];
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_PDF_SIZE = 20 * 1024 * 1024; // 20MB
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+const ALLOWED_PDF_TYPES = ['application/pdf'];
+const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_PDF_TYPES];
+const ALLOWED_FOLDERS = ['partners', 'team', 'about', 'programs', 'news', 'blog', 'reports'];
 
 function isAuthorized(request: NextRequest): boolean {
   const auth = request.headers.get('Authorization');
@@ -33,11 +36,13 @@ export async function POST(request: NextRequest) {
     if (!file || !(file instanceof File)) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
-    if (file.size > MAX_SIZE) {
-      return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
+    const isPdf = ALLOWED_PDF_TYPES.includes(file.type);
+    const maxSize = isPdf ? MAX_PDF_SIZE : MAX_IMAGE_SIZE;
+    if (file.size > maxSize) {
+      return NextResponse.json({ error: `File too large (max ${isPdf ? '20MB' : '5MB'})` }, { status: 400 });
     }
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Use JPEG, PNG, GIF, WebP, or SVG.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid file type. Use JPEG, PNG, GIF, WebP, SVG, or PDF.' }, { status: 400 });
     }
 
     const folder = formData.get('folder');

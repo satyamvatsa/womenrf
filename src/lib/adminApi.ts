@@ -78,6 +78,25 @@ export async function uploadAdminImage(file: File, folder?: string): Promise<str
   }
 }
 
+/** Upload a PDF file; returns public URL or null. */
+export async function uploadAdminPdf(file: File, folder?: string): Promise<string | null> {
+  try {
+    const form = new FormData();
+    form.append('file', file);
+    if (folder) form.append('folder', folder);
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${ADMIN_PASSWORD}` },
+      body: form,
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.url ?? null;
+  } catch {
+    return null;
+  }
+}
+
 const adminHeaders = () => ({
   Authorization: `Bearer ${ADMIN_PASSWORD}`,
 });
