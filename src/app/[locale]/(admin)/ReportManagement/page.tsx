@@ -128,13 +128,16 @@ export default function ReportManagementPage() {
     setUploadingPdf(pdfLang);
     const url = await uploadAdminPdf(file, 'reports');
     if (url) {
-      setForm(f => ({
-        ...f,
-        pdfs: [
-          ...f.pdfs.filter(p => p.language !== pdfLang),
-          { language: pdfLang, url, fileName: file.name },
-        ],
-      }));
+      const uploadedLang = pdfLang;
+      setForm(f => {
+        const newPdfs = [
+          ...f.pdfs.filter(p => p.language !== uploadedLang),
+          { language: uploadedLang, url, fileName: file.name },
+        ];
+        const remaining = LANGUAGES.filter(l => !newPdfs.some(p => p.language === l.value));
+        if (remaining.length > 0) setPdfLang(remaining[0].value);
+        return { ...f, pdfs: newPdfs };
+      });
     } else {
       alert('PDF upload failed.');
     }
@@ -143,7 +146,12 @@ export default function ReportManagementPage() {
   };
 
   const removePdf = (language: ReportPdf['language']) => {
-    setForm(f => ({ ...f, pdfs: f.pdfs.filter(p => p.language !== language) }));
+    setForm(f => {
+      const newPdfs = f.pdfs.filter(p => p.language !== language);
+      const remaining = LANGUAGES.filter(l => !newPdfs.some(p => p.language === l.value));
+      if (remaining.length > 0) setPdfLang(remaining[0].value);
+      return { ...f, pdfs: newPdfs };
+    });
   };
 
   return (
