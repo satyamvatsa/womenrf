@@ -1,6 +1,7 @@
 import Hero from '@/components/Hero';
 import Partners from '@/components/Partners';
 import Programs from '@/components/Programs';
+import UpcomingEvents from '@/components/UpcomingEvents';
 import Testimonials from '@/components/Testimonials';
 import LatestNews from '@/components/LatestNews';
 import CareerOpportunities from '@/components/CareerOpportunities';
@@ -14,6 +15,7 @@ export default function HomePage() {
         <Hero />
         <Partners />
         <Programs />
+        <UpcomingEvents />
         <Testimonials />
         <CareerOpportunities />
         <LatestNews />

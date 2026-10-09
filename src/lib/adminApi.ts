@@ -59,8 +59,17 @@ export async function submitPublicForm(section: string, data: Record<string, unk
   }
 }
 
-/** Upload an image; returns public URL or null. Optional folder for subdirectory (e.g. 'partners', 'team'). */
-export async function uploadAdminImage(file: File, folder?: string): Promise<string | null> {
+export type UploadResult = { url: string } | { error: string };
+
+/**
+ * Upload a file and report why it failed.
+ *
+ * The server explains rejections precisely ("File too large (max 5MB)",
+ * "Invalid file type...") but the url-or-null helpers below drop that message,
+ * leaving the admin with a failure and no reason. Prefer this when the caller
+ * can show the reason to the user.
+ */
+export async function uploadAdminFile(file: File, folder?: string): Promise<UploadResult> {
   try {
     const form = new FormData();
     form.append('file', file);
@@ -70,31 +79,37 @@ export async function uploadAdminImage(file: File, folder?: string): Promise<str
       headers: { Authorization: `Bearer ${ADMIN_PASSWORD}` },
       body: form,
     });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data?.url ?? null;
+
+    // A rejection by the hosting platform (e.g. a payload limit) is not JSON.
+    let data: { url?: string; error?: string } | null = null;
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
+
+    if (!res.ok) {
+      return { error: data?.error || `Upload failed (HTTP ${res.status}).` };
+    }
+    if (!data?.url) {
+      return { error: 'Upload succeeded but no file URL was returned.' };
+    }
+    return { url: data.url };
   } catch {
-    return null;
+    return { error: 'Could not reach the server. The file may be too large to send.' };
   }
+}
+
+/** Upload an image; returns public URL or null. Optional folder for subdirectory (e.g. 'partners', 'team'). */
+export async function uploadAdminImage(file: File, folder?: string): Promise<string | null> {
+  const result = await uploadAdminFile(file, folder);
+  return 'url' in result ? result.url : null;
 }
 
 /** Upload a PDF file; returns public URL or null. */
 export async function uploadAdminPdf(file: File, folder?: string): Promise<string | null> {
-  try {
-    const form = new FormData();
-    form.append('file', file);
-    if (folder) form.append('folder', folder);
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${ADMIN_PASSWORD}` },
-      body: form,
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data?.url ?? null;
-  } catch {
-    return null;
-  }
+  const result = await uploadAdminFile(file, folder);
+  return 'url' in result ? result.url : null;
 }
 
 const adminHeaders = () => ({

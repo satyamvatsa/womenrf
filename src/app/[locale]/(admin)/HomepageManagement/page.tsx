@@ -125,6 +125,11 @@ export default function HomepageManagementPage() {
   const [vacanciesSubtitle, setVacanciesSubtitle] = useState("Make a difference in women's lives around the world. Explore our latest career opportunities.");
   const [vacanciesButtonColor, setVacanciesButtonColor] = useState('bg-primary');
 
+  const [showEvents, setShowEvents] = useState(true);
+  const [eventsTitle, setEventsTitle] = useState('Upcoming Events');
+  const [eventsTitleBg, setEventsTitleBg] = useState('bg-secondary');
+  const [eventsSubtitle, setEventsSubtitle] = useState('Join us at our next events and dialogues.');
+  const [eventsButtonColor, setEventsButtonColor] = useState('bg-secondary');
   const [showNews, setShowNews] = useState(true);
   const [newsTitle, setNewsTitle] = useState('Latest Updates');
   const [newsTitleBg, setNewsTitleBg] = useState('bg-support-1');
@@ -189,6 +194,11 @@ export default function HomepageManagementPage() {
       if (data.vacanciesTitleBg !== undefined) setVacanciesTitleBg(data.vacanciesTitleBg);
       if (data.vacanciesSubtitle !== undefined) setVacanciesSubtitle(data.vacanciesSubtitle);
       if (data.vacanciesButtonColor !== undefined) setVacanciesButtonColor(data.vacanciesButtonColor);
+      if (data.showEvents !== undefined) setShowEvents(data.showEvents);
+      if (data.eventsTitle !== undefined) setEventsTitle(data.eventsTitle);
+      if (data.eventsTitleBg !== undefined) setEventsTitleBg(data.eventsTitleBg);
+      if (data.eventsSubtitle !== undefined) setEventsSubtitle(data.eventsSubtitle);
+      if (data.eventsButtonColor !== undefined) setEventsButtonColor(data.eventsButtonColor);
       if (data.showNews !== undefined) setShowNews(data.showNews);
       if (data.newsTitle !== undefined) setNewsTitle(data.newsTitle);
       if (data.newsTitleBg !== undefined) setNewsTitleBg(data.newsTitleBg);
@@ -241,6 +251,7 @@ export default function HomepageManagementPage() {
       showPrograms, programsTitle, programsTitleBg, programsSubtitle, programsButtonColor,
       showTestimonials, testimonialTitle, testimonialTitleBg, testimonialSubtitle,
       showVacancies, vacanciesTitle, vacanciesTitleBg, vacanciesSubtitle, vacanciesButtonColor,
+      showEvents, eventsTitle, eventsTitleBg, eventsSubtitle, eventsButtonColor,
       showNews, newsTitle, newsTitleBg, newsSubtitle, newsButtonColor,
       showPartners, partnersTitle, partnersTitleBg, partnersSubtitle, partnersList,
     };
@@ -558,6 +569,47 @@ export default function HomepageManagementPage() {
               <div>
                 <label className={labelClass}>Button Color</label>
                 <select className={selectClass + ' mt-2'} value={vacanciesButtonColor} onChange={(e) => setVacanciesButtonColor(e.target.value)}>
+                  {COLOR_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Upcoming Events Section */}
+        <div className={sectionClass}>
+          <div className={cardHeaderClass}>
+            <h3 className={cardTitleClass}>Upcoming Events Section</h3>
+            <p className={cardDescClass}>Shows the next 3 published events. The section hides itself automatically when no upcoming events exist.</p>
+          </div>
+          <div className={spaceYClass}>
+            <ToggleRow id="show_events_section" label="Show Events Section" checked={showEvents} onChange={setShowEvents} />
+            <div className={gridClass}>
+              <div>
+                <label className={labelClass}>Title</label>
+                <input className={inputClass + ' mt-2'} name="events_title" value={eventsTitle} onChange={(e) => setEventsTitle(e.target.value)} />
+              </div>
+              <div>
+                <label className={labelClass}>Title Background Color</label>
+                <select className={selectClass + ' mt-2'} value={eventsTitleBg} onChange={(e) => setEventsTitleBg(e.target.value)}>
+                  {COLOR_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className={labelClass}>Subtitle</label>
+                <textarea className={textareaClass + ' mt-2'} name="events_subtitle" value={eventsSubtitle} onChange={(e) => setEventsSubtitle(e.target.value)} />
+              </div>
+              <div>
+                <label className={labelClass}>Button Color</label>
+                <select className={selectClass + ' mt-2'} value={eventsButtonColor} onChange={(e) => setEventsButtonColor(e.target.value)}>
                   {COLOR_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>
                       {o.label}

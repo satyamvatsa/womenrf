@@ -42,7 +42,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: `File too large (max ${isPdf ? '20MB' : '5MB'})` }, { status: 400 });
     }
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Use JPEG, PNG, GIF, WebP, SVG, or PDF.' }, { status: 400 });
+      // iPhones hand over HEIC/HEIF, which no browser can display. Say so plainly
+      // instead of listing formats — some browsers also send it with an empty type,
+      // so fall back to the filename.
+      const isHeic = /hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
+      return NextResponse.json({
+        error: isHeic
+          ? 'HEIC/HEIF photos cannot be shown on the web. Convert the photo to JPEG and upload it again.'
+          : 'Invalid file type. Use JPEG, PNG, GIF, WebP, SVG, or PDF.',
+      }, { status: 400 });
     }
 
     const folder = formData.get('folder');

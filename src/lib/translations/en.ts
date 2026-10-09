@@ -71,6 +71,9 @@ const en: Record<string, string> = {
   'latestNews.title': 'Latest Updates',
   'latestNews.subtitle': 'Stay informed about our news, events, and announcements.',
   'latestNews.viewAll': 'View All News',
+  'upcomingEvents.title': 'Upcoming Events',
+  'upcomingEvents.subtitle': 'Join us at our next events and dialogues.',
+  'upcomingEvents.viewAll': 'View All Events',
 
   // ─── Careers (homepage) ───
   'careers.title': 'Join Our Team',

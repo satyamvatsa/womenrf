@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { AdminShell } from '@/components/AdminShell';
-import { loadAdminData, saveAdminData, uploadAdminImage, uploadAdminPdf } from '@/lib/adminApi';
+import { loadAdminData, saveAdminData, uploadAdminFile } from '@/lib/adminApi';
 
 interface EventDocument {
   label: string;
@@ -58,6 +58,52 @@ const emptyEvent: Omit<EventItem, 'id'> = {
 };
 
 const inputClass = 'w-full rounded-none border-2 border-gray-200 px-3 py-2 focus:ring-2 focus:ring-[#725D92] outline-none';
+
+// Mirrors MAX_IMAGE_SIZE in /api/upload.
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_IMAGE_DIMENSION = 2000;
+const JPEG_QUALITY = 0.85;
+
+/**
+ * Shrink a photo in the browser before uploading it.
+ *
+ * Event photos come straight off a camera or phone and routinely exceed the
+ * server's 5MB cap, which is what makes uploads fail. Nothing on the site
+ * displays a gallery image above ~1000px wide, so the full-resolution original
+ * buys nothing. Returns the file untouched when it is already small enough, or
+ * when the browser cannot decode it (HEIC) — the server then explains why.
+ */
+async function downscaleImage(file: File): Promise<File> {
+  // Vector and animated formats lose meaning when rasterised to a still JPEG.
+  if (!file.type.startsWith('image/') || file.type === 'image/svg+xml' || file.type === 'image/gif') {
+    return file;
+  }
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, MAX_IMAGE_DIMENSION / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size <= MAX_IMAGE_BYTES) {
+      bitmap.close();
+      return file;
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      bitmap.close();
+      return file;
+    }
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((resolve) =>
+      canvas.toBlob(resolve, 'image/jpeg', JPEG_QUALITY)
+    );
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  } catch {
+    return file;
+  }
+}
 
 export default function EventManagementPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
@@ -136,11 +182,11 @@ export default function EventManagementPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploadingImage(true);
-    const url = await uploadAdminImage(file, 'events');
-    if (url) setForm(f => ({ ...f, image: url }));
-    else alert('Image upload failed.');
+    const result = await uploadAdminFile(await downscaleImage(file), 'events');
+    if ('url' in result) setForm(f => ({ ...f, image: result.url }));
     setUploadingImage(false);
     if (imageInputRef.current) imageInputRef.current.value = '';
+    if ('error' in result) alert(`Could not upload ${file.name}\n\n${result.error}`);
   };
 
   const handleDocUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -148,15 +194,14 @@ export default function EventManagementPage() {
     if (!file) return;
     const label = docLabel.trim() || file.name.replace(/\.pdf$/i, '');
     setUploadingDoc(true);
-    const url = await uploadAdminPdf(file, 'events');
-    if (url) {
-      setForm(f => ({ ...f, documents: [...f.documents, { label, url, fileName: file.name }] }));
+    const result = await uploadAdminFile(file, 'events');
+    if ('url' in result) {
+      setForm(f => ({ ...f, documents: [...f.documents, { label, url: result.url, fileName: file.name }] }));
       setDocLabel('');
-    } else {
-      alert('Document upload failed.');
     }
     setUploadingDoc(false);
     if (docInputRef.current) docInputRef.current.value = '';
+    if ('error' in result) alert(`Could not upload ${file.name}\n\n${result.error}`);
   };
 
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,14 +209,19 @@ export default function EventManagementPage() {
     if (files.length === 0) return;
     setUploadingPhoto(true);
     const uploaded: EventPhoto[] = [];
+    const failures: string[] = [];
     for (const file of files) {
-      const url = await uploadAdminImage(file, 'events');
-      if (url) uploaded.push({ url, alt: '' });
+      const result = await uploadAdminFile(await downscaleImage(file), 'events');
+      if ('url' in result) uploaded.push({ url: result.url, alt: '' });
+      else failures.push(`• ${file.name} — ${result.error}`);
     }
     if (uploaded.length > 0) setForm(f => ({ ...f, gallery: [...f.gallery, ...uploaded] }));
-    if (uploaded.length < files.length) alert(`${files.length - uploaded.length} photo(s) failed to upload.`);
+    // Clear the spinner before the blocking alert, or it stays stuck behind it.
     setUploadingPhoto(false);
     if (photoInputRef.current) photoInputRef.current.value = '';
+    if (failures.length > 0) {
+      alert(`${failures.length} of ${files.length} photo(s) failed to upload:\n\n${failures.join('\n')}`);
+    }
   };
 
   const movePhoto = (index: number, delta: number) => {
