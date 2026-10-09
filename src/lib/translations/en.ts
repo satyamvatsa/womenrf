@@ -342,17 +342,11 @@ const en: Record<string, string> = {
   'team.saba.bio': 'Saba Ghori currently serves as the Director for the Center on Global Rights for Women at the Battered Women\u2019s Justice Project, an international legal resource center on gender-based violence, advancing systemic and community-level changes to ensure safety, justice, and accountability for survivors of violence against women. Saba is also an independent consultant and advisor with numerous women\u2019s rights organizations including Safepath Prosperity, Vital Voices, Too Young To Wed, and BLOOM Charity on strategic planning, program assessment, fundraising, and institutional partnerships. For more than two decades, Saba has held senior roles at the U.S. Department of State, including as Senior Gender Advisor across multiple bureaus such as the Secretary\u2019s Office of Global Women\u2019s Issues, the Bureau of Democracy, Human Rights, and Labor and at the U.S. Embassy in Islamabad, where she managed and developed multi-million-dollar portfolios on gender equality, justice sector reform, political empowerment, and women\u2019s entrepreneurship. As Vice President at Vital Voices Global Partnership, Saba oversaw global programs on gender-based violence, women\u2019s leadership, and crisis response. Following the Taliban takeover of Afghanistan, she played a central role in coordinating emergency support, evacuation pathways, and relocation assistance for Afghan women leaders and human rights defenders, working with governments, NGOs, and private partners to secure visas, safe passage, short-term protection, and longer-term resettlement and support. Across her career, Saba has partnered closely with grassroots organizations, multilateral institutions, and donors to design survivor-centered, systems-level solutions and strengthen women-led movements worldwide. Saba has served on the Board of numerous anti-domestic violence organizations working with immigrant communities, including the Asian Pacific Islander Domestic Violence Resource Project, Saheli, and Peaceful Families Project.',
 
   // ─── Events Page ───
-  'events.tab.upcoming': 'Upcoming Events',
-  'events.tab.today': 'Today',
-  'events.tab.week': 'Week',
-  'events.tab.past': 'Past Events',
   'events.breadcrumb.home': 'Home',
   'events.breadcrumb.events': 'Events',
   'events.search.placeholder': 'Search by Keyword',
   'events.search.button': 'Search',
-  'events.empty.today': 'No events found for today.',
-  'events.empty.upcoming': 'No upcoming events.',
-  'events.empty.past': 'No past events.',
+  'events.empty': 'No events found.',
   'events.notFound': 'Event not found',
   'events.backToEvents': 'Back to Events',
   'events.detail.publishedOn': 'Published on:',
