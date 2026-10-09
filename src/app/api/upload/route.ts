@@ -12,7 +12,7 @@ const MAX_PDF_SIZE = 20 * 1024 * 1024; // 20MB
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
 const ALLOWED_PDF_TYPES = ['application/pdf'];
 const ALLOWED_TYPES = [...ALLOWED_IMAGE_TYPES, ...ALLOWED_PDF_TYPES];
-const ALLOWED_FOLDERS = ['partners', 'team', 'about', 'programs', 'news', 'blog', 'reports'];
+const ALLOWED_FOLDERS = ['partners', 'team', 'about', 'programs', 'news', 'blog', 'reports', 'events'];
 
 function isAuthorized(request: NextRequest): boolean {
   const auth = request.headers.get('Authorization');

@@ -18,6 +18,7 @@ const sidebarItems = [
   { label: 'Blog Posts', href: '/BlogPostManagement', icon: 'book-open' },
   { label: 'Program Management', href: '/ProgramManagement', icon: 'book-open' },
   { label: 'Report Management', href: '/ReportManagement', icon: 'file-text' },
+  { label: 'Event Management', href: '/EventManagement', icon: 'calendar' },
   { label: 'Testimonials', href: '/TestimonialManagement', icon: 'message-square' },
   { label: 'Founder Management', href: '/FounderManagement', icon: 'venetian-mask' },
   { label: 'Team Management', href: '/TeamManagement', icon: 'users' },
@@ -161,6 +162,14 @@ const icons: Record<string, React.ReactNode> = {
       <rect width="20" height="5" x="2" y="3" rx="1" />
       <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" />
       <path d="M10 12h4" />
+    </svg>
+  ),
+  calendar: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 h-5 w-5">
+      <path d="M8 2v4" />
+      <path d="M16 2v4" />
+      <rect width="18" height="18" x="3" y="4" rx="2" />
+      <path d="M3 10h18" />
     </svg>
   ),
 };

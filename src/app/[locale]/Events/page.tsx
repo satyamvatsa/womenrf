@@ -9,6 +9,7 @@ type EventItem = {
   id: string;
   slug: string;
   title: string;
+  status?: 'draft' | 'published';
   date: string;
   endDate?: string;
   time: string;
@@ -20,7 +21,7 @@ type EventItem = {
   registrationLink?: string;
 };
 
-const TABS = ['upcoming', 'today', 'week'] as const;
+const TABS = ['upcoming', 'today', 'week', 'past'] as const;
 type Tab = (typeof TABS)[number];
 
 function getWeekRange(refDate: Date): { start: Date; end: Date } {
@@ -76,7 +77,12 @@ function EventCard({ ev }: { ev: EventItem }) {
 export default function EventsPage() {
   const { t } = useTranslation();
   const eventsData = useCmsData<Record<string, any>>('events');
-  const events: EventItem[] = eventsData?.events ?? [];
+  const allEvents: EventItem[] = eventsData?.events ?? [];
+  // Drafts stay out of the public site. Events saved before `status` existed are treated as published.
+  const events: EventItem[] = useMemo(
+    () => allEvents.filter((e) => e.status !== 'draft'),
+    [allEvents]
+  );
   const [activeTab, setActiveTab] = useState<Tab>('upcoming');
   const [weekOffset, setWeekOffset] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
@@ -114,6 +120,11 @@ export default function EventsPage() {
     if (activeTab === 'today') {
       return list.filter((e) => isSameDay(new Date(e.date), today));
     }
+    if (activeTab === 'past') {
+      return list
+        .filter((e) => new Date(e.endDate || e.date) < today)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
     return list
       .filter((e) => {
         const d = new Date(e.date);
@@ -141,6 +152,7 @@ export default function EventsPage() {
     upcoming: t('events.tab.upcoming'),
     today: t('events.tab.today'),
     week: t('events.tab.week'),
+    past: t('events.tab.past'),
   };
 
   return (
@@ -171,7 +183,7 @@ export default function EventsPage() {
         </div>
 
         {/* ── SEARCH / FILTER BAR ── */}
-        {activeTab === 'upcoming' && (
+        {(activeTab === 'upcoming' || activeTab === 'past') && (
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
             <input
               type="text"
@@ -195,7 +207,11 @@ export default function EventsPage() {
             {filtered.length === 0 ? (
               <div className="py-20 text-center">
                 <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900">
-                  {activeTab === 'today' ? t('events.empty.today') : t('events.empty.upcoming')}
+                  {activeTab === 'today'
+                    ? t('events.empty.today')
+                    : activeTab === 'past'
+                      ? t('events.empty.past')
+                      : t('events.empty.upcoming')}
                 </h3>
               </div>
             ) : (
