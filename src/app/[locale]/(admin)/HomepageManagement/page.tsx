@@ -6,6 +6,16 @@ import { useParams } from 'next/navigation';
 import { AdminShell } from '@/components/AdminShell';
 import { loadAdminData, saveAdminData, uploadAdminImage } from '@/lib/adminApi';
 
+const MAX_FEATURED_EVENTS = 3;
+
+type HomepageEventOption = {
+  id: string;
+  slug: string;
+  title: string;
+  date: string;
+  status?: 'draft' | 'published';
+};
+
 const COLOR_OPTIONS = [
   { value: 'bg-primary', label: 'Primary (Dark)' },
   { value: 'bg-secondary', label: 'Secondary (Purple)' },
@@ -126,6 +136,8 @@ export default function HomepageManagementPage() {
   const [vacanciesButtonColor, setVacanciesButtonColor] = useState('bg-primary');
 
   const [showEvents, setShowEvents] = useState(true);
+  const [featuredEventIds, setFeaturedEventIds] = useState<string[]>([]);
+  const [allEvents, setAllEvents] = useState<HomepageEventOption[]>([]);
   const [eventsTitle, setEventsTitle] = useState('Upcoming Events');
   const [eventsTitleBg, setEventsTitleBg] = useState('bg-secondary');
   const [eventsSubtitle, setEventsSubtitle] = useState('Join us at our next events and dialogues.');
@@ -154,6 +166,12 @@ export default function HomepageManagementPage() {
   ]);
 
   const [saveStatus, setSaveStatus] = useState<'idle'|'saving'|'saved'|'error'>('idle');
+
+  useEffect(() => {
+    loadAdminData<{ events?: HomepageEventOption[] }>('events').then(data => {
+      if (data?.events) setAllEvents(data.events);
+    });
+  }, []);
 
   useEffect(() => {
     loadAdminData<Record<string, any>>('homepage').then(data => {
@@ -195,6 +213,7 @@ export default function HomepageManagementPage() {
       if (data.vacanciesSubtitle !== undefined) setVacanciesSubtitle(data.vacanciesSubtitle);
       if (data.vacanciesButtonColor !== undefined) setVacanciesButtonColor(data.vacanciesButtonColor);
       if (data.showEvents !== undefined) setShowEvents(data.showEvents);
+      if (Array.isArray(data.featuredEventIds)) setFeaturedEventIds(data.featuredEventIds);
       if (data.eventsTitle !== undefined) setEventsTitle(data.eventsTitle);
       if (data.eventsTitleBg !== undefined) setEventsTitleBg(data.eventsTitleBg);
       if (data.eventsSubtitle !== undefined) setEventsSubtitle(data.eventsSubtitle);
@@ -251,7 +270,7 @@ export default function HomepageManagementPage() {
       showPrograms, programsTitle, programsTitleBg, programsSubtitle, programsButtonColor,
       showTestimonials, testimonialTitle, testimonialTitleBg, testimonialSubtitle,
       showVacancies, vacanciesTitle, vacanciesTitleBg, vacanciesSubtitle, vacanciesButtonColor,
-      showEvents, eventsTitle, eventsTitleBg, eventsSubtitle, eventsButtonColor,
+      showEvents, featuredEventIds, eventsTitle, eventsTitleBg, eventsSubtitle, eventsButtonColor,
       showNews, newsTitle, newsTitleBg, newsSubtitle, newsButtonColor,
       showPartners, partnersTitle, partnersTitleBg, partnersSubtitle, partnersList,
     };
@@ -584,10 +603,82 @@ export default function HomepageManagementPage() {
         <div className={sectionClass}>
           <div className={cardHeaderClass}>
             <h3 className={cardTitleClass}>Upcoming Events Section</h3>
-            <p className={cardDescClass}>Shows the next 3 published events. The section hides itself automatically when no upcoming events exist.</p>
+            <p className={cardDescClass}>Choose which events appear on the homepage, or let it show the next 3 upcoming ones. The section hides itself automatically when there is nothing to show.</p>
           </div>
           <div className={spaceYClass}>
             <ToggleRow id="show_events_section" label="Show Events Section" checked={showEvents} onChange={setShowEvents} />
+
+            <div className="rounded-md border p-4">
+              <label className={labelClass}>Events shown on the homepage</label>
+              <p className={cardDescClass + ' mt-1'}>
+                Pick up to {MAX_FEATURED_EVENTS} events to feature, upcoming or past, in any order.
+                Leave every box unchecked to show the next {MAX_FEATURED_EVENTS} upcoming events automatically.
+              </p>
+
+              {allEvents.length === 0 ? (
+                <p className="mt-3 text-sm text-muted-foreground">
+                  No events yet. Create them in Event Management first.
+                </p>
+              ) : (
+                <div className="mt-3 max-h-64 space-y-1 overflow-y-auto">
+                  {allEvents.map((ev) => {
+                    const checked = featuredEventIds.includes(ev.id);
+                    const atLimit = featuredEventIds.length >= MAX_FEATURED_EVENTS;
+                    const isDraft = ev.status === 'draft';
+                    return (
+                      <label
+                        key={ev.id}
+                        className={`flex items-start gap-3 rounded-md border p-2 ${
+                          checked ? 'border-secondary bg-gray-50' : 'border-transparent'
+                        } ${!checked && (atLimit || isDraft) ? 'opacity-50' : 'cursor-pointer hover:bg-gray-50'}`}
+                      >
+                        <input
+                          type="checkbox"
+                          className="mt-1"
+                          checked={checked}
+                          // A draft has no public page, so it must not be featured.
+                          disabled={isDraft || (!checked && atLimit)}
+                          onChange={() =>
+                            setFeaturedEventIds((ids) =>
+                              ids.includes(ev.id)
+                                ? ids.filter((id) => id !== ev.id)
+                                : [...ids, ev.id].slice(0, MAX_FEATURED_EVENTS)
+                            )
+                          }
+                        />
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-sm font-medium">{ev.title}</span>
+                          <span className="block text-xs text-muted-foreground">
+                            {ev.date}
+                            {isDraft && ' \u00b7 draft — publish it first'}
+                          </span>
+                        </span>
+                        {checked && (
+                          <span className="text-xs font-semibold text-secondary">
+                            #{featuredEventIds.indexOf(ev.id) + 1}
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+
+              <p className="mt-2 text-xs text-muted-foreground">
+                {featuredEventIds.length === 0
+                  ? `Automatic — showing the next ${MAX_FEATURED_EVENTS} upcoming events.`
+                  : `${featuredEventIds.length} of ${MAX_FEATURED_EVENTS} selected.`}
+                {featuredEventIds.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setFeaturedEventIds([])}
+                    className="ml-2 underline hover:no-underline"
+                  >
+                    Clear selection
+                  </button>
+                )}
+              </p>
+            </div>
             <div className={gridClass}>
               <div>
                 <label className={labelClass}>Title</label>

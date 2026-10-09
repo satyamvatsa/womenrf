@@ -51,12 +51,25 @@ export default function UpcomingEvents() {
   const titleBgClass = BG_MAP[titleBg] || 'bg-wrf-purple';
   const btnBgClass = BG_MAP[buttonColor] || 'bg-wrf-purple';
 
-  const upcoming = useMemo(() => {
+  const featuredIds: string[] = Array.isArray(adminData?.featuredEventIds) ? adminData!.featuredEventIds : [];
+
+  const events = useMemo(() => {
     const all: EventItem[] = eventsData?.events ?? [];
+    const published = all.filter((e) => e.status !== 'draft');
+
+    // When the admin has hand-picked events in Homepage Settings, show exactly
+    // those, in the order they picked them, whether they are upcoming or past.
+    if (featuredIds.length > 0) {
+      return featuredIds
+        .map((id) => published.find((e) => e.id === id))
+        .filter((e): e is EventItem => Boolean(e))
+        .slice(0, MAX_EVENTS);
+    }
+
+    // Otherwise fall back to announcing whatever is coming up next.
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return all
-      .filter((e) => e.status !== 'draft')
+    return published
       // An event runs until its end date, so a multi-day event stays "upcoming" while in progress.
       .filter((e) => {
         const until = new Date(e.endDate || e.date);
@@ -64,10 +77,10 @@ export default function UpcomingEvents() {
       })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(0, MAX_EVENTS);
-  }, [eventsData]);
+  }, [eventsData, featuredIds.join(',')]);
 
-  // The whole section stays out of the page unless there is something to announce.
-  if (!showEvents || upcoming.length === 0) return null;
+  // The whole section stays out of the page unless there is something to show.
+  if (!showEvents || events.length === 0) return null;
 
   return (
     <section id="upcoming-events" className="bg-gray-50 py-16">
@@ -80,7 +93,7 @@ export default function UpcomingEvents() {
         </div>
 
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {upcoming.map((ev) => {
+          {events.map((ev) => {
             const d = new Date(ev.date);
             const day = d.getDate();
             const month = d.toLocaleString('en', { month: 'short' }).toUpperCase();
