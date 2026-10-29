@@ -45,8 +45,6 @@ const DEFAULT_IMPACT_STATS = [
   { id: '1', value: '12,000+', label: 'Women Empowered', color: 'wrf-black', textColor: 'wrf-coral' },
   { id: '2', value: '45', label: 'Countries Reached', color: 'wrf-purple', textColor: 'wrf-coral' },
   { id: '3', value: '150+', label: 'Partner Organizations', color: 'wrf-coral', textColor: 'white' },
-  { id: '4', value: '$2.1M', label: 'Funds Raised', color: 'wrf-footer-mauve', textColor: 'wrf-coral' },
-];
 
 const GET_INVOLVED_KEYS = [
   { id: '1', labelKey: 'about.getInvolved.volunteer', href: '/Volunteer', color: 'wrf-black' },
