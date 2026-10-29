@@ -372,7 +372,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold text-white">{t('about.impact.title')}</h2>
           </div>
           <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {impactData.map((stat: { id: string; value: string; label: string; color: string; textColor?: string }) => (
+            {impactData.filter((stat: { value?: string; label?: string }) => stat.value || stat.label).map((stat: { id: string; value: string; label: string; color: string; textColor?: string }) => (
               <ScrollReveal key={stat.id} variant="slideUpLg">
                 <div
                   className="p-8 text-center text-white shadow-lg"
