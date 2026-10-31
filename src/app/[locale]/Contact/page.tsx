@@ -139,7 +139,7 @@ export default function ContactPage() {
                 <div className="bg-wrf-coral p-2">
                   <img
                     src={QUOTE_IMAGE}
-                    alt="Sanga Siddiqi"
+                    alt="Hanifa Girowal"
                     className="h-64 w-full object-cover"
                   />
                 </div>
