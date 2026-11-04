@@ -313,7 +313,7 @@ const en: Record<string, string> = {
   'founders.hanifa.exp5': 'Public International Law and Transnational Justice.',
 
   // ─── News Page ───
-  'news.hero.title': "WRF Demands Real Peace Beyond Words for Afghan Women and Girl's at WPS High-Level Event",
+  'news.hero.title': "WRF Demands Real Peace Beyond Words for Afghan Women and Girls at WPS High-Level Event",
   'news.hero.description': "On behalf of Women's Rights First, our Vice-President Hanifa Girowal spoke as a panelist at a high-level Women, Peace and Security event co-hosted by Mina's List, WPHF, the Georgetown Institute for Women, Peace and Security (GIWPS), the Permanent Missions of Greece and Panama, and UN Women. The discussion focused on centering Afghan women's voices in global peace and accountability efforts.",
   'news.search.placeholder': 'Search within these posts...',
   'news.search.button': 'Search',
