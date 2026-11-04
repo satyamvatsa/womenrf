@@ -473,7 +473,7 @@ function DigitalTransformationContent({ adminProgram }: { adminProgram?: any }) 
                 {adminProgram?.title || t('program.digital.title')}
               </h1>
               <p className="text-lg leading-relaxed text-white/90">
-                {adminProgram?.description || t('program.digital.introDesc')}
+                {adminProgram?.description || t('programs.digital.description')}
               </p>
             </div>
           </div>
