@@ -183,7 +183,7 @@ const en: Record<string, string> = {
   'contact.hero.title': 'Get in touch with us',
   'contact.hero.description': 'Connect with the Afghan women legal experts, human rights defenders, and visionary leaders driving our mission with courage, expertise, and unwavering commitment to justice.',
   'contact.quote': "Afghan women are not voiceless. They are deliberately silenced. At Women's Rights First, our work is to make the world listen and to ensure that silence is never mistaken for surrender.",
-  'contact.quote.author': 'Sanga Siddiqi',
+  'contact.quote.author': 'Hanifa Girowal',
   'contact.quote.role': 'Co-Founder and Vice President',
   'contact.location.title': 'Our Location',
   'contact.location.address': '915 Elmsmere Rd\nOttawa, ON K1J 8H8',
